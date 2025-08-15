@@ -1,0 +1,20 @@
+on:
+  push:
+    branches: master
+
+name: Render and Publish
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Publish to Quarto Pub
+        uses: quarto-dev/quarto-actions/publish@v2
+        with:
+          token: ${{ secrets.QUARTO_PUB_AUTH_TOKEN }}
