@@ -18,32 +18,34 @@ jobs:
       - name: Fazer checkout do código do repositório
         uses: actions/checkout@v4
 
+      # Instala o R na máquina virtual para que o Quarto possa executar scripts R.
+      - name: Instalar o R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          # Você pode especificar uma versão do R ('4.3', '4.2.2') ou usar 'latest'.
+          r-version: 'latest'
+      
+      # Instalar pacotes do R necessários para o Quarto.
+      - name: Instalar dependências do R
+        run: |
+          install.packages(c("ggplot2", "dplyr", "plotly", "patchwork", "fitdistrplus"))
+        shell: Rscript {0}
+
       # --- PASSO 2: CONFIGURAÇÃO E PUBLICAÇÃO DO QUARTO ---
       - name: Configurar o ambiente do Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
+      # Este passo agora funcionará, pois o R está disponível.
       - name: Publicar o projeto no Quarto Pub
         uses: quarto-dev/quarto-actions/publish@v2
         with:
-          # O nome correto para o token de autenticação do Quarto Pub.
           QUARTO_PUB_AUTH_TOKEN: ${{ secrets.QUARTO_PUB_AUTH_TOKEN }}
 
       # --- PASSO 3: UPLOAD DE TODOS OS ARQUIVOS PARA O GOOGLE DRIVE ---
-      # Este passo se conecta ao Google Drive e envia o conteúdo completo do repositório.
       - name: Fazer o upload de todos os arquivos do repositório para o Google Drive
         uses: Jumbo810/Upload_Github_Artifacts_TO_GDrive@v2.2.2
         with:
-          # O caminho para o conteúdo que você deseja enviar.
-          # './' representa o diretório raiz do repositório, ou seja, todos os arquivos.
           target: './'
-
-          # O ID da pasta principal no Google Drive onde a subpasta será criada.
           parent_folder_id: ${{ secrets.GDRIVE_FOLDER_ID }}
-
-          # As credenciais da sua conta de serviço do Google Cloud (em Base64).
           credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
-
-          # (Opcional, mas MUITO recomendado) Cria uma subpasta dentro da 'parent_folder_id'.
-          # Usar o SHA do commit garante que cada push crie uma pasta única, mantendo um histórico organizado.
-          # Por exemplo, uma pasta chamada 'commit-a1b2c3d4e5f6' será criada.
           child_folder: 'commit-${{ github.sha }}'
