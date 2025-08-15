@@ -1,81 +1,49 @@
-# Define o nome do workflow. Este nome será exibido na aba "Actions" do seu repositório GitHub.
-# É um nome descritivo para você identificar facilmente o que esta automação faz.
+# Define o nome do workflow.
 name: Deploy Quarto e Upload para Google Drive
 
-# Define o "gatilho" (trigger) que iniciará a execução do workflow.
+# Aciona o workflow em cada push para a branch 'main'.
 on:
-  # O workflow será acionado sempre que um 'push' (envio de código) for feito no repositório.
   push:
-    # Especifica que a ação só deve ocorrer em pushes para a branch 'main'.
-    # Se você usa outra branch principal (como 'master'), altere aqui.
     branches: main
 
-# Agrupa todos os "trabalhos" (jobs) que este workflow executará.
-# Um workflow pode ter um ou mais jobs que rodam em paralelo ou em sequência.
+# Agrupa os trabalhos a serem executados.
 jobs:
-  # Define um job chamado 'build-and-deploy'. Você pode dar o nome que quiser.
-  # Cada job é executado em uma instância separada de máquina virtual.
   build-and-deploy:
-    # Especifica o tipo de máquina virtual (chamada de 'runner') onde o job será executado.
-    # 'ubuntu-latest' usa a versão estável mais recente do Ubuntu e é uma escolha comum e versátil.
+    # O job será executado em uma máquina virtual Ubuntu.
     runs-on: ubuntu-latest
 
-    # Define a sequência de "passos" (steps) que serão executados em ordem dentro deste job.
+    # Define a sequência de passos do job.
     steps:
       # --- PASSO 1: PREPARAÇÃO DO AMBIENTE ---
-      # Este passo baixa uma cópia do código do seu repositório para a máquina virtual.
-      # É essencial para que os próximos passos possam acessar seus arquivos.
       - name: Fazer checkout do código do repositório
-        # 'uses' indica que estamos usando uma ação pré-construída do GitHub Marketplace.
-        # 'actions/checkout@v4' é a ação oficial e mais segura para clonar o repositório.
         uses: actions/checkout@v4
 
       # --- PASSO 2: CONFIGURAÇÃO E PUBLICAÇÃO DO QUARTO ---
-      # Este passo instala o Quarto na máquina virtual para que possamos usá-lo.
       - name: Configurar o ambiente do Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      # Este passo executa o comando de publicação do seu projeto para o Quarto Pub.
       - name: Publicar o projeto no Quarto Pub
         uses: quarto-dev/quarto-actions/publish@v2
-        # 'with' é usado para passar parâmetros (inputs) para a ação que está sendo usada.
         with:
-          # O token de autenticação é necessário para que a action possa publicar em seu nome.
-          # Ele é passado de forma segura usando os "Secrets" do repositório.
-          # `${{ secrets.NOME_DO_SECRET }}` é a sintaxe para acessar um secret.
-          token: ${{ secrets.QUARTO_PUB_AUTH_TOKEN }}
+          # O nome correto para o token de autenticação do Quarto Pub.
+          QUARTO_PUB_AUTH_TOKEN: ${{ secrets.QUARTO_PUB_AUTH_TOKEN }}
 
-      # --- PASSO 3: PREPARAÇÃO DO ARQUIVO PARA UPLOAD ---
-      # O Quarto gera todo o site na pasta '_site'. Este passo cria um único arquivo .zip
-      # a partir dessa pasta, facilitando o upload.
-      - name: Compactar a pasta de saída do Quarto (_site)
-        # 'run' permite executar comandos de linha de comando (shell commands) diretamente na máquina virtual.
-        # O comando 'zip -r [nome_do_arquivo] [pasta_de_origem]' cria um arquivo zip recursivamente.
-        run: zip -r site-output.zip _site
-
-      # --- PASSO 4: UPLOAD PARA O GOOGLE DRIVE ---
-      # Este é o passo que se conecta ao Google Drive e envia o arquivo compactado.
-      - name: Fazer o upload do arquivo para o Google Drive
+      # --- PASSO 3: UPLOAD DE TODOS OS ARQUIVOS PARA O GOOGLE DRIVE ---
+      # Este passo se conecta ao Google Drive e envia o conteúdo completo do repositório.
+      - name: Fazer o upload de todos os arquivos do repositório para o Google Drive
         uses: Jumbo810/Upload_Github_Artifacts_TO_GDrive@v2.2.2
         with:
-          # O caminho para o arquivo ou pasta que você deseja enviar.
-          # Neste caso, é o arquivo .zip que criamos no passo anterior.
-          target: 'site-output.zip'
+          # O caminho para o conteúdo que você deseja enviar.
+          # './' representa o diretório raiz do repositório, ou seja, todos os arquivos.
+          target: './'
 
-          # O ID da pasta de destino no Google Drive para onde o arquivo será enviado.
-          # Este ID deve ser armazenado em um secret chamado 'GDRIVE_FOLDER_ID'.
+          # O ID da pasta principal no Google Drive onde a subpasta será criada.
           parent_folder_id: ${{ secrets.GDRIVE_FOLDER_ID }}
 
-          # As credenciais da sua conta de serviço do Google Cloud.
-          # Este é o conteúdo do arquivo JSON que você codificou em Base64.
-          # Deve ser armazenado em um secret chamado 'GDRIVE_CREDENTIALS'.
+          # As credenciais da sua conta de serviço do Google Cloud (em Base64).
           credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
 
-          # (Opcional, mas recomendado) O nome que o arquivo terá ao ser salvo no Google Drive.
-          # Usar '${{ github.sha }}' adiciona o identificador único do commit ao nome do arquivo.
-          # Isso garante que cada upload tenha um nome diferente, evitando conflitos.
-          name: 'deploy-site-${{ github.sha }}.zip'
-
-          # (Opcional) Se definido como 'true', a action irá sobrescrever qualquer arquivo
-          # existente com o mesmo nome na pasta de destino. Útil se você não usar nomes únicos.
-          override: 'true'
+          # (Opcional, mas MUITO recomendado) Cria uma subpasta dentro da 'parent_folder_id'.
+          # Usar o SHA do commit garante que cada push crie uma pasta única, mantendo um histórico organizado.
+          # Por exemplo, uma pasta chamada 'commit-a1b2c3d4e5f6' será criada.
+          child_folder: 'commit-${{ github.sha }}'
