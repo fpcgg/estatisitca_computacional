@@ -14,28 +14,27 @@ jobs:
       - name: Fazer checkout do código do repositório
         uses: actions/checkout@v4
 
-      # --- OTIMIZAÇÃO 1: USAR PACOTES BINÁRIOS ---
-      # Configura o R para usar o RStudio Package Manager, que acelera a instalação.
+      # Instala o R e as dependências com cache e binários
       - name: Instalar o R
         uses: r-lib/actions/setup-r@v2
         with:
           r-version: 'latest'
-          use-public-rspm: true # Esta linha ativa o uso de binários!
+          use-public-rspm: true
 
-      # --- OTIMIZAÇÃO 2: INSTALAR DEPENDÊNCIAS COM CACHE ---
-      # Este passo instala os pacotes necessários e armazena o resultado em cache
-      # para as próximas execuções.
       - name: Instalar dependências do R (com cache)
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           packages: |
+            any::knitr
+            any::rmarkdown
+            any::downlit
+            any::xml2
             any::ggplot2
             any::dplyr
-            any::fitdistrplus
-            any::patchwork
-            any::plotly
-            any::htmlwidgets 
+            any::htmlwidgets
+            # Adicione outros pacotes aqui
 
+      # Passos do Quarto
       - name: Configurar o ambiente do Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
@@ -44,10 +43,26 @@ jobs:
         with:
           QUARTO_PUB_AUTH_TOKEN: ${{ secrets.QUARTO_PUB_AUTH_TOKEN }}
 
-      - name: Fazer o upload de todos os arquivos do repositório para o Google Drive
+      # --- PASSO NOVO/MODIFICADO: COMPACTAÇÃO ---
+      # Cria um único arquivo .zip com todo o conteúdo do repositório.
+      # O '.' no final do comando significa "o diretório atual".
+      - name: Compactar todo o repositório em um arquivo
+        run: zip -r repository-archive.zip .
+
+      # --- PASSO DE UPLOAD CORRIGIDO ---
+      # Faz o upload do arquivo .zip criado no passo anterior.
+      - name: Fazer o upload do arquivo compactado para o Google Drive
         uses: Jumbo810/Upload_Github_Artifacts_TO_GDrive@v2.2.2
         with:
-          target: './'
+          # Alvo agora é o arquivo .zip específico.
+          target: 'repository-archive.zip'
+
+          # ID da pasta principal no Google Drive.
           parent_folder_id: ${{ secrets.GDRIVE_FOLDER_ID }}
+
+          # Credenciais da conta de serviço.
           credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
-          child_folder: 'commit-${{ github.sha }}'
+
+          # Renomeia o arquivo no Drive para ser único para cada commit.
+          # É mais limpo que criar uma pasta para um único arquivo.
+          name: 'commit-${{ github.sha }}.zip'
