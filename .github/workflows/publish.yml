@@ -24,6 +24,11 @@ jobs:
       - name: Instalar dependências do R (com cache)
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
+          # ADICIONADO para forçar a recriação do cache de pacotes.
+          # Se o erro persistir, mude o número para 2, 3, etc.
+          cache-version: 1
+          
+          # GARANTA QUE A LISTA DE PACOTES ESTEJA COMPLETA
           packages: |
             any::knitr
             any::rmarkdown
@@ -31,7 +36,7 @@ jobs:
             any::xml2
             any::ggplot2
             any::dplyr
-            any::htmlwidgets
+            any::htmlwidgets  
 
       # Passos do Quarto
       - name: Configurar o ambiente do Quarto
@@ -42,26 +47,15 @@ jobs:
         with:
           QUARTO_PUB_AUTH_TOKEN: ${{ secrets.QUARTO_PUB_AUTH_TOKEN }}
 
-      # --- PASSO NOVO/MODIFICADO: COMPACTAÇÃO ---
-      # Cria um único arquivo .zip com todo o conteúdo do repositório.
-      # O '.' no final do comando significa "o diretório atual".
+      # Compacta e faz upload do repositório para o Drive
       - name: Compactar todo o repositório em um arquivo
         run: zip -r repository-archive.zip .
 
-      # --- PASSO DE UPLOAD CORRIGIDO ---
-      # Faz o upload do arquivo .zip criado no passo anterior.
       - name: Fazer o upload do arquivo compactado para o Google Drive
         uses: Jumbo810/Upload_Github_Artifacts_TO_GDrive@v2.2.2
         with:
-          # Alvo agora é o arquivo .zip específico.
           target: 'repository-archive.zip'
-
-          # ID da pasta principal no Google Drive.
           parent_folder_id: ${{ secrets.GDRIVE_FOLDER_ID }}
-
-          # Credenciais da conta de serviço.
           credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
-
-          # Renomeia o arquivo no Drive para ser único para cada commit.
-          # É mais limpo que criar uma pasta para um único arquivo.
           name: 'commit-${{ github.sha }}.zip'
+
