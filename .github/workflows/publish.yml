@@ -32,7 +32,6 @@ jobs:
             any::ggplot2
             any::dplyr
             any::htmlwidgets
-            # Adicione outros pacotes aqui
 
       # Passos do Quarto
       - name: Configurar o ambiente do Quarto
