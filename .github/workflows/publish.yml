@@ -1,31 +1,47 @@
 name: Deploy Quarto e Upload para Google Drive
 
+# Dispara o workflow apenas quando houver push na branch main
+# E somente se os arquivos modificados forem relevantes para o site
 on:
   push:
-    branches: main
+    branches:
+      - main
+    paths:
+      - '**.qmd'       # Arquivos Quarto
+      - '**.Rmd'       # Arquivos RMarkdown
+      - '**.R'         # Scripts R
+      - '**.css'       # Estilos
+      - '**.js'        # Scripts JS
+      - '**.png'       # Imagens
+      - '**.jpg'
+      - '**.jpeg'
+      - '**.gif'
+      - '**.svg'
+      - '_quarto.yml'  # Arquivo de configuração do Quarto
+      - '**.yml'       # Arquivos YAML de configuração
+      - '!README.md'   # Ignora mudanças só no README
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Baixar o código do repositório
       - name: Fazer checkout do código do repositório
         uses: actions/checkout@v4
 
+      # 2️⃣ Instalar o R na versão mais recente
       - name: Instalar o R
         uses: r-lib/actions/setup-r@v2
         with:
           r-version: 'latest'
           use-public-rspm: true
 
-      - name: Verificar e instalar htmlwidgets
-        run: |
-          R -e "if (!require(htmlwidgets)) install.packages('htmlwidgets'); library(htmlwidgets); cat('htmlwidgets OK\n')"
-
+      # 3️⃣ Instalar pacotes necessários do R (incluindo plotly e dependências HTML)
       - name: Instalar dependências do R
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          cache-version: 1
+          cache-version: 2
           packages: |
             any::knitr
             any::rmarkdown
@@ -34,24 +50,37 @@ jobs:
             any::ggplot2
             any::dplyr
             any::htmlwidgets
+            any::htmltools
+            any::plotly
 
+      # 4️⃣ (Opcional) Mostrar pacotes instalados para debug
+      - name: Verificar pacotes instalados
+        run: |
+          R -e "installed.packages()[, c('Package', 'Version')]"
+
+      # 5️⃣ Configurar o Quarto
       - name: Configurar o ambiente do Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
+      # 6️⃣ Atualizar o Quarto
       - name: Atualizar o Quarto
         run: quarto update
 
+      # 7️⃣ Renderizar o site
       - name: Renderizar o projeto Quarto
         run: quarto render --to html
 
+      # 8️⃣ Publicar no Quarto Pub
       - name: Publicar no Quarto Pub
         uses: quarto-dev/quarto-actions/publish@v2
         with:
           QUARTO_PUB_AUTH_TOKEN: ${{ secrets.QUARTO_PUB_AUTH_TOKEN }}
 
+      # 9️⃣ Compactar todo o repositório para backup no Google Drive
       - name: Compactar todo o repositório
         run: zip -r repository-archive.zip .
 
+      # 🔟 Enviar para Google Drive
       - name: Upload para Google Drive
         uses: Jumbo810/Upload_Github_Artifacts_TO_GDrive@v2.2.2
         with:
