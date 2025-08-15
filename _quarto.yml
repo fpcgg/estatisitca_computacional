@@ -1,0 +1,32 @@
+project: 
+  type: book
+
+execute:
+  cache: true
+  warning: false
+
+lang: pt
+
+book: 
+  title: "Estatística Computacional"
+  favicon: "favicon.jpg"
+  author: "Guilherme"
+  search: false
+
+  sidebar:
+    title: "Aulas"
+  
+  chapters: 
+    - index.qmd
+    - capitulo1.qmd
+    - capitulo2.qmd
+    - capitulo3.qmd
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-title: "Conteúdo"
+    toc-location: left
+    toc-depth: 4
+    css: style.css

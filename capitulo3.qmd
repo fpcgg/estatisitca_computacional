@@ -1,0 +1,1755 @@
+```{r message=FALSE, warning=FALSE, error=FALSE, include=FALSE}
+if(!require(fitdistrplus)) install.packages("fitdistrplus", dependencies=TRUE)
+if(!require(ggplot2)) install.packages("ggplot2", dependencies=TRUE)
+if(!require(patchwork)) install.packages("patchwork", dependencies=TRUE)
+if(!require(plotly)) install.packages("plotly", dependencies=TRUE)
+```
+
+# Estimadores Pontuais e sua Propriedades
+
+A inferência estatística busca tirar conclusões sobre parâmetros populacionais a partir de uma amostra observada. A estimação pontual é uma das abordagens fundamentais da inferência, focando em fornecer um único valor (a “melhor aposta”) para o parâmetro desconhecido da população.
+
+Imagine uma população real, como:
+
+ - todos os eleitores de um país,
+ - todos os carros fabricados por uma montadora,
+ - todos os pacientes acometidos por determinada doença.
+
+Geralmente, temos interesse em parâmetros que descrevem essa população como:
+
+ - a média $\mu$ de idade dos eleitores,
+ - a proporção $p$ de carros com defeito,
+ - a taxa $r$ de recuperação dos pacientes.
+
+Contudo, não temos acesso à população inteira. Em vez disso, trabalhamos com uma **amostra aleatória** e, a partir dela, estimamos os parâmetros desejados. Para além da teoria, a utilização de ferramentas computacionais como o R permite **explorar os estimadores de maneira empírica**. Com simulações, poderemos comparar **propriedades** dos estimadores como o **viés** e **consistência**, e experimentar diferentes métodos em cenários controlados, o que fortalece a compreensão dos conceitos e estimula a autonomia na análise de dados.
+
+## Notação
+
+Vamos definir a notação que utilizaremos ao longo da disciplina. Dessa forma, seja $X$ uma variável aleatória que descreve alguma característica de interesse da população, com distribuição de probabilidade $F$. Denotamos:
+
+ - $\mu$: média populacional
+ - $\sigma^2$: variância populacional
+ - $p$: proporção populacional
+
+No caso de uma amostra aleatória de tamanho $n$, que é um vetor de variáveis aleatórias $X_1, X_2, \ldots, X_n$, independentes e identicamente distribuídas (i.i.d.) segundo a distribuição $F$, podemos denotar
+
+$$
+(x_1, x_2, \ldots, x_n)
+$$
+
+como a realização da amostra, ou seja, os valores observados de $X_1, X_2, \ldots, X_n$. Um estimador de um parâmetro $\theta$ é uma **função dos dados da amostra,** denotada por $\hat{\theta} = g(X_1, X_2, \ldots, X_n)$, ou seja, é uma **variável aleatória** que tenta aproximar o valor do parâmetro $\theta$.
+
+Exemplos:
+
+ - Estimador da média: $\hat{\mu} = \frac{1}{n} \sum_{i=1}^{n} X_i$
+ - Estimador da variância: $\hat{\sigma}^2 = \frac{1}{n-1} \sum_{i=1}^{n} (X_i - \hat{\mu})^2$
+
+A **estimativa** é o valor numério obtido ao aplicar o estimador a uma realização da amostra:
+
+$$
+\hat{\theta} = g(x_1, x_2, \ldots, x_n)
+$$
+
+Resumindo:
+
+ - **Estimador**: é uma função dos dados da amostra, uma variável aleatória.
+ - **Estimativa**: número fixo obtido com dados reais.
+
+## Estimadores Pontuais
+
+Os **estimadores pontuais** fornecem, a partir de uma **amostra**, um único valor que represente a nossa melhor **estimativa** para um **parâmetro**. Para isso, utilizamos **estimadores**, que nada mais são do que funções dos dados amostrais. Basicamente, na **inferência estatística**, aprendemos três métodos de estimação pontual:
+
+ - Método dos Momentos
+ - Método da Máxima Verossimilhança
+ - Método dos Mínimos Quadrados
+
+Nas próximas seções, veremos os detalhes computacionais dos dois primeiros métodos. O método dos mínimos quadrados será visto na disciplina de **modelos lineares**.
+
+Sendo assim, no `R`, podemos obter os estimadores de momentos e de máxima verossimilhança para diferentes distribuições de probabilidade a partir da função `fitdistr()` do pacote `fitdistrplus`. Alguns dos seus parâmetros são:
+
+ - `data`: vetor de dados amostrais
+ - `distr`: distribuição de probabilidade 
+ - `method`: `mme` para o método dos momentos ou `mle` para o método da máxima verossimilhança
+
+ Para mais detalhes, execute `?fitdistr` no console do `R`.
+
+### Método dos Momentos
+
+O **método dos momentos** é uma técnica clássica de estimação de **parâmetros populacionais** com base nas **amostras**. Ele foi proposto por **Karl Pearson** no final do século XIX e é uma das formas mais simples de construir **estimadores**. A ideia central do método dos momentos é **igualar os momentos amostrais com os momentos populacionais teóricos** e, a partir dessa equação, obter **estimativas** para os **parâmetros da distribuição**.
+
+O r-ésimo momento populacional é definido por:
+
+$$
+\mu_r = E[X^r]
+$$
+
+e o r-ésimo momento amostral é definido por:
+
+$$
+m_r = \frac{1}{n} \sum_{i=1}^{n} X_i^r
+$$
+
+Suponha que desejamos estimar k parâmetros $\theta_1, \theta_2, \ldots, \theta_k$. O procedimento do método dos momentos é o seguinte:
+
+ 1. Calcular os k primeiros momentos amostrais $m_1, m_2, \ldots, m_k$.
+ 2. Obter os k primeiros momentos populacionais teóricos $\mu_1, \mu_2, \ldots, \mu_k$.
+ 3. Igualar os momentos amostrais aos momentos populacionais teóricos:
+
+$$
+    m_r = \mu_r, \quad para \quad r = 1, 2, \ldots, k
+$$
+
+ 4. Resolver o sistema de equações para obter os estimadores dos parâmetros $\hat{\theta}_1, \hat{\theta}_2, \ldots, \hat{\theta}_k$.
+
+ Vamos ver um exemplo utilizando a distribuição Gama. Seja $X \sim \text{Gamma}(\alpha, \beta)$, com $\alpha > 0$ (parâmetro de forma) e $\beta > 0$ (parâmetro de taxa). Tem-se, portanto, dois parâmetros a serem estimados: $\alpha$ e $\beta$. Sabemos que $E(X) = \frac{\alpha}{\beta}$ e $Var(X) = \frac{\alpha}{\beta^2}$. Considere que uma amostra de tamanho n $(X_1, X_2, ..., X_n)$ foi obtida dessa variável. De acordo com o métdodo dos momentos, temos que resolver o seguinte sistema:
+
+$$
+\begin{cases} 
+    \mu_1 = m_1 \\ 
+    \mu_2 = m_2 
+\end{cases}
+$$
+
+No caso de distribuições como a Gama, podemos recorrer ao segundo momento centrado na média para evitar complexidades algébricas. Isto é,
+
+$$
+\begin{align*}
+    \mu_1 = E[X] = \frac{\alpha}{\beta} \\
+    \mu_2 = E[X - \mu_1]^2 = Var(X) &= \frac{\alpha}{\beta^2} \\
+    m_1 = \bar{x} = \sum_{i=1}^{n} \frac{X_i}{n} \\
+    m_2 = \sum_{i=1}^{n} \frac{(X_i - \bar{x})^2}{n}
+\end{align*}
+$$
+
+Tem-se, por fim, o seguinte sistema:
+
+$$
+\begin{cases}
+    \frac{\hat{\alpha}}{\hat{\beta}} = \bar{x} \\
+    \frac{\hat{\alpha}}{\hat{\beta}^2} = \sum_{i=1}^{n} \frac{(X_i - \bar{x})^2}{n}
+\end{cases}
+$$
+
+Ao resolver esse sistema, obtemos a seguinte solução:
+
+$$
+\begin{align*}
+    \hat{\alpha} = \frac{\bar{x}^2}{\sum_{i=1}^{n} \frac{(x_i - \bar{x})^2}{n}} \\ \\
+    \hat{\beta} = \frac{\bar{x}}{\sum_{i=1}^{n} \frac{(X_i - \bar{x})^2}{n}}
+\end{align*}
+$$
+
+Considere a situação de uma clínica que quer estimar o tempo de atendimento por paciente, desde o momento em que a pessoa chega até a saída, para planejar a alocação de pessoal. Estudos anteriores sugerem que o tempo de atendimento (em horas) é assimétrico à direita — muitos atendimentos são rápidos, mas alguns demoram mais (por exemplo, em casos de crianças, idosos, pessoas com medo de agulha etc). Por isso, consideramos adequado modelar o tempo de atendimento com uma distribuição Gama. Foram coletados 100 valores de tempos de atendimento, em horas. Os dados estão apresentados abaixo:
+
+```{r}
+Tempos = c(
+  1.98, 0.60, 1.28, 1.57, 1.71, 1.34, 1.69, 1.14, 1.64, 0.43,
+  1.11, 0.92, 2.40, 1.14, 1.32, 1.54, 2.36, 2.56, 3.76, 3.05,
+  1.36, 1.88, 2.29, 0.33, 0.92, 1.17, 0.79, 1.49, 2.49, 0.73,
+  1.78, 1.30, 1.01, 0.74, 0.88, 0.92, 0.85, 1.01, 1.16, 0.39,
+  1.00, 1.90, 0.57, 2.31, 1.62, 1.97, 0.39, 1.67, 0.79, 1.98,
+  1.72, 0.47, 1.87, 1.33, 0.90, 3.72, 3.46, 1.91, 2.85, 1.80,
+  1.85, 0.55, 0.90, 1.51, 1.57, 2.37, 1.79, 0.48, 0.87, 1.47,
+  1.85, 1.24, 0.32, 2.77, 1.69, 0.59, 0.84, 2.36, 2.03, 1.26,
+  0.40, 0.63, 0.59, 1.50, 0.52, 0.20, 0.25, 3.09, 3.72, 3.16,
+  1.93, 0.85, 1.87, 1.66, 1.31, 1.63, 1.94, 0.20, 2.72, 3.57
+)
+```
+
+Vamos calcular as estimativas de α e β segundo o método dos momentos:
+
+```{r}
+# Tamanho da amostra
+n = length(Tempos)
+# Segundo momento amostral centrado na média
+m_2 = var(Tempos)*(n-1)/n
+
+# Estimativas pelo método dos momentos
+Alfa_MM = mean(Tempos)^2/m_2
+Beta_MM = mean(Tempos)/m_2
+
+Alfa_MM
+
+Beta_MM
+```
+
+Agora, podemos usar a função fitdist para conferir os nossos resultados:
+
+```{r}
+# Função automática do R
+fitdist(data=Tempos,distr="gamma",method="mme")$estimate
+```
+
+Conforme esperado, os valores são iguais.
+
+#### Exercício
+
+Uma confeitaria artesanal produz barras de chocolate e, devido a pequenas variações no processo manual de produção, o **peso** pode variar. A empresa garante que **qualquer peso é igualmente provável**. Ou seja, o peso da barra pode ser modelado por uma **variável aleatória uniforme** (a,b). Para fazer a **inferência** sobre os limites a e b, foi coletada uma amostra de **50 barras** de chocolate e foi verificado o peso de cada uma delas. Os dados estão descritos abaixo:
+
+```{r}
+Peso = c(97.77, 101.74, 107.97, 102.23, 93.34, 105.71, 100.51,
+  103.90, 93.34, 109.43, 103.24, 96.71, 93.80, 103.36,
+  98.99, 93.22, 102.47, 109.30, 94.99, 105.54, 91.84,
+  108.32, 101.80, 109.16, 99.82, 108.04, 90.53, 95.29,
+  101.64, 100.59, 100.75, 107.65, 97.48, 90.91, 98.79,
+  96.31, 96.82, 96.56, 107.75, 101.14, 105.16, 106.20,
+  95.98, 105.90, 91.40, 102.19, 99.40, 93.33, 102.95,
+  93.65)
+```
+
+Dados importantes:
+
+Se $X \sim U(a, b)$, então:
+
+$$
+f(x) = \begin{cases}
+    \frac{1}{b-a} & \text{se } a \leq x \leq b \\
+    0 & \text{caso contrário}
+\end{cases} \\ 
+$$
+
+$$
+\begin{align*}
+    E(X) = \frac{a+b}{2} \\
+    Var(X) = \frac{(b-a)^2}{12}
+\end{align*}
+$$
+
+Encontre as **estimativas** de a e b pelo **método dos momentos** e confira o seu resultado com o da função `fitdist`.
+
+### Método da Máxima Verossimilhança
+
+Imagine que você está tentando descobrir qual parâmetro de uma distribuição é o mais provável de ter gerado os dados que você tem em mãos. O método da máxima verossimilhança permite justamente isso: a partir dos dados observados, ele nos fornece um valor do parâmetro que torna a ocorrência dos dados mais “verossímil”. Essa ideia é fundamental em estatística inferencial e está por trás de muitas aplicações em ciência de dados, aprendizado de máquina, economia, biologia e diversas outras áreas.
+
+Por exemplo, suponha que você está estudando o tempo de vida de peças de uma máquina, que você acredita seguir uma distribuição exponencial. Após observar uma amostra de tempos de vida, você quer descobrir qual valor de λ
+
+torna mais plausível a ocorrência dos dados observados. A resposta vem pela maximização de uma função: a função de verossimilhança.
+
+Essa função mede o quanto os dados combinam com diferentes valores do parâmetro. O valor que maximiza essa função é então aquele que melhor explica os dados observados, no sentido probabilístico.
+
+A função de verossimilhança é dada por:
+
+$$
+L(\theta) = \prod_{i=1}^{n} f(x_i | \theta)
+$$
+
+em que $f(x_i; \theta)$ é a função de probabilidade ou densidade avaliada no valor $x_i$. Trata-se de uma função de $\theta$, com os dados $x_1,...,x_n$ fixos. Para facilitar os cálculos, utilizamos a log-verossimilhança:
+
+$$
+\ell(\theta) = \log L(\theta) = \sum_{i=1}^{n} \log f(x_i | \theta)
+$$
+
+Para encontrar o estimador de máxima verossimilhança, precisamos maximizar $L(\theta)$ ou $\ell(\theta)$, com respeito a $\theta$. É mais fácil maximizar a função de log-verossimilhança do que a função de verossimilhança tanto analiticamente quanto computacionalmente. Ambas tem o mesmo ponto de máximo, uma vez que a função logaritmica é uma função crescente e as funções de densidade e probabilidade são positivas. Assim, o estimador de máxima verossimilhança é dado por:
+
+$$
+\hat{\theta}_{MV} = \arg \max_{\theta \in \Theta} \ell(\theta)
+$$
+
+Para encontrar $\hat{\theta}_{MV}$, buscamos os pontos críticos:
+
+$$
+\frac{\partial}{\partial \theta}\ell(\theta) = 0
+$$
+
+No caso vetorial:
+
+$$
+\nabla_{\theta}\ell(\theta) = 0
+$$
+
+em que são necessários os cálculos de todas as derivadas parciais. É fundamental verificar se o ponto encontrado é um máximo e se está no interior do espaço paramétrico.
+
+#### Distribuição Exponencial
+
+Seja $X_1, X_2, \ldots, X_n$ uma amostra aleatória simples de uma população com distribuição exponencial com parâmetro $\lambda$, cuja função de densidade é dada por:
+
+$$
+f(x | \lambda) = \lambda e^{-\lambda x}, \quad x \geq 0
+$$
+
+A log-verossimilhança é dada por:
+
+$$
+\ell(\lambda) = \sum_{i=1}^{n} \log f(X_i | \lambda) = n \log \lambda - \lambda \sum_{i=1}^{n} X_i
+$$
+
+A função de verossimilhança é o produto das densidades avaliadas nos dados observados:
+
+$$
+L(\lambda) = \prod_{i=1}^{n} f(x_i | \lambda) = \prod_{i=1}^{n} \lambda e^{-\lambda x_i} = \lambda^n e^{-\lambda \sum_{i=1}^{n} x_i}
+$$
+
+A função log-verossimilhança é dada por:
+
+$$
+\ell(\lambda) = n \log \lambda - \lambda \sum_{i=1}^{n} x_i
+$$  
+
+Sabemos que o estimador obtido pelo método da máxima verossimilhança para λ é dado por:
+$$
+\hat{\lambda}_{MV} = \frac{n}{\bar{x}}
+$$
+
+Podemos usar o `R` para provar computacionalmente que este estimador maximiza $L(\lambda)$ e $\ell(\lambda)$ de forma gráfica. Para isto, considere uma fábrica que possua uma linha de montagem completamente automatizada. Engenheiros perceberam que as falhas nessa linha ocorrem de forma esporádica e são independentes entre si. Após observar o sistema por muitos dias, eles verificam que o tempo entre duas falhas consecutivas pode ser modelado por uma variável aleatória exponencial com parâmetro $\lambda$. Para estimar esse parâmetro a partir do método de máxima verossimilhança, eles coletaram 34 tempos, em horas, entre falhas:
+
+```{r}
+# Amostra
+Tempos = c(0.47, 0.27, 0.12, 0.13, 0.16, 0.16, 0.38, 0.59,
+  0.04, 0.12, 0.25, 0.20, 0.21, 0.31, 0.34, 0.26,
+  0.08, 0.20, 0.45, 0.18, 0.15, 0.29, 0.25, 0.25,
+  0.06, 0.08, 0.07, 0.11, 0.02, 0.35, 0.17, 0.08,
+  0.15, 0.21)
+```
+
+Sabemos que o estimador de máxima verossimilhança para $\lambda$ é $\hat{\lambda}_{MV} = \frac{n}{\bar{x}}$. Vamos calcular ele no `R`:
+
+```{r}
+# Estimativa de máxima verossimilhança
+rate_MV = 1/mean(Tempos)
+```
+
+Assim $\hat{\lambda}_{MV} = 4.748603$ é a estimativa de máxima verossimilhança para $\lambda$. Esse número deve maximizar as funções de verossimilhança ou log-verossimilhança, atreladas aos dados. Para iniciar, vamos implementar as funções de verossimilhança e log verossimilhança no `R`:
+
+```{r}
+# Função de verossimilhança
+Vero_Exp <- function(rate, x) {
+  prod(dexp(x=x,rate=rate))
+}
+
+# Função de log-verossimilhança
+Log_Vero_Exp <- function(rate,x){
+  sum(dexp(x=x,rate=rate,log=T))
+}
+```
+
+Note que a função de verossimilhança é o produtório de densidades e a função de log-verossimilhança é o somatório do logaritmo das densidades (por isso usamos o argumento log=T para usar a escala logaritmica). Vamos avaliar ambas as funções graficamente e verificar como a estimativa de máxima verossimilhança $\hat{\lambda}_{MV} = 4.748603$ maximiza ambas as funções:
+
+```{r}
+# Taxas arbitrárias
+rates = seq(0.01,10,0.01)
+
+# Data Frame com os valores das funções aplicado nas taxas
+df = data.frame(rates = rates,
+                verossim_vals = sapply(rates, Vero_Exp, x = Tempos),
+                logverossim_vals = sapply(rates, Log_Vero_Exp, x = Tempos))
+
+# Gráfico da função de verossimilhança
+A = ggplot(df, aes(x = rates, y = verossim_vals)) +
+  geom_line(color = "blue", size = 1) +
+   geom_point(aes(x = rate_MV, y = Vero_Exp(rate_MV, Tempos)),
+             color = "black", size = 3)+
+  geom_vline(xintercept = rate_MV, linetype = "dashed", color = "blue") +
+  labs(title = "Função de Verossimilhança",
+       x = "Lambda (rate)",
+       y = "Verossimilhança") +
+  theme_minimal()
+
+# Gráfico da função de log-verossimilhança
+B = ggplot(df, aes(x = rates, y = logverossim_vals)) +
+  geom_line(color = "darkred", size = 1) +
+  geom_point(aes(x = rate_MV, y = Log_Vero_Exp(rate_MV, Tempos)),
+             color = "black", size = 3)+
+  geom_vline(xintercept = rate_MV, linetype = "dashed", color = "blue") +
+  labs(title = "Função de Log-Verossimilhança",
+       x = "Lambda (rate)",
+       y = "Log-Verossimilhança") +
+  theme_minimal()
+
+A+B
+```
+
+Temos, portanto, o gráfico da função de verossimilhança (esquerda) e o gráfico da função de log-verossimilhança (direita). Para finalizar, vamos conferir com a função automática do `R` :
+
+```{r}
+# Função automática do R
+fitdist(data=Tempos,distr="exp",method="mle")$estimate
+```
+
+O `R` utiliza a função `optim` dentro da função `fitdist` para maximizar a função de log-verossimilhança.
+
+#### Exercício
+
+Suponha que estamos estudando a chegada de clientes em uma farmácia de plantão 24h em um bairro tranquilo. A gerência quer entender melhor como otimizar o número de atendentes durante a madrugada entre meia-noite e 1h da manhã. Um funcionário coletou dados de 36 madrugadas neste horário e anotou os seguintes resultados:
+
+```{r}
+# Amostra
+Clientes = c(9, 5, 6, 5, 2, 8, 3, 2, 4, 9, 8, 6, 6, 11, 6, 6, 5, 5, 4, 3, 9, 8, 6, 7, 1, 5, 6, 3, 4, 3, 3, 4, 4, 4, 3, 3)
+```
+
+Como a unidade de tempo é fixa (1 hora) e os eventos ocorrem de forma independente, considerou-se que o número de clientes que chegam nessa horário é uma variável aleatória Poisson com parâmetro $\lambda$.
+
+ 1. Encontre a estimativa de máxima verossimilhança para $\lambda$.
+ 2. Plote as funções de verossimilhança e log-verossimilhança atrelada aos dados
+ 3. Marque nestas funções a estimativa obtida no item 1. Qual característica ele atende?
+ 4. Confira o resultado com a função `fitdist`.
+
+#### Distribuição Uniforme
+
+Seja $X_1, X_2, \ldots, X_n$ uma amostra aleatória simples de uma população com distribuição uniforme (0, $\theta$), cuja função de densidade é dada por:
+
+$$
+f(x | \theta) = \begin{cases}
+    \frac{1}{\theta} & \text{se } 0 \leq x \leq \theta \\
+    0 & \text{caso contrário}
+\end{cases}
+$$  
+
+A função de verossimilhança é o produto das densidades avaliadas nos dados observados:
+
+$$
+L(\theta) = \prod_{i=1}^{n} f(x_i; \theta) = \prod_{i=1}^{n} \frac{1}{\theta} \cdot \mathbb{I}_{[0, \theta]}(x_i) = \theta^{-n} \cdot \mathbb{I}_{[X_{(n)} \le \theta]}
+$$
+
+Como $\theta^{-n}$ é uma função decrescente e $\theta \geq X_{(n)}$, o estimador de máxima verossimilhança para $\theta$ é dado por:
+
+$$
+\hat{\theta}_{MV} = X_{(n)} = max(X_1, X_2, \ldots, X_n)
+$$
+
+Para ilustrar este resultado, suponha uma empresa de tecnologia que desenvolve um sistema de atendimento automático. A equipe de engenharia afirma que o tempo de resposta do sistema (em segundos), quando está operando corretamente, é distribuído de maneira uniforme entre 0 e um valor máximo θ, desconhecido. Por simplicidade, o tempo de resposta nunca é negativo (começa em 0) e nunca excede esse limite superior desconhecido θ. Foram registrados os tempos de resposta de 28 atendimentos e foram observados os seguintes valores:
+
+```{r}
+# Amostra
+Tempos = c(7.46, 14.91,  8.51, 27.45,  1.47, 14.15,
+ 25.57,  3.90, 17.95,  6.61,  4.08, 24.11,
+ 28.64, 11.98, 21.28,  3.03, 12.29,  8.78,
+ 26.07, 14.35, 25.92, 26.00, 25.42, 14.07,
+ 24.14, 20.14, 22.73,  0.02)
+```
+
+Sabemos que o estimador de máxima verossimilhança para $\theta$ é o valor máximo $X_{28}$:
+
+```{r}
+# Estimativa de máxima verossimilhança
+Theta_MV = max(Tempos)
+```
+
+Assim, $\hat{\theta}_{MV} = 28.64$ é a estimativa de máxima verossimilhança para $\theta$. Agora, vamos implementar a função de verossimilhança no `R`:
+
+```{r}
+# Função de verossimilhança
+Vero_Unif <- function(theta, x) {
+  n <- length(x)
+  if (theta < max(x)) 
+    return(0)
+  else
+    return((1/theta)^n)
+}
+```
+
+Agora, vamos avaliar esta função graficamente e marcar a estimativa de máxima verossimilhança $\hat{\theta}_{MV} = 28.64$:
+
+```{r}
+# Thetas arbitrários
+thetas = seq(25,40,0.01)
+
+# Data frame com o valor da função de verossimilhança
+df = data.frame(thetas = thetas,
+                verossim_vals = sapply(thetas, Vero_Unif, x = Tempos))
+
+# Gráfico da função de verossimilhança
+ggplot(df, aes(x = thetas, y = verossim_vals)) +
+  geom_line(color = "blue", size = 1) +
+   geom_point(aes(x = Theta_MV, y = Vero_Unif(Theta_MV, Tempos)),
+             color = "black", size = 3)+
+  geom_vline(xintercept = Theta_MV, linetype = "dashed", color = "blue") +
+  labs(title = "Função de Verossimilhança",
+       x = "Theta",
+       y = "Verossimilhança") +
+  theme_minimal()
+```
+
+Note como a estimativa de máxima verossimilhança maximiza esta função. Para finalizar, o comando a seguir certifica o resultado com a análise automática do `R`:
+
+```{r}
+# Análise automática do R
+fitdist(data=Tempos,distr="unif",method="mle",fix.arg=list(min = 0))$estimate
+```
+
+O comando `fix.arg=list(min = 0)` fixa o primeiro parâmetro em 0.
+
+#### Distribuição Normal
+
+Seja $X_1, X_2, \ldots, X_n$ uma amostra aleatória simples de uma população com distribuição normal com média $\mu$ e variância $\sigma^2$, cuja função de densidade é dada por:
+
+$$
+f(x | \mu, \sigma^2) = \frac{1}{\sqrt{2\pi \sigma^2}} e^{-\frac{(x - \mu)^2}{2\sigma^2}}, \quad -\infty < x < \infty
+$$
+
+A função de verossimilhança é:
+
+$$
+L(\mu, \sigma^2) = \prod_{i=1}^{n} f(x_i | \mu, \sigma^2) = \left(\frac{1}{\sqrt{2\pi \sigma^2}}\right)^n e^{-\frac{1}{2\sigma^2} \sum_{i=1}^{n} (x_i - \mu)^2}
+$$
+
+A função de log-verossimilhança é dada por:
+
+$$
+\ell(\mu, \sigma^2) = -\frac{n}{2} \log(2\pi) - \frac{n}{2} \log(\sigma^2) - \frac{1}{2\sigma^2} \sum_{i=1}^{n} (x_i - \mu)^2
+$$
+
+Após o processo de maximização da função de log-verossimilhança com respeito ao vetor $(\mu, \sigma^2)$, obtemos as seguintes estimativas de máxima verossimilhança:
+
+$$
+\hat{\mu} = \bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i
+$$
+
+e
+
+$$
+\hat{\sigma}^2 = \frac{1}{n} \sum_{i=1}^{n} (x_i - \hat{x})^2
+$$
+
+Podemos usar o `R` para provar computacionalmente que este estimador maximiza $L(\mu, \sigma^2)$ e $\ell(\mu, \sigma^2)$ de forma gráfica. Um engenheiro agrônomo está analisando o peso das laranjas colhidas em uma fazenda para verificar se a produção está dentro dos padrões desejados. Sabe-se que o peso de cada laranja é influenciado por diversos fatores como irrigação, incidência solar, solo, nutrientes e genética — todos com efeitos pequenos e relativamente independentes. Por isso, é razoável assumir que o peso das laranjas segue uma distribuição normal com média $\mu$ e variância $\sigma^2$. Para estimar os parâmetros dessa distribuição, o engenheiro coleta aleatoriamente 38 laranjas da plantação e registra os seguintes pesos (em gramas):
+
+```{r}
+# Amostra
+Peso = c(129.7, 128.5, 128.1, 126.5, 129.0, 123.7, 140.8,
+  136.0, 124.4, 128.0, 127.7, 133.9, 129.6, 131.3,
+  129.9, 129.8, 136.8, 128.9, 137.6, 122.3, 132.9,
+  130.6, 131.1, 131.9, 127.5, 128.3, 124.9, 124.6,
+  131.5, 132.2, 130.3, 134.6, 140.3, 127.5, 118.5,
+  135.0, 126.5, 126.6)
+```
+
+Sabemos que as estimativas de máxima verossimilhança para $\mu$ e $\sigma^2$ são $\hat{\mu} = \bar{x}$ e $\hat{\sigma}^2 = \frac{1}{n} \sum_{i=1}^{n} (x_i - \hat{x})^2$. Vamos calculá-los no `R`:
+
+```{r}
+n=length(Peso)
+
+# Estimativa de máxima verossimilhança para mu
+mean_MV = mean(Peso)
+
+# Estimativa de máxima verossimilhança para sigma^2
+sd_2_MV = var(Peso)*(n-1)/n
+
+# Estimativa de máxima verossimilhança para sigma
+sd_MV = sqrt(sd_2_MV)
+```
+
+Assim, temos que $\hat{\mu}_{MV} = 129.93$ e $\hat{\sigma}^2_{MV} = 4.68$ são as estimativas de máxima verossimilhança para $\mu$ e $\sigma^2$, respectivamente. Esse vetor deve maximizar as funções de verossimilhança ou log-verossimilhança, atreladas aos dados. Para iniciar, vamos implementar ambas as funções de verossimilhança e de log-verossimilhança no R:
+
+```{r}
+# Função de verossimilhança
+Vero_Norm <- function(mean,sd, x){
+  prod(dnorm(x=x,mean=mean,sd=sd))
+}
+
+# Função de log-verossimilhança
+Log_Vero_Norm <- function(mean,sd, x){
+  sum(dnorm(x=x,mean=mean,sd=sd,log=T))
+}
+```
+
+Vamos avaliar essas funções graficamente. Primeiro, vamos criar valores arbitrários para ambos os parâmetros e construir uma matriz com os dados em cada função:
+
+```{r}
+# Valores arbitrários para a média e desvio padrão
+means = seq(100,150,0.5)
+sds = seq(1,8,0.1)
+
+# Matriz com os dados da função de verossimilhança
+matrix_vero_norm <- outer(
+  sds, means,
+  Vectorize(function(sd, mean) Vero_Norm(mean, sd, x = Peso))
+)
+rownames(matrix_vero_norm) <- sds
+colnames(matrix_vero_norm) <- means
+
+# Matriz com os dados da função de log-verossimilhança
+matrix_log_vero_norm <- outer(
+  sds, means,
+  Vectorize(function(sd, mean) Log_Vero_Norm(mean, sd, x = Peso))
+)
+rownames(matrix_log_vero_norm) <- sds
+colnames(matrix_log_vero_norm) <- means
+```
+
+Agora, vamos fazer os gráficos das funções com o ponto $(\hat{\mu}_{MV}, \hat{\sigma}_{MV}) = (129.93, 2.16)$, maximizando ambas as funções:
+
+```{r}
+# Gráfico de superfície 3D para a verossimilhança
+plot_ly(x = means, y = sds, z = matrix_vero_norm,
+               type = "surface", colorscale = "Viridis")|> 
+               add_trace(x = c(mean_MV), y = c(sd_MV), 
+                         z = c(Vero_Norm(mean_MV, sd_MV, Peso)),
+                         type = "scatter3d", mode = "markers+text",
+                         marker = list(size = 5, color = 'red'),
+                         text = 'Máximo', textposition = 'top right') |>
+            layout(title = "Superfície da Verossimilhança - Normal",
+                      scene = list(xaxis = list(title = "Média"),
+                                   yaxis = list(title = "Desvio Padrão"),
+                                   zaxis = list(title = "Verossimilhança")))
+
+# Gráfico de superfície 3D para a log-verossimilhança
+plot_ly(x = means, y = sds, z = matrix_log_vero_norm,
+               type = "surface", colorscale = "Viridis")|> 
+               add_trace(x = c(mean_MV), y = c(sd_MV), 
+                         z = c(Log_Vero_Norm(mean_MV, sd_MV, Peso)),
+                         type = "scatter3d", mode = "markers+text",
+                         marker = list(size = 5, color = 'red'),
+                         text = 'Máximo', textposition = 'top right') |>
+            layout(title = "Superfície da Log-Verossimilhança - Normal",
+                      scene = list(xaxis = list(title = "Média"),
+                                   yaxis = list(title = "Desvio Padrão"),
+                                   zaxis = list(title = "Log-Verossimilhança")))
+```
+
+Para finalizar, vamos recorrer à função automática do R para conferir os resultados:
+
+```{r}
+fitdist(data=Peso,distr="norm",method="mle")$estimate
+```
+
+#### Exercício
+
+Seja $x_1, x_2, \ldots, x_n$ uma amostra aleatória simples de uma população com distribuição Gama com parâmetros $\alpha > 0$ e $\beta > 0$, cuja função de densidade é dada por:
+
+$$
+f(x | \alpha, \beta) = \frac{\beta^\alpha}{\Gamma(\alpha)} x^{\alpha - 1} e^{-\beta x}, \quad x > 0
+$$
+
+A função de verossimilhança é o produto das densidades individuais:
+
+$$
+L(\alpha, \beta | x_1, x_2, \ldots, x_n) = \prod_{i=1}^{n} f(x_i | \alpha, \beta) = \prod_{i=1}^{n} \frac{\beta^\alpha}{\Gamma(\alpha)} x_i^{\alpha - 1} e^{-\beta x_i}
+$$
+
+Tomando o logaritmo da função de verossimilhança, obtemos a função de log-verossimilhança:
+
+$$
+\ell(\alpha, \beta | x_1, x_2, \ldots, x_n) = n \log(\beta^\alpha) - n \log(\Gamma(\alpha)) + (\alpha - 1) \sum_{i=1}^{n} \log(x_i) - \beta \sum_{i=1}^{n} x_i
+$$
+
+Para encontrar os estimadores de máxima verossimilhança, não conseguimos fazer as contas na mão e é necessário recorrer a métodos numéricos como a função `optim`, presente na função `fitdist` do `R` para estimadores de máxima verossimilhança. Isso acontece também para muitas outras distribuições. O `optim` aplica métodos numéricos que maximizam funções. Para ilustrar, considere o mesmo exemplo realizado com o método dos momentos. Considere a situação de uma clínica que quer estimar o tempo de atendimento por paciente, desde o momento em que a pessoa chega até a saída, para planejar a alocação de pessoal. Estudos anteriores sugerem que o tempo de atendimento (em horas) é assimétrico à direita — muitos atendimentos são rápidos, mas alguns demoram mais (por exemplo, em casos de crianças, idosos, pessoas com medo de agulha etc). Por isso, consideramos adequado modelar o tempo de atendimento com uma distribuição Gama. Foram coletados 100 valores de tempos de atendimento, em horas. Os dados estão apresentados abaixo:
+
+```{r}
+Tempos = c(
+  1.98, 0.60, 1.28, 1.57, 1.71, 1.34, 1.69, 1.14, 1.64, 0.43,
+  1.11, 0.92, 2.40, 1.14, 1.32, 1.54, 2.36, 2.56, 3.76, 3.05,
+  1.36, 1.88, 2.29, 0.33, 0.92, 1.17, 0.79, 1.49, 2.49, 0.73,
+  1.78, 1.30, 1.01, 0.74, 0.88, 0.92, 0.85, 1.01, 1.16, 0.39,
+  1.00, 1.90, 0.57, 2.31, 1.62, 1.97, 0.39, 1.67, 0.79, 1.98,
+  1.72, 0.47, 1.87, 1.33, 0.90, 3.72, 3.46, 1.91, 2.85, 1.80,
+  1.85, 0.55, 0.90, 1.51, 1.57, 2.37, 1.79, 0.48, 0.87, 1.47,
+  1.85, 1.24, 0.32, 2.77, 1.69, 0.59, 0.84, 2.36, 2.03, 1.26,
+  0.40, 0.63, 0.59, 1.50, 0.52, 0.20, 0.25, 3.09, 3.72, 3.16,
+  1.93, 0.85, 1.87, 1.66, 1.31, 1.63, 1.94, 0.20, 2.72, 3.57
+)
+
+# Estimadores de Momentos
+Alfa_MM
+
+Beta_MM
+```
+
+ 1. Encontre as estimativas de máxima verossimilhança a partir da função automática do `R`, a `fitdist`. Guarde estas estimativas nos objetos Alfa_MV e Beta_MV. Compare com as estimativas obtidas pelo método dos momentos.
+
+ 2. Plote a função de verossimilhança e de log-verossimilhança. Marque as estimativas de máxima verossimilhança dos parâmetros e verifique que elas configuram o ponto de máximo de ambas as funções.
+
+Resposta
+
+```{r}
+# Obtendo as estimativas de máxima verossimilhança
+EMV = fitdist(data=Tempos, distr="gamma", method="mle")$estimate
+Alfa_MV = EMV[1]
+Beta_MV = EMV[2]
+
+# Função de verossimilhança
+Vero_Gamma <- function(shape,rate, x){
+  prod(dgamma(x=x,shape=shape,rate=rate))
+}
+
+# Função de log-verossimilhança
+Log_Vero_Gamma <- function(shape,rate, x){
+  sum(dgamma(x=x,shape=shape,rate=rate,log=T))
+}
+
+# Valores arbitrários para a shape e rate
+shapes = seq(0.1,5,0.02)
+rates = seq(0.1,5,0.02)
+
+# Matriz com os dados da função de verossimilhança
+matrix_vero_gamma <- outer(
+  rates, shapes,
+  Vectorize(function(rate, shape) Vero_Gamma(shape, rate, x = Tempos))
+)
+rownames(matrix_vero_gamma) <- rates
+colnames(matrix_vero_gamma) <- shapes
+
+# Matriz com os dados da função de log-verossimilhança
+matrix_log_vero_gamma <- outer(
+  rates, shapes,
+  Vectorize(function(rate, shape) Log_Vero_Gamma(shape, rate, x = Tempos))
+)
+rownames(matrix_log_vero_gamma) <- rates
+colnames(matrix_log_vero_gamma) <- shapes
+
+# Gráfico de superfície 3D para a verossimilhança
+plot_ly(x = shapes, y = rates, z = matrix_vero_gamma,
+               type = "surface", colorscale = "Viridis")%>% 
+               add_trace(x = c(Alfa_MV), y = c(Beta_MV), 
+                         z = c(Vero_Gamma(Alfa_MV, Beta_MV, Tempos)),
+                         type = "scatter3d", mode = "markers+text",
+                         marker = list(size = 5, color = 'red'),
+                         text = 'Máximo', textposition = 'top right') %>%
+            layout(title = "Superfície da Verossimilhança - Gama",
+                      scene = list(xaxis = list(title = "Shape"),
+                                   yaxis = list(title = "Rate"),
+                                   zaxis = list(title = "Verossimilhança")))
+
+# Gráfico de superfície 3D para a log-verossimilhança
+plot_ly(x = shapes, y = rates, z = matrix_log_vero_gamma,
+               type = "surface", colorscale = "Viridis")%>% 
+               add_trace(x = c(Alfa_MV), y = c(Beta_MV), 
+                         z = c(Log_Vero_Gamma(Alfa_MV, Beta_MV, Tempos)),
+                         type = "scatter3d", mode = "markers+text",
+                         marker = list(size = 5, color = 'red'),
+                         text = 'Máximo', textposition = 'top right') %>%
+            layout(title = "Superfície da Log-Verossimilhança - Gama",
+                      scene = list(xaxis = list(title = "Shape"),
+                                   yaxis = list(title = "Rate"),
+                                   zaxis = list(title = "Log-Verossimilhança")))
+```
+
+## Distribuição dos Estimadores
+
+Imagine que você acabou de coletar uma amostra — talvez alturas de pessoas, tempos de espera, medidas de pressão arterial — e precisa estimar algum parâmetro populacional, como uma média, uma proporção, uma variância. Você aplica o método dos momentos ou o método da máxima verossimilhança, e ele te devolve um número, uma estimativa. Ótimo. Mas… e agora? Será que esse número está próximo do verdadeiro valor do parâmetro? Quão confiável ele é? Será que, se eu coletasse outra amostra, obteria um valor muito diferente? E como eu posso expressar matematicamente essa incerteza? É exatamente nesse ponto que entra a distribuição dos estimadores. Ela é a chave que abre a porta da inferência estatística para as propriedades dos estimadores (viés, eficiência e consistência).
+
+Mesmo que a gente tenda a pensar nos estimadores como simples fórmulas ou funções — média amostral, proporção amostral, etc. —, é fundamental lembrar que eles são funções da amostra. E a amostra é aleatória. Portanto, os estimadores também são aleatórios.
+
+Isso quer dizer que:
+
+ - A cada nova amostra, o valor estimado muda.
+ - Existe uma distribuição de probabilidades associada a esse estimador.
+ - E essa distribuição tem uma média, uma variância, uma forma.
+
+Ou seja, entender a distribuição do estimador é entender como ele se comporta ao longo de muitas amostras possíveis. É como imaginar um universo paralelo onde você pudesse repetir o experimento milhares de vezes e observar os valores que o estimador toma. Isso é essencial para responder à pergunta: “quão confiável é o meu estimador?”. Dentro dessa distribuição, duas características se destacam: o valor esperado e a variância do estimador.
+
+### Esperança do Estimador
+
+O valor esperado de um estimador é, de forma simplificada, a média de longo prazo dos valores que ele assume se a gente repetir o experimento muitas vezes.
+
+Formalmente, se $\hat{\theta}$ é o estimador do parâmetro θ, então o valor esperado de $\hat{\theta}$ é E($\hat{\theta}$). Esse valor esperado nos diz qual é a tendência central da distribuição do estimador e está diretamente relacionada ao seu viés.
+
+Exemplo: Considere a coleta da amostra $X_1, X_2, \ldots, X_n$ de uma população cuja média é $\mu$ e a variância é σ². No caso da média amostral $\bar{X}$, por exemplo, sabemos que:
+
+$$
+E(\bar{X}) = \mu
+$$
+
+### Variância do Estimador
+
+Já a variância de um estimador mede o quanto ele oscila de uma amostra para outra. É uma medida de precisão: quanto menor a variância, mais estável o estimador, e mais próximos uns dos outros tendem a ser os valores estimados em diferentes amostras. Formalmente, se $\hat{\theta}$ é o estimador do parâmetro θ, então a variância de $\hat{\theta}$ é
+
+$$
+Var(\hat{\theta})
+$$
+
+E consequentemente, o erro padrão do estimador $\hat{\theta}$ é
+
+$$
+EP(\hat{\theta}) = \sqrt{Var(\hat{\theta})}
+$$
+
+Considere a coleta da amostra $X_1,X_2,...,_n$ de uma população cuja média é $\mu$ e a variância é $\sigma^2$. No caso da média amostral $\bar{X}$, por exemplo, sabemos que:
+
+$$
+Var(\bar{X}) = \frac{\sigma^2}{n}
+$$
+
+e
+
+$$
+EP(\bar{X}) = \frac{\sigma}{\sqrt{n}}
+$$
+
+A função `fitdist` além de soltar as **estimativas dos parâmetros**, também solta uma estimativa do **erro padrão** do estimador, tanto para o método dos momentos quanto para o método da **máxima verossimilhança**. Veja para o caso da **Poisson** e **Gama**:
+
+```{r}
+# Amostra de uma Poisson
+Clientes = c(9, 5, 6, 5, 2, 8, 3, 2, 4, 9, 8, 6, 6, 11, 6, 6, 5, 5, 4, 3, 9, 8, 6, 7, 1, 5, 6, 3, 4, 3, 3, 4, 4, 4, 3, 3)
+
+fitdist(data=Clientes,distr="pois",method="mme")
+
+# Amostra de uma Gama
+Tempos = c(
+  1.98, 0.60, 1.28, 1.57, 1.71, 1.34, 1.69, 1.14, 1.64, 0.43,
+  1.11, 0.92, 2.40, 1.14, 1.32, 1.54, 2.36, 2.56, 3.76, 3.05,
+  1.36, 1.88, 2.29, 0.33, 0.92, 1.17, 0.79, 1.49, 2.49, 0.73,
+  1.78, 1.30, 1.01, 0.74, 0.88, 0.92, 0.85, 1.01, 1.16, 0.39,
+  1.00, 1.90, 0.57, 2.31, 1.62, 1.97, 0.39, 1.67, 0.79, 1.98,
+  1.72, 0.47, 1.87, 1.33, 0.90, 3.72, 3.46, 1.91, 2.85, 1.80,
+  1.85, 0.55, 0.90, 1.51, 1.57, 2.37, 1.79, 0.48, 0.87, 1.47,
+  1.85, 1.24, 0.32, 2.77, 1.69, 0.59, 0.84, 2.36, 2.03, 1.26,
+  0.40, 0.63, 0.59, 1.50, 0.52, 0.20, 0.25, 3.09, 3.72, 3.16,
+  1.93, 0.85, 1.87, 1.66, 1.31, 1.63, 1.94, 0.20, 2.72, 3.57
+)
+
+fitdist(data=Tempos,distr="gamma",method="mle")
+```
+
+Assim, todas estas estimativas do erro padrão dos estimadores captam a variabilidade dos mesmos.
+
+## Propriedades dos Estimadores
+
+Tradicionalmente, as propriedades dos estimadores são estudadas de forma teórica: deduzimos a esperança, a variância, o viés, a distribuição assintótica… Mas no contexto da Estatística Computacional, abrimos espaço para outra abordagem: avaliar as propriedades dos estimadores por meio de simulações.
+
+Essa abordagem é valiosa porque:
+
+  - Permite observar na prática o comportamento de um estimador.
+
+  - Ajuda a comparar diferentes estimadores mesmo quando as soluções teóricas são complicadas ou não existem.
+
+  - Serve para verificar empiricamente propriedades assintóticas (por exemplo, como o estimador se comporta quando o tamanho da amostra aumenta).
+
+  - Cria um caminho para ensinar inferência de maneira mais visual e intuitiva.
+
+A ideia central é simular muitas amostras de uma distribuição conhecida (com parâmetros conhecidos), calcular o estimador em cada amostra e analisar os resultados. Por exemplo, podemos gerar 1.000 amostras de tamanho 30 de uma distribuição normal com média 5, calcular a média amostral em cada uma e, com isso, estimar empiricamente o comportamento desse estimador. Em muitos casos, utilizaremos a função `replicate` do `R` para agilizar as replicações da amostra. Essa função tem a seguinte estrutura:
+
+```{r eval=FALSE}
+replicate("B réplicas","Função a ser replicada")
+```
+
+As principais propriedades dos estimadores são:
+
+  - Viés
+
+  - Consistência
+
+  - Eficiência
+
+  - Erro quadrático médio
+
+### Estimando a Esperança do Estimador
+
+Antes de verificar, com detalhes, cada uma destas propriedades, é importante destacar como estimamos a esperança, variância e erro padrão de um estimador, computacionalmente. Essas duas estimativas são fundamentais para o bom entendimento das propriedades. Abaixo está o passo a passo computacional para estimar a esperança, variância e erro padrão de um estimador usando simulação:
+
+1- Defina o modelo populacional: escolha uma distribuição populacional conhecida (por exemplo, normal, binomial, exponencial) com parâmetros fixos. Esse será o modelo gerador dos dados.
+
+2- Escolha o estimador $\hat{\theta}$: defina claramente qual quantidade populacional θ você deseja estimar e qual estimador $\hat{\theta}$ será utilizado.
+
+3- Fixe o tamanho amostral n: determine quantas observações cada amostra terá.
+
+4- Simule B amostras independentes: gere B amostras de tamanho n da população especificada (em geral, B=1000 ou 10000).
+
+5- Calcule o estimador em cada amostra: para a b-ésima amostra, calcule o o estimador $\hat{\theta}^{(b)}$, com $b=1,2,3,...,B$.
+
+6- Armazene os valores obtidos: guarde os B valores do estimador em um vetor ou lista: {$\hat{\theta}^{(1)}$,$\hat{\theta}^{(2)}$,…,$\hat{\theta}^{(B)}$}. Este vetor representa a distribuição empírica do estimador $\hat{\theta}$.
+
+Com essa distribuição, $\hat{\theta}$, podemos obter:
+
+ - A estimativa da esperança de $\hat{\theta}$:
+
+$$
+\hat{E}(\hat{\theta}) = \frac{1}{B} \sum_{b=1}^{B} \hat{\theta}^{(b)}
+$$
+
+ - A estimativa da variância de $\hat{\theta}$:
+
+$$
+\hat{Var}(\hat{\theta}) = \frac{1}{B-1} \sum_{b=1}^{B} \left( \hat{\theta}^{(b)} - \hat{E}(\hat{\theta}) \right)^2
+$$
+
+ - O erro padrão do estimador $\hat{\theta}$:
+
+$$
+EP(\hat{\theta}) = \sqrt{\hat{Var}(\hat{\theta})}
+$$
+
+Exemplo: Média Amostral
+
+Seja $X_1, X_2,\ldots, X_n$ uma amostra aleatória de uma população com média $\mu$ e variância $\sigma^2$. A média amostral é dada por:
+
+$$
+\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i
+$$
+
+Sabemos que:
+
+$$
+\begin{align}
+    E(\bar{X}) = \mu \\
+    Var(\bar{X}) = \frac{\sigma^2}{n} \\
+    EP(\bar{X}) = \frac{\sigma}{\sqrt{n}}
+\end{align}
+$$
+
+Vamos conduzir um estudo assumindo que $X_1,X_2,\ldots,X_n$ é uma amostra aleatória de uma população normalmente distribuída com média $\mu=170$ e variância $\sigma^2=100$. Nosso objetivo será estimar empiricamente a esperança, variância e erro padrão de $\bar{X}$. Para isso, vamos extrair $B=1000$ amostras de tamanho $n=25$ dessa população. Seguem os comandos:
+
+```{r}
+# Parâmetros populacionais
+media_real <- 170
+sigma_real <- 10
+
+# Quantidade de réplicas
+B <- 1000
+
+# Tamanho de amostra
+n = 25
+
+# Guarda as médias das B réplicas (distribuição do estimador)
+set.seed(2025)
+medias <- replicate(B, mean(rnorm(n, mean = media_real, sd = sigma_real)))
+
+# Estimativa da Esperança
+Est_Esperanca = mean(medias)
+
+# Estimativa da variância
+Est_Variância <- var(medias)
+
+# Estimativa do erro padrão
+Est_ErroPadrão <- sd(medias)
+
+# Data frame para o ggplot
+df <- data.frame(media = medias)
+
+# Gráfico com ggplot2
+ggplot(df, aes(x = media)) +
+  # Histograma
+  geom_histogram(fill = "lightblue", color = "black") +
+  labs(title = "Histogramas das medias amostrais",
+       x = "Media amostral", y = "Frequência") +
+  theme_minimal()
+```
+
+Assim, temos as seguintes estimativas: $\hat{E}(\hat{\theta})=169,98$, $\hat{Var}(\hat{\theta})=3,94$ e $\hat{EP}(\hat{\theta})=1,98$. Os valores reais são $E(\hat{\theta})=\mu=170$, $Var(\hat{\theta})=\frac{\sigma^2}{n}=\frac{100}{25}=4$ e $EP(\hat{\theta})=\frac{\sigma}{\sqrt{n}}=\frac{10}{5}=2$. Tem-se que os resultados teóricos são validados computacionalmente.
+
+A proporção amostral é dada por:
+
+$$
+\hat{p} = \frac{1}{n} \sum_{i=1}^{n} X_i
+$$
+
+Sabemos que:
+
+$$
+\begin{align*}
+    E(\hat{p}) = p \\
+    Var(\hat{p}) = \frac{p(1-p)}{n} \\
+    EP(\hat{p}) = \sqrt{\frac{p(1-p)}{n}}
+\end{align*}
+$$
+
+Conduza um estudo assumindo que $X_1, X_2, \ldots, X_n$ é uma amostra aleatória de uma população onde $p=0,6$. Nosso objetivo será estimar empiricamente a esperança, variância e erro padrão de $\hat{p}$. Para isso, extraia $B=1000$ amostras de tamanho $n=25$ dessa população. Faça o histograma da distribuição deste estimador.
+
+### Viés
+
+O viés (bias) de um estimador $\hat{\theta}$ é definido como:
+
+$$
+Viés(\hat{\theta}) = E(\hat{\theta}) - \theta
+$$
+
+onde $E[\hat{\theta}]$ representa o valor esperado do estimador $\hat{\theta}$.
+
+  - Se $Viés(\hat{\theta})=0$, dizemos que o estimador é não viesado
+
+  - Se $Viés(\hat{\theta})\neq0$, o estimador é viesado.
+
+No `R`, podemos estimar o viés por meio de simulação computacional. Assim, a **estimativa** do **viés** do **estimador** é dada por:
+
+$$
+\hat{Viés}(\hat{\theta}) = \hat{E}(\hat{\theta}) - \theta
+$$
+
+#### Viés da Média Amostral
+
+Seja $X_1,X_2,\ldots,X_n$ uma amostra aleatória de uma população com média $\mu$ e variância $\sigma^2$. A média amostral é dada por:
+
+$$
+\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i
+$$
+
+Queremos verificar se a média amostral $\bar{X}$ é viesada como estimador de $\mu$. Sabemos que, teoricamente:
+
+$$
+E(\bar{X}) = \mu \Rightarrow Viés(\bar{X}) = E(\bar{X}) - \mu = 0
+$$
+
+Ou seja, a média amostral é um estimador não-viesado da média populacional.
+
+Vamos conduzir um estudo computacional assumindo que a população é descrita por uma variável Normal $(\mu=170,\sigma^2=100)$ e estaremos coletando amostras de tamanho $n=30$:
+
+```{r}
+# Parâmetros populacionais
+media_real <- 170
+sigma_real <- 10
+
+# Quantidade de réplicas
+B <- 1000
+
+# Tamanho de amostra
+n = 30
+
+# Guarda as médias das B réplicas (distribuição do estimador)
+set.seed(2025)
+medias <- replicate(B, mean(rnorm(n, mean = media_real, sd = sigma_real)))
+
+# Estimativa da Esperança
+Est_Esperanca = mean(medias)
+
+# Estimativa do viés
+Est_Vies <- Est_Esperanca-media_real
+
+# Data frame para o ggplot
+df <- data.frame(media = medias)
+
+# Gráfico com ggplot2
+ggplot(df, aes(x = media)) +
+  # Histograma
+  geom_histogram(fill = "lightblue", color = "black") +
+  # Marcando de vermelho o verdadeiro valor do parâmetro.
+  geom_vline(xintercept = media_real, color = "red", linewidth = 1) +
+  # Marcando de azul a estimativa da esperança do estimador
+  geom_vline(xintercept = Est_Esperanca, color = "blue", linewidth = 1) +
+  labs(title = "Histogramas das medias amostrais",
+       x = "Media amostral", y = "Frequência") +
+  theme_minimal()
+```
+
+Comprova-se, portanto, a falta de viés da média amostral.
+
+#### Viés de Estimadores de $\theta$ da Uniforme(0, $\theta$)
+
+Seja $X_1, X_2, \ldots, X_n$ uma amostra aleatória de uma população com distribuição Uniforme(0, $\theta$). Para estimar o parâmetro $\theta$, podemos usar dois estimadores diferentes:
+
+ - Estimador de Momentos: $\hat{\theta}_{MM} = 2\bar{X}$
+ - Estimador Máximo de Verossimilhança: $\hat{\theta}_{MV} = X_{(n)}$
+
+Pode-se provar que $E(\hat{\theta}_{MM}) = \theta$ e $E(\hat{\theta}_{MV}) = \frac{n}{n-1}\theta$, mostrando que o primeiro é não-viesado e o segundo é viesado, que, particularmente, subestima o parâmetro.
+
+Vamos conduzir um estudo computacional coletando amostras de tamanho $n=30$ de uma população Uniforme(0, $\theta=100$):
+
+```{r}
+# Parâmetro populacional
+theta_real <- 100
+
+# Quantidade de réplicas
+B <- 1000
+
+# Tamanho de amostra
+n = 30
+
+# Guarda as estimativas de momentos das B réplicas 
+set.seed(2025)
+theta_mm <- replicate(B, 2*mean(runif(n, max=theta_real)))
+
+# Guarda as estimativas de máxima verossimilhança das B réplicas 
+set.seed(2025)
+theta_mv <- replicate(B, max(runif(n, max=theta_real)))
+
+# Estimativa da esperança dos estimadores
+Est_Esperanca_mm = mean(theta_mm)
+Est_Esperanca_mv = mean(theta_mv)
+
+# Estimativa do viés
+Est_Vies_mm <- Est_Esperanca_mm-theta_real
+Est_Vies_mv <- Est_Esperanca_mv-theta_real
+
+# Data frames para o ggplot
+df_mm <- data.frame(theta_mm = theta_mm)
+df_mv <- data.frame(theta_mv = theta_mv)
+
+# Gráficos com ggplot2
+A = ggplot(df_mm, aes(x = theta_mm)) +
+      geom_histogram(fill = "lightblue", color = "black") +
+      geom_vline(xintercept = theta_real, color = "red", linewidth = 1) +
+      geom_vline(xintercept = Est_Esperanca_mm, color = "blue", linewidth = 1) +
+      labs(title = "Histograma do estimador MM",
+               x = "Estimador MM", y = "Frequência") +
+      theme_minimal()+
+      xlim(60,130)
+
+B = ggplot(df_mv, aes(x = theta_mv)) +
+      geom_histogram(fill = "lightblue", color = "black") +
+      geom_vline(xintercept = theta_real, color = "red", linewidth = 1) +
+      geom_vline(xintercept = Est_Esperanca_mv, color = "blue", linewidth = 1) +
+      labs(title = "Histograma do estimador MV",
+               x = "Estimador MV", y = "Frequência") +
+      theme_minimal()+
+      xlim(60,130)
+A/B
+```
+
+Assim, comprovamos que o estimador de MV é viesado e tende a subestimar o parâmetro $\theta$, especialmente, quando $n$ não é suficientemente grande.
+
+#### Exercício: Variâncias Amostrais
+
+Seja $X_1, X_2, \ldots, X_n$ uma amostra aleatória de uma população com média $\mu$ e variância $\sigma^2$. Considere os seguintes estimadores para a variância populacional:
+
+$$
+S_V^2 = \frac{1}{n} \sum_{i=1}^{n} (X_i - \bar{X})^2
+$$
+
+e 
+
+$$
+S^2 = \frac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{X})^2
+$$
+
+Pode-se provar que $E(S_V^2) = \frac{n-1}{n}\sigma^2$ e $E(S^2) = \sigma^2$, mostrando que o primeiro é viesado e o segundo é não-viesado.
+
+Faça em sequencia:
+
+Gere 1000 amostras de tamanho 30 de uma distribuição normal com média $\mu=170$ e $\sigma=10$. Calcule, para cada uma, os estimadores $S_V^2$ e $S^2$. Calcule as estimativas das esperanças dos dois estimadores e os respectivos vieses estimados. Faça um gráfico para cada estimador com os resultados.
+
+### Consistência
+
+A consistência de um estimador é uma propriedade fundamental que garante que, à medida que o tamanho da amostra aumenta, o estimador converge para o valor verdadeiro do parâmetro que está sendo estimado. Utilizaremos agora a notação $\hat{\theta}^n$ para o estimador apenas para reforçar que ele depende do tamanho amostral n. Formalmente, um estimador $\hat{\theta}^n$ é consistente para o parâmetro $\theta$ se:
+
+$$
+\hat{\theta}^n \xrightarrow{P} \theta \quad \text{quando} \quad n \to \infty
+$$
+
+onde $\xrightarrow{P}$ denota convergência em probabilidade, ou seja, para qualquer $\epsilon > 0$,
+
+$$
+\lim_{n \to \infty} P(\mod{\hat{\theta}^n - \theta} > \epsilon) = 0
+$$
+
+Isso significa que, com o aumento do tamanho da amostra $n$, a probabilidade de o estimador $\hat{\theta}^n$ se desviar de $\theta$ por mais de $\epsilon$ vai para zero.
+
+Para verificar computacionalmente se um estimador é consistente, podemos usar simulações para observar seu comportamento à medida que o tamanho da amostra aumenta. O processo é o seguinte:
+
+  1. Escolha um parâmetro $\theta$: Defina o parâmetro para o qual você deseja verificar a consistência do estimador.
+
+  2. Gere amostras: Para diferentes tamanhos de amostras $n$, gere $B$ amostras da população indexada por $\theta$ (por exemplo, $n=10, 30, 50, 100, 500…$)
+
+  3. Aplique o estimador: Para cada amostra, calcule o estimador $\hat{\theta}^n$.
+
+  4. Estime a esperança do estimador: Para cada tamanho de amostra $n$, estime a esperança do estimador.
+
+  5. Analise a convergência: Verifique se, à medida que $n$ aumenta, a estimativa da esperança de $\hat{\theta}^n$ se aproxima de $\theta$.
+
+#### Exemplo: Uniforme(0, $\theta$)
+
+Seja $X_1,X_2,…,X_n$ uma amostra aleatória de uma população descrita por uma variável uniforme (0,$\theta$). O valor máximo da amostra, dado por $X_{(n)}$ é o estimador de máxima verossimilhança de $\theta$. Queremos verificar se este estimador $X_{(n)}$ é um estimador consistente para $\theta$. Para exemplificar, vamos considerar $\theta=50$ e $n=10,30,50$ e $100$.
+
+```{r}
+# Parâmetro populacional
+theta_real = 50
+
+# Quantidade de réplicas
+B <- 1000
+
+# Função para gerar o gráfico
+gerar_grafico <- function(n) {
+
+  set.seed(2025)
+  thetas <- replicate(B, max(runif(n, min=0, max=theta_real)))
+  
+  # Estimativa da esperança
+  Est_Esperanca = mean(thetas)
+  
+  # Data frame para o ggplot
+  df <- data.frame(thetas = thetas)
+  
+  # Gráfico com ggplot2
+  ggplot(df, aes(x = thetas)) +
+    geom_histogram(fill = "lightblue", color = "black") +
+    geom_vline(xintercept = theta_real, color = "red", linewidth = 1) +
+    geom_vline(xintercept = Est_Esperanca, color = "blue", linewidth = 1) +
+    labs(title = paste("n=", n, sep = ""),
+         x = "Maximo Amostral", y = "Frequência absoluta") +
+    theme_minimal()+
+    xlim(25,50)
+}
+
+n <- c(10, 30, 50, 100)
+graficos <- lapply(n, gerar_grafico)
+
+# Combinar os gráficos com patchwork
+graficos[[1]] + graficos[[2]] + graficos[[3]] + graficos[[4]]+ plot_layout(ncol = 2)
+```
+
+Note como a estimativa da esperança do estimador vai se aproximando do verdadeiro valor do parâmetro, refletindo na consistência deste estimador.
+
+#### Exemplo: Distribuição Gamma (Parâmetro $\beta$)
+
+Seja $X_1,X_2,\ldots,X_n$ uma amostra aleatória de uma população descrita por uma variável Gamma $(\alpha,\beta)$. Considere a abordagem abordagem pelo método da máxima verossimilhança para o parâmetro $\beta$ (não há uma forma fechada, pois recorremos a métodos numéricos). Vamos verificar a consistência desse estimador. Para isto, vamos supor que a população possui uma distribuição Gama($\alpha=50,\beta=1/2$), $B=1000$ e utilizaremos $n=10,30,50$ e $100$.
+
+### Eficiência
+
+Na inferência estatística, frequentemente nos deparamos com mais de um estimador não viesado para o mesmo parâmetro populacional. Para decidir qual estimador utilizar, comparamos a variância desses estimadores. Surge então o conceito de eficiência.
+
+Sejam $\hat{\theta}^1$ e $\hat{\theta}^2$ dois estimadores não viesados de $\theta$. Dizemos que $\hat{\theta}^1$ é mais eficiente que $\hat{\theta}^2$ se:
+
+$$
+Var(\hat{\theta}^1) < Var(\hat{\theta}^2)
+$$
+
+Ou seja, entre dois estimadores não viesados, o mais eficiente é aquele com menor variância. A eficiência de $\hat{\theta}^1$ em relação a $\hat{\theta}^2$ é definida como:
+
+$$
+\text{Eficiência}(\hat{\theta}^1, \hat{\theta}^2) = \frac{Var(\hat{\theta}^2)}{Var(\hat{\theta}^1)}
+$$
+
+ - Se a eficiência for maior que 1, então $\hat{\theta}^2$ é mais eficiente.
+ - Se for menor que 1, então $\hat{\theta}^1$ é mais eficiente.
+ - Se for igual a 1, os dois estimadores têm a mesma eficiência.
+
+No R, para estimar a eficiência de dois estimadores não viesados $\hat{\theta}^1$ e $\hat{\theta}^2$, basta fazer:
+
+$$
+\text{Eficiência}(\hat{\theta}_1, \hat{\theta}_2) = \frac{Var(\hat{\theta}_2)}{Var(\hat{\theta}_1)}
+$$
+
+#### Exemplo: Média e Mediana Amostrais
+
+Seja $X_1,X_2,…,_n$ uma amostra aleatória de uma população com distribuição normal de média $\mu=170$ e desvio padrão $\sigma=10$.
+
+Nosso objetivo é comparar dois estimadores que podem ser usadas para estimar $\mu$:
+
+ - A média amostral: $\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i$.
+ - A mediana amostral: $\tilde{X} = $ valor central da amostra ordenada.
+
+Sabemos que:
+
+  - A média amostral é o estimador de máxima verossimilhança e, para dados normais, é o melhor estimador não-viesado.
+  - A mediana é um estimador robusto, mas menos eficiente quando a distribuição é simétrica como a normal.
+
+Vamos comparar esses dois estimadores quanto à sua eficiência, definida por:
+
+$$
+\text{Eficiência}(\bar{X}, \tilde{X}) = \frac{Var(\tilde{X})}{Var(\bar{X})}
+$$
+
+Sabemos que, $Var(\bar{X}) = \frac{\sigma^2}{n}$ e, para n grande, $Var(\tilde{X}) \approx \frac{\pi \sigma^2}{2n}$. Assim, para $n$ grande, temos:
+
+$$
+\text{Eficiência}(\bar{X}, \tilde{X}) = \frac{\frac{\sigma^2}{n} }{\frac{\pi \sigma^2}{2n}} = \frac{2}{\pi} \approx 0.6366
+$$
+
+Como $\text{Eficiência}(\bar{X}, \tilde{X}) < 1$ a média amostral é mais eficiente que a mediana para estimar o centro de uma normal. Apesar de ser menos eficiente, a mediana é muito mais robusta a outliers — daí ela ser super valorizada em situações de dados discrepantes. Seguem os códigos para um tamanho $n=25$:
+
+```{r}
+# Parâmetros populacionais
+media_real <- 170
+sigma_real <- 10
+
+# Quantidade de réplicas
+B <- 1000
+# Tamanho de amostra
+n = 25
+
+# Guarda as médias das B réplicas (distribuição do estimador)
+set.seed(2025)
+medias <- replicate(B, mean(rnorm(n, mean = media_real, sd = sigma_real)))
+
+# Guarda as medianas das B réplicas (distribuição do estimador)
+set.seed(2025)
+medianas <- replicate(B, median(rnorm(n, mean = media_real, sd = sigma_real)))
+
+# Estimativa da Variância do estimador média amostral
+Est_Variancia_media = var(medias)
+# Estimativa da Variância do estimador mediana amostral
+Est_Variancia_mediana = var(medianas)
+
+# Estimativa da eficiência:
+Est_Eficiencia = Est_Variancia_media/Est_Variancia_mediana
+
+# Resultados:
+Est_Variancia_mediana
+
+Est_Variancia_media
+
+Est_Eficiencia
+```
+
+Agora vamos fazer um estudo variando o tamanho da amostra $n$:
+
+```{r}
+# Parâmetros populacionais
+media_real <- 170
+sigma_real <- 10
+
+# Quantidade de réplicas
+B <- 1000
+
+# Tamanhos de amostra
+n_vals <- c(10, 20, 30, 50, 100, 200, 300, 400, 500)
+
+# Vetor para armazenar as eficiências
+eficiencias <- numeric(length(n_vals))
+
+# Loop para calcular a eficiência para cada tamanho de amostra
+for (i in 1:length(n_vals)) {
+  n <- n_vals[i]
+  
+  # Guarda as médias das B réplicas (distribuição do estimador)
+  set.seed(2025)
+  medias <- replicate(B, mean(rnorm(n, mean = media_real, sd = sigma_real)))
+  
+  # Guarda as medianas das B réplicas (distribuição do estimador)
+  set.seed(2025)
+  medianas <- replicate(B, median(rnorm(n, mean = media_real, sd = sigma_real)))
+  
+  # Estimativa da Variância do estimador média amostral
+  Est_Variancia_media = var(medias)
+  # Estimativa da Variância do estimador mediana amostral
+  Est_Variancia_mediana = var(medianas)
+  
+  # Estimativa da eficiência:
+  Est_Eficiencia = Est_Variancia_media / Est_Variancia_mediana
+  
+  # Armazenando a eficiência
+  eficiencias[i] <- Est_Eficiencia
+}
+
+# Criar um gráfico da eficiência em função de n
+dados <- data.frame(
+  n = n_vals,
+  eficiencia = eficiencias
+)
+
+# Gráfico
+ggplot(dados, aes(x = n, y = eficiencia)) +
+  geom_line(color = "blue") +
+  geom_point(color = "blue") +
+  labs(
+    title = "Eficiência da Media em relação à Mediana para Diferentes Tamanhos de Amostra",
+    x = "Tamanho da Amostra (n)",
+    y = "Eficiência"
+  ) +
+  theme_minimal() 
+```
+
+Como esperado, para $n$ grande, a eficiência oscila em torno do valor 0,637.\
+
+#### Exercício: Distribuição Exponencial
+
+Seja $X_1,X_2,\ldots,X_n$ uma amostra aleatória simples de uma distribuição exponencial $Exp(\lambda)$.
+
+Dois estimadores não viesados são propostos para estimar a média $\mu=\frac{1}{\lambda}$:
+
+  - Estimador 1 (média amostral):
+
+$$
+\mu_1 = \frac{1}{n} \sum_{i=1}^{n} X_i
+$$
+
+A média amostral é um estimador não tendencioso para $\mu$. A variância da média amostral $\bar{X}$ é dada por:
+
+$$
+Var(\hat{\mu}_1) = \frac{\sigma^2}{n} = \frac{1/\lambda^2}{n} = \frac{1}{\lambda^2 n}
+$$
+
+Para a distribuição exponencial, sabemos que $\sigma^2 = \frac{1}{\lambda^2}$, logo:
+
+$$
+Var(\hat{\mu}_1) = \frac{1/\lambda^2}{n} = \frac{1}{\lambda^2 n}
+$$
+
+ - Estimador 2 (mínimo ajustado)
+
+$$
+\hat{\mu}_2 = n \cdot \min(X_1, X_2, \ldots, X_n)
+$$
+
+Pode-se provar que:
+
+$$
+E[\hat{\mu}_2] = \frac{1}{\lambda} = \mu
+$$
+
+Logo, $\hat{\mu}_2$ é um estimador não tendencioso para $\mu$.
+
+A variância de $min(X_1, \cdots, X_n)$ é:
+
+$$
+Var(min(X_1, \cdots, X_n)) = \frac{1}{\lambda^2 n^2}
+$$
+
+Portanto:
+
+$$
+Var(\hat{\mu}_2) = n^2 \cdot Var(min(X_1, \cdots, X_n)) = n^2 \cdot \frac{1}{\lambda^2 n^2} = \frac{1}{\lambda^2}
+$$
+
+A eficiência teórica do estimador 2 em relação ao estimador 1 é dada pela razão das variâncias:
+
+$$
+\text{Eficiência}(\hat{\mu}_1, \hat{\mu}_2) = \frac{Var(\hat{\mu}_1)}{Var(\hat{\mu}_2)} = \frac{\frac{1}{\lambda^2 n}}{\frac{1}{\lambda^2}} = \frac{1}{n}
+$$
+
+Portanto, a eficiência teórica do estimador 2 em relação ao estimador 1 é:
+
+$$
+\text{Eficiência} = \frac{1}{n}
+$$
+
+ 1. Considere $\lambda = 1/50, n = 25 \text{ e } B = 1000$. Estime, empiricamente, a eficiência entre estes dois estimadores.
+
+ 2. Faça um estudo variando o tamanho da amostra $n$ com a eficiência, considerando $n = 10, 20, 30, 50, 100, 200, 300, 400, 500$.
+
+### Erro Quadrático Médio
+
+Na prática, um estimador pode ser não viesado, mas ainda assim apresentar alta variância, tornando-o indesejável. Para avaliar a qualidade global de um estimador, consideramos o seu Erro Quadrático Médio (EQM).
+
+Dado um estimador $\hat{\theta}$ de um parâmetro $\theta$, o EQM é definido como:
+
+$$
+EQM(\hat{\theta}) = E\left[(\hat{\theta} - \theta)^2\right] 
+$$
+
+O EQM pode ser decomposto em duas partes fundamentais:
+
+$$
+EQM(\hat{\theta}) = Var(\hat{\theta}) + Viés(\hat{\theta})^2
+$$
+
+Ou seja, o erro quadrático médio incorpora tanto a variância quanto o viés do estimador. Isso significa que mesmo um estimador viesado pode ter baixo EQM, caso seu viés seja pequeno e sua variância também.
+
+Dado dois estimadores $\hat{\theta}^1$ e $\hat{\theta}^2$, podemos dizer que:
+
+
+  - $\hat{\theta}^1$ é melhor que $\hat{\theta}^2$ se $EQM(\hat{\theta}^1)<EQM(\hat{\theta}^2)$.
+
+Essa comparação leva em conta tanto a precisão (variância) quanto a exatidão (viés) dos estimadores. Podemos definir, ainda, a eficiência relativa de dois estimadores $\hat{\theta}^1$ e $\hat{\theta}^2$ que é a razão entre seus erros quadráticos médios (EQMs). Suponha que ambos sejam estimadores de um mesmo parâmetro $\theta$. A eficiência relativa de $\hat{\theta}^1$ em relação a $\hat{\theta}^2$ é dada por:
+
+$$
+\text{Eficiência Relativa} = \frac{EQM(\hat{\theta}^1)}{EQM(\hat{\theta}^2)}
+$$
+
+Uma eficiência relativa menor que 1 indica que $\hat{\theta}^1$ é mais eficiente que $\hat{\theta}^2$, ou seja, possui menor EQM.
+
+No R, para estimar o erro quadrático médio de um estimador $\hat{\theta}$, basta fazer:
+
+$$
+\hat{EQM}(\hat{\theta}) = \hat{Var}(\hat{\theta}) + \hat{Viés}(\hat{\theta})^2
+$$
+
+Consequentemente, para estimar a eficiência relativa entre dois estimadores $\hat{\theta}^1$ e $\hat{\theta}^2$, tem-se:
+
+$$
+\hat{Eficiência Relativa} = \frac{\hat{EQM}(\hat{\theta}^1)}{\hat{EQM}(\hat{\theta}^2)}
+$$
+
+#### Exemplo: Distribuição Uniforme
+
+Seja $X_1,X_2,\ldots,X_n$ uma amostra aleatória de uma população distribuição Uniforme $(0,\theta)$. Para estimar $\theta$, temos dois estimadores, por exemplo:
+
+  - Estimador de momentos: \hat{\theta}^{MM} = 2\bar{X}
+
+  - Estimador de máxima verossimilhança: \hat{\theta}^{MV} = X_{(n)}
+
+Pode-se provar que, analiticamente:
+
+$$
+EQM(\hat{\theta}_{MM}) = \frac{\theta^2}{3n}
+$$
+
+$$
+EQM(\hat{\theta}_{MV}) = \frac{2\theta^2}{(n+1)(n+2)}
+$$
+
+A eficiência relativa do estimador de máxima verossimilhança em relação ao estimador de momentos é dada por:
+
+$$
+\hat{Eficiência Relativa} = \frac{(n+1)(n+2)}{6n}
+$$
+
+Assim, quanto maior o tamanho amostral n
+
+, mais eficiente se torna o estimador de máxima verossimilhança em comparação com o de momentos.
+
+Vamos avaliar o erro quadrático médio de ambos os estimadores e a eficiencia relativa entre eles coletando amostras de tamanho $n=30$ de uma população uniformemente distribuida com $\theta=100$. Para isso, os resultados teóricos são:
+
+$$
+\begin{align*}
+EQM(\hat{\theta}_{MM}) &= \frac{100^2}{3 \cdot 30} = \frac{10000}{90} \approx 111.11 \\
+EQM(\hat{\theta}_{MV}) &= \frac{2 \cdot 100^2}{(30+1)(30+2)} = 20,16 \\
+\hat{Eficiência Relativa} &= \frac{EQM(\hat{\theta}_{MM})}{EQM(\hat{\theta}_{MV})} \approx 5,51
+\end{align*}
+$$
+
+Seguem os comandos que estimam, empiricamente, estes erros quadráticos médios e eficiência relativa.
+
+```{r}
+# Parâmetro populacional
+theta_real <- 100
+
+# Quantidade de réplicas
+B <- 1000
+
+# Tamanho de amostra
+n = 30
+
+# Guarda as estimativas de momentos das B réplicas 
+set.seed(2025)
+theta_mm <- replicate(B, 2*mean(runif(n, max=theta_real)))
+
+# Guarda as estimativas de máxima verossimilhança das B réplicas 
+set.seed(2025)
+theta_mv <- replicate(B, max(runif(n, max=theta_real)))
+
+# Estimativa da esperança dos estimadores
+Est_Esperanca_mm = mean(theta_mm)
+Est_Esperanca_mv = mean(theta_mv)
+
+# Estimativa do viés dos estimadores
+Est_Vies_mm <- Est_Esperanca_mm-theta_real
+Est_Vies_mv <- Est_Esperanca_mv-theta_real
+
+# Estimativa da variância dos estimadores
+Est_Var_mm <- var(theta_mm)
+Est_Var_mv <- var(theta_mv)
+
+# Estimativa do erro quadrático médio dos estimadores
+Est_EQM_mm <- Est_Var_mm + Est_Vies_mm^2
+Est_EQM_mv <- Est_Var_mv + Est_Vies_mv^2
+
+# Estimativa da eficiência relativa entre os dois estimadores
+Est_Eficiencia <- Est_EQM_mm/Est_EQM_mv
+
+Est_EQM_mm 
+
+Est_EQM_mv
+
+Est_Eficiencia
+```
+
+Conforme esperado, as estimativas são próximas dos valores reais. Dessa forma, apesar do estimador de momentos ser não viesado, ele apresenta um erro quadrático médio bem inferior ao do estimador de máxima verossimilhança e, consequentemente, é menos eficiente. Agora vamos verificar como essa eficiência varia de acordo com o tamanho da amostra $n$:
+
+```{r}
+# Parâmetro populacional
+theta_real <- 100
+
+# Quantidade de réplicas
+B <- 1000
+
+# Tamanhos de amostra
+n_vals <- c(10, 20, 30, 50, 100, 200, 300, 400, 500)
+
+# Vetor de eficiências
+eficiencias <- numeric(length(n_vals))
+
+# Loop para calcular a eficiência para cada tamanho de amostra
+for (i in 1:length(n_vals)) {
+  n <- n_vals[i]
+  # Guarda as estimativas de momentos das B réplicas 
+  set.seed(2025)
+  theta_mm <- replicate(B, 2*mean(runif(n, max=theta_real)))
+  # Guarda as estimativas de máxima verossimilhança das B réplicas 
+  set.seed(2025)
+  theta_mv <- replicate(B, max(runif(n, max=theta_real)))
+  # Estimativa da esperança dos estimadores
+  Est_Esperanca_mm = mean(theta_mm)
+  Est_Esperanca_mv = mean(theta_mv)
+
+  # Estimativa do viés dos estimadores
+  Est_Vies_mm <- Est_Esperanca_mm-theta_real
+  Est_Vies_mv <- Est_Esperanca_mv-theta_real
+
+  # Estimativa da variância dos estimadores
+  Est_Var_mm <- var(theta_mm)
+  Est_Var_mv <- var(theta_mv)
+
+  # Estimativa do erro quadrático médio dos estimadores
+  Est_EQM_mm <- Est_Var_mm + Est_Vies_mm^2
+  Est_EQM_mv <- Est_Var_mv + Est_Vies_mv^2
+
+  # Estimativa da eficiência relativa entre os dois estimadores
+  Est_Eficiencia <- Est_EQM_mm/Est_EQM_mv
+  
+  # Armazenando a eficiência
+  eficiencias[i] <- Est_Eficiencia
+}
+
+  # Criar um gráfico da eficiência em função de n
+  dados <- data.frame(
+  n = n_vals,
+  eficiencia = eficiencias
+ )
+
+  # Gráfico
+  ggplot(dados, aes(x = n, y = eficiencia)) +
+   geom_line(color = "blue") +
+   geom_point(color = "blue") +
+   labs(
+    title = "Eficiência do estimador mm em relação ao estimador mv para Diferentes Tamanhos de Amostra",
+    x = "Tamanho da Amostra (n)",
+    y = "Eficiência"
+  ) +
+  theme_minimal() 
+```
+
+#### Exercício: Variâncias Amostrais
+
+Seja $X_1,X_2,\ldots,X_n$ uma amostra aleatória de uma população com distribuição Normal $(\mu, \sigma^2)$. Para estimar $\sigma^2$, temos dois estimadores, por exemplo:
+
+ - Estimador não viesado: $S^2 = \frac{1}{n-1}\sum_{i=1}^n (X_i - \bar{X})^2$
+ - Estimador viesado: $\hat{\sigma}^2 = \frac{1}{n}\sum_{i=1}^n (X_i - \bar{X})^2$
+
+Pode-se provar que, analiticamente:
+
+$$
+\begin{align*}
+E(S^2) &= \frac{2}{n-1}\sigma^4 \\
+E(S^2_{v}) &= \frac{2n-1}{n^2}\sigma^4
+\end{align*}
+$$
+
+A **eficiência relativa** do estimador não viesado em relação ao viesado é dada por:
+
+$$
+\text{Eficiência Relativa} = \frac{E(S^2)}{E(S^2_{v})} = \frac{\frac{2}{n-1}\sigma^4}{\frac{2n-1}{n^2}\sigma^4} = \frac{n^2}{(n-1)(2n-1)}
+$$
+
+Assim, para grandes amostras ($n$ grande), a eficiência de ambos os estimadores se torna muito próxima, em termos do MSE.
+
+  1. Avalie o erro quadrático médio de ambos os estimadores e a eficiência relativa entre eles coletando amostras de tamanho $n=30$ de uma população normalmente distribuída com média $\mu=170$ e variância $\sigma^2=100$. Para isso, os resultados teóricos são:
+
+$$
+\begin{align*}
+EQM(\hat{\sigma}^2_{viesado}) = \frac{2*30-1}{30^2} \cdot 100^2 = \frac{59}{900} \cdot 10000 = 655.56 \\
+EQM(\hat{\sigma}_{nv}) = \frac{2}{30 - 1} \cdot 100^2 = \frac{2}{29} \cdot 10000 = 689.66 \\
+\text{Eficiência Relativa} = \frac{689.66}{655.56} = 1.05
+\end{align*}
+$$
+
+Estime estes resultados a partir de simulação.
+
+ 2. Faça um estudo variando o tamanho da amostra $n$ com a eficiência, considerando $n = 10, 20, 30, 50, 100, 200, 300, 400$ e $500$.
+
+#### Exemplo: Distribuição Gamma (Parâmetro $\alpha=2$)
+
+Seja $X_1,X_2,…,_n$ uma amostra aleatória de uma população com distribuição Gamma($\alpha,\beta$). Para estimar $\alpha$, temos dois estimadores, por exemplo:
+
+  - Estimador de momentos $\hat{\alpha}^{MM}$
+
+  - Estimador de máxima verossimilhança $\hat{\alpha}^{MV}$
+
+Diferentemente dos exemplos anteriores, não temos fórmulas fechadas para o EQM de ambos os estimadores e uma forma muito válida de avaliar a eficiência relativa entre estes dois estimadores é recorrendo a estudos computacionais. Vamos supor $B=1000$, $\alpha=5$, $\beta=4$ e $n=25$:
+
+```{r}
+# Parâmetros populacionais
+alfa_real <- 5
+beta_real <- 4
+
+# Quantidade de réplicas
+B <- 1000
+
+# Tamanho de amostra
+n = 25
+
+# Guarda as estimativas de momentos das B réplicas 
+set.seed(2025)
+alfa_mm <- replicate(B,fitdist(data=rgamma(n,shape=alfa_real,rate=beta_real),
+                               dist="gamma",
+                               method="mme")$estimate[1])
+
+# Guarda as estimativas de máxima verossimilhança das B réplicas 
+set.seed(2025)
+alfa_mv <- replicate(B,fitdist(data=rgamma(n,shape=alfa_real,rate=beta_real),
+                               dist="gamma",
+                               method="mle")$estimate[1])
+
+# Estimativa da esperança dos estimadores
+Est_Esperanca_mm = mean(alfa_mm)
+Est_Esperanca_mv = mean(alfa_mv)
+
+# Estimativa do viés dos estimadores
+Est_Vies_mm <- Est_Esperanca_mm-alfa_real
+Est_Vies_mv <- Est_Esperanca_mv-alfa_real
+
+# Estimativa da variância dos estimadores
+Est_Var_mm <- var(alfa_mm)
+Est_Var_mv <- var(alfa_mv)
+
+# Estimativa do erro quadrático médio dos estimadores
+Est_EQM_mm <- Est_Var_mm + Est_Vies_mm^2
+Est_EQM_mv <- Est_Var_mv + Est_Vies_mv^2
+
+# Estimativa da eficiência relativa entre os dois estimadores
+Est_Eficiencia <- Est_EQM_mm/Est_EQM_mv
+
+Est_EQM_mm 
+
+Est_EQM_mv
+
+Est_Eficiencia
+```
+
+Observa-se que o estimador de máxima verossimilhança melhor eficiencia que o estimador do método dos momentos: Vamos avaliar agora variando o tamanho amostral $n$:
+
+```{r}
+# Parâmetros populacionais
+alfa_real <- 5
+beta_real <- 4
+
+# Quantidade de réplicas
+B <- 1000
+
+# Tamanhos de amostra
+n_vals <- c(10, 20, 30, 50, 100, 200, 300, 400, 500)
+
+# Vetor de eficiências
+eficiencias <- numeric(length(n_vals))
+
+# Loop para calcular a eficiência para cada tamanho de amostra
+for (i in 1:length(n_vals)) {
+  n <- n_vals[i]
+# Guarda as estimativas de momentos das B réplicas 
+set.seed(2025)
+alfa_mm <- replicate(B,fitdist(data=rgamma(n,shape=alfa_real,rate=beta_real),
+                               dist="gamma",
+                               method="mme")$estimate[1])
+
+# Guarda as estimativas de máxima verossimilhança das B réplicas 
+set.seed(2025)
+alfa_mv <- replicate(B,fitdist(data=rgamma(n,shape=alfa_real,rate=beta_real),
+                               dist="gamma",
+                               method="mle")$estimate[1])
+
+# Estimativa da esperança dos estimadores
+Est_Esperanca_mm = mean(alfa_mm)
+Est_Esperanca_mv = mean(alfa_mv)
+
+# Estimativa do viés dos estimadores
+Est_Vies_mm <- Est_Esperanca_mm-alfa_real
+Est_Vies_mv <- Est_Esperanca_mv-alfa_real
+
+# Estimativa da variância dos estimadores
+Est_Var_mm <- var(alfa_mm)
+Est_Var_mv <- var(alfa_mv)
+
+# Estimativa do erro quadrático médio dos estimadores
+Est_EQM_mm <- Est_Var_mm + Est_Vies_mm^2
+Est_EQM_mv <- Est_Var_mv + Est_Vies_mv^2
+
+# Estimativa da eficiência relativa entre os dois estimadores
+Est_Eficiencia <- Est_EQM_mm/Est_EQM_mv
+
+  # Armazenando a eficiência
+  eficiencias[i] <- Est_Eficiencia
+}
+
+  # Criar um gráfico da eficiência em função de n
+  dados <- data.frame(
+  n = n_vals,
+  eficiencia = eficiencias
+ )
+
+  # Gráfico
+  ggplot(dados, aes(x = n, y = eficiencia)) +
+   geom_line(color = "blue") +
+   geom_point(color = "blue") +
+   labs(
+    title = "Eficiência do estimador mm em relação ao estimador mv para Diferentes Tamanhos de Amostra",
+    x = "Tamanho da Amostra (n)",
+    y = "Eficiência"
+  ) +
+  theme_minimal() 
+```
+
+#### Exercício: Distribuição Gamma (Parâmetro $\beta$)
+
+Seja $X_1,X_2,…,_n$ uma amostra aleatória de uma população com distribuição Gamma($\alpha$,$\beta$). Para estimar $\beta$, temos dois estimadores, por exemplo:
+
+  - Estimador de momentos $\hat{\beta}^{MM}$
+
+  - Estimador de máxima verossimilhança $\hat{\beta}^{MV}$
+
+Diferentemente dos exemplos anteriores, não temos fórmulas fechadas para o EQM de ambos os estimadores e uma forma muito válida de avaliar a eficiência relativa entre estes dois estimadores é recorrendo a estudos computacionais. Suponha $B=1000$, $\alpha=5$, $\beta=4$ e $n=25$ e estime os erros quadráticos médios e eficiência relativa entre estes dois estimadores.

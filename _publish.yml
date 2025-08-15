@@ -1,0 +1,4 @@
+- source: project
+  quarto-pub:
+    - id: 2ced663d-529e-40ed-be80-f90dc6f1f3bb
+      url: https://fpcgg.quarto.pub/estatistica-computacional
