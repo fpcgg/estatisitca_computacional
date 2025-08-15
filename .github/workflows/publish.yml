@@ -75,16 +75,3 @@ jobs:
         uses: quarto-dev/quarto-actions/publish@v2
         with:
           QUARTO_PUB_AUTH_TOKEN: ${{ secrets.QUARTO_PUB_AUTH_TOKEN }}
-
-      # 9️⃣ Compactar todo o repositório para backup no Google Drive
-      - name: Compactar todo o repositório
-        run: zip -r repository-archive.zip .
-
-      # 🔟 Enviar para Google Drive
-      - name: Upload para Google Drive
-        uses: Jumbo810/Upload_Github_Artifacts_TO_GDrive@v2.2.2
-        with:
-          target: 'repository-archive.zip'
-          parent_folder_id: ${{ secrets.GDRIVE_FOLDER_ID }}
-          credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
-          name: 'commit-${{ github.sha }}.zip'
