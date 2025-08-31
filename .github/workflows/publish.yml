@@ -53,6 +53,9 @@ jobs:
             any::htmltools
             any::plotly
             any::tidyverse
+            any::fitdistrplus
+            any::patchwork
+            any::tibble
 
       # 4️⃣ (Opcional) Mostrar pacotes instalados para debug
       - name: Verificar pacotes instalados
