@@ -260,7 +260,7 @@ Se $n =  49$, $a = 2$, $b = 5$:
 
 ## Aplicativo Shiny
 
-Este aplicativo Shiny foi desenvolvido para ilustrar, de forma interativa e visual, o Teorema Central do Limite (TCL) — um dos pilares da inferência estatística. A partir da simulação de amostras de diferentes distribuições, o usuário pode observar como a distribuição da média amostral tende a uma distribuição normal à medida que o tamanho da amostra aumenta, independentemente da forma da distribuição original. Explore diferentes cenários, escolha a distribuição populacional, defina parâmetros, o tamanho da amostra e o número de repetições, e veja o TCL em ação: \[Simulação TCL\](https://guilhermeuff.shinyapps.io/TEOREMA_TCL/)
+Este aplicativo Shiny foi desenvolvido para ilustrar, de forma interativa e visual, o Teorema Central do Limite (TCL) — um dos pilares da inferência estatística. A partir da simulação de amostras de diferentes distribuições, o usuário pode observar como a distribuição da média amostral tende a uma distribuição normal à medida que o tamanho da amostra aumenta, independentemente da forma da distribuição original. Explore diferentes cenários, escolha a distribuição populacional, defina parâmetros, o tamanho da amostra e o número de repetições, e veja o TCL em ação: [Simulação TCL](https://guilhermeuff.shinyapps.io/TEOREMA_TCL/ "Simulação TCL")
 
 ## Distribuição Amostral da Proporção
 
@@ -387,4 +387,4 @@ Este resultado é exato somente sob a suposição de normalidade da população.
 
 ### Exercício
 
-Considere que $X_1, X_2, \cdots, X_n$ seja uma amostra aleatória de tamanho $n=16$ de uma população com distribuição Normal com parâmetros $\mu=170$ e $\sigma^2=100$. Considerando $B=1000$ verifique, computacionalmente, se a distribuição da estatística $(n−1)S^2\sigma^2$ tem distribuição qui-quadrado com $n−1$ graus de liberdade. [Simulação TCL](https://guilhermeuff.shinyapps.io/TEOREMA_TCL/ "Simulação TCL")
+Considere que $X_1, X_2, \cdots, X_n$ seja uma amostra aleatória de tamanho $n=16$ de uma população com distribuição Normal com parâmetros $\mu=170$ e $\sigma^2=100$. Considerando $B=1000$ verifique, computacionalmente, se a distribuição da estatística $(n−1)S^2\sigma^2$ tem distribuição qui-quadrado com $n−1$ graus de liberdade. 
