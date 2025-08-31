@@ -52,6 +52,7 @@ jobs:
             any::htmlwidgets
             any::htmltools
             any::plotly
+            any::tibble
 
       # 4️⃣ (Opcional) Mostrar pacotes instalados para debug
       - name: Verificar pacotes instalados
