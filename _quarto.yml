@@ -21,7 +21,7 @@ book:
     - capitulo1.qmd
     - capitulo2.qmd
     - capitulo3.qmd
-    - capítulo4.qmd
+    - capitulo4.qmd
 
 format:
   html:
