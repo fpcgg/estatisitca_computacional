@@ -1,5 +1,6 @@
-```{r message=FALSE, warning=FALSE, error=FALSE, include=FALSE}
-if(!require(tidyverse)) install.packages("tidyverse", dependencies=TRUE)
+```{r setup, message=FALSE, warning=FALSE, include=FALSE}
+# Apenas carregue os pacotes. A instalação é feita pelo workflow.
+library(tidyverse)
 ```
 
 # Inferência para Uma População

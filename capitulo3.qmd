@@ -1,8 +1,9 @@
-```{r message=FALSE, warning=FALSE, error=FALSE, include=FALSE}
-if(!require(fitdistrplus)) install.packages("fitdistrplus", dependencies=TRUE)
-if(!require(ggplot2)) install.packages("ggplot2", dependencies=TRUE)
-if(!require(patchwork)) install.packages("patchwork", dependencies=TRUE)
-if(!require(plotly)) install.packages("plotly", dependencies=TRUE)
+```{r setup, message=FALSE, warning=FALSE, include=FALSE}
+# Apenas carregue os pacotes. A instalação é feita pelo workflow.
+library(fitdistrplus)
+library(ggplot2)
+library(patchwork)
+library(plotly)
 ```
 
 # Estimadores Pontuais e sua Propriedades
