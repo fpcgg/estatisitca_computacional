@@ -1,5 +1,4 @@
 ```{r setup, message=FALSE, warning=FALSE, include=FALSE}
-# Apenas carregue os pacotes. A instalação é feita pelo workflow.
 library(fitdistrplus)
 library(ggplot2)
 library(patchwork)
