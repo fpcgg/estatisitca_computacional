@@ -1,5 +1,5 @@
-```{r message=FALSE, warning=FALSE}
-require("tidyverse")
+```{r message=FALSE, warning=FALSE, error=FALSE, include=FALSE}
+if(!require(tidyverse)) install.packages("tidyverse", dependencies=TRUE)
 ```
 
 # Inferência para Uma População
