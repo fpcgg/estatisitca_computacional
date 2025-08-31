@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>capitulo4</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="capitulo4_files/libs/clipboard/clipboard.min.js"></script>
+<script src="capitulo4_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="capitulo4_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="capitulo4_files/libs/quarto-html/popper.min.js"></script>
+<script src="capitulo4_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="capitulo4_files/libs/quarto-html/anchor.min.js"></script>
+<link href="capitulo4_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="capitulo4_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="capitulo4_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="capitulo4_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="capitulo4_files/libs/bootstrap/bootstrap-bb462d781dde1847d9e3ccf7736099dd.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(<span class="st">"tidyverse"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="inferência-para-uma-população" class="level1">
+<h1>Inferência para Uma População</h1>
+<p>Quando nos deparamos com a necessidade de fazer inferências sobre uma única população, estamos lidando com o desafio de entender e estimar parâmetros populacionais com base em uma única amostra. Em muitas situações práticas, é impossível ou inviável coletar dados de toda a população. Nesse contexto, a estatística nos oferece ferramentas para tirar conclusões sobre essa população, com base em um número limitado de observações.</p>
+<p>Até agora, aprendemos como avaliar a qualidade de um estimador: vimos o que significa ele ser não viciado, consistente e eficiente. Em outras palavras, já sabemos julgar se um número calculado a partir de uma amostra é, em princípio, um bom representante daquilo que queremos saber sobre a população — como a média, a proporção ou a variância populacional.</p>
+<p>Mas há uma pergunta essencial que ainda não foi respondida: “Mesmo que o meu estimador seja bom, o quão confiável é o valor obtido na prática, a partir de uma única amostra?”</p>
+<p>É aí que entra o próximo passo da jornada: entender o comportamento dos estimadores ao longo de todas as possíveis amostras. O nome disso é distribuição amostral. Quando conhecemos essa distribuição, conseguimos quantificar a incerteza que acompanha qualquer estimativa — e com isso, construir intervalos de confiança e realizar testes de hipótese.</p>
+<p>Para isso, vamos estudar os casos em que essas distribuições são conhecidas:</p>
+<ul>
+<li>A distribuição da média amostral quando a população é normal</li>
+<li>A distribuição da variância amostral quando a população é normal</li>
+</ul>
+<p>Adicionalmente, vamos explorar uma das ideias mais poderosas da estatística: o Teorema Central do Limite (TCL). Ele nos mostra que, mesmo que a população não seja normal, a média das amostras tende a seguir uma distribuição normal à medida que o tamanho da amostra cresce. Isso abre as portas para aplicar a inferência em situações reais, onde raramente conhecemos a distribuição da população. Um exemplo clássico é a utilização do TCL na distribuição da proporção amostral em dados binários.</p>
+<p>O apelo computacional entra aqui como um aliado fundamental. Ao simularmos muitas amostras de uma mesma população, conseguimos:</p>
+<ul>
+<li>Ver na prática como as distribuições amostrais se formam.</li>
+<li>Comparar distribuições em diferentes cenários (normal, assimétrica, etc.)</li>
+<li>Observar o efeito do tamanho amostral sobre a variabilidade e a forma da distribuição</li>
+<li>Visualizar como os estimadores se comportam e como o TCL se manifesta</li>
+</ul>
+<p>Essa abordagem transforma o aprendizado: da teoria abstrata para uma compreensão visual, empírica e exploratória, tornando a transição para intervalos de confiança e testes de hipótese muito mais natural e intuitiva.</p>
+<p>Vamos ver os seguintes tópicos, computacionalmente:</p>
+<ul>
+<li>Distribuição amostral da média (caso normal)</li>
+<li>Teorema central do limite</li>
+<li>Distribuição amostral da proporção</li>
+<li>Distribuição amostral da variância (caso normal)</li>
+</ul>
+<section id="distribuição-amostral-da-média-caso-normal" class="level2">
+<h2 class="anchored" data-anchor-id="distribuição-amostral-da-média-caso-normal">Distribuição Amostral da Média (Caso Normal)</h2>
+<p>Seja <span class="math inline">\(X_1, X_2, \cdots, X_n\)</span> uma amostra aleatória simples de tamanho n extraída de uma população com distribuição normal:</p>
+<p><span class="math display">\[
+\bar{X} \sim N\left(\mu, \frac{\sigma^2}{n}\right)
+\]</span></p>
+<p>com <span class="math inline">\(\mu \in \mathbb{R}\)</span> e <span class="math inline">\(\sigma^2 &gt; 0\)</span>.</p>
+<p>Pode-se provar que a média amostral <span class="math inline">\(\bar{X}\)</span> possui distribuição normal com média <span class="math inline">\(\mu\)</span> e variância <span class="math inline">\(\frac{\sigma^2}{n}\)</span>.</p>
+<p><span class="math display">\[
+\bar{X} \sim N\left(\mu, \frac{\sigma^2}{n}\right)
+\]</span></p>
+<p>Este resultado é exato, pois decorre da suposição de normalidade da população. Não há necessidade de invocar o Teorema Central do Limite aqui.</p>
+<section id="exemplo" class="level3">
+<h3 class="anchored" data-anchor-id="exemplo">Exemplo</h3>
+<p>Para exemplificar, considere que <span class="math inline">\(X_1, X_2,\cdots, X_n\)</span> seja uma amostra aleatória de uma população com distribuição Normal <span class="math inline">\((\mu=170,\sigma^2=100)\)</span>. Ao considerar <span class="math inline">\(n=25\)</span>, teremos que:</p>
+<p><span class="math display">\[
+\bar{X} \sim N(\mu, \frac{\sigma^2}{n}) = N(170, 4)
+\]</span></p>
+<p>Vamos comprovar este resultado computacionalmente, simulando <span class="math inline">\(B=1000\)</span> amostras:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Configuração dos Parâmetros ---</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Parâmetros da população original (X)</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>media_pop <span class="ot">&lt;-</span> <span class="dv">170</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>dp_pop <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Parâmetros da simulação</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>n_amostra <span class="ot">&lt;-</span> <span class="dv">25</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>n_replicas <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Parâmetros da distribuição amostral teórica (X-barra)</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>media_esperada_x_barra <span class="ot">&lt;-</span> media_pop</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>dp_esperado_x_barra <span class="ot">&lt;-</span> dp_pop <span class="sc">/</span> <span class="fu">sqrt</span>(n_amostra)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Garantir a reprodutibilidade dos resultados</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Gerar as médias amostrais e armazená-las em um tibble (data frame moderno)</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>dados_simulados <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">media_amostral =</span> <span class="fu">replicate</span>(n_replicas, {</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    amostra <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_amostra, <span class="at">mean =</span> media_pop, <span class="at">sd =</span> dp_pop)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mean</span>(amostra)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar o gráfico usando um fluxo de dados com o pipe |&gt;</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>dados_simulados <span class="sc">|&gt;</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> media_amostral)) <span class="sc">+</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Histograma de densidade:</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  <span class="co"># - `alpha` controla a transparência para um visual mais suave</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  <span class="co"># - `binwidth` pode ser ajustado para controlar a granularidade do histograma</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)),</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>                 <span class="at">fill =</span> <span class="st">"#0072B2"</span>, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">binwidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Curva de densidade teórica (Normal) adicionada diretamente:</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  <span class="co"># - `stat_function` plota uma função sem precisar de um data frame pré-calculado</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>  <span class="co"># - `fun = dnorm` especifica a função de densidade da Normal</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  <span class="co"># - `args` passa os parâmetros (média e desvio padrão) para a função `dnorm`</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_function</span>(<span class="at">fun =</span> dnorm,</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>                <span class="at">args =</span> <span class="fu">list</span>(<span class="at">mean =</span> media_esperada_x_barra, <span class="at">sd =</span> dp_esperado_x_barra),</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>                <span class="at">color =</span> <span class="st">"firebrick"</span>, <span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Melhorar os rótulos e adicionar um subtítulo explicativo</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Distribuição Amostral da Média vs. Previsão Teórica"</span>,</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste0</span>(n_replicas, <span class="st">" amostras de tamanho n="</span>, n_amostra, </span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>                      <span class="st">" de uma população N("</span>, media_pop, <span class="st">", "</span>, dp_pop<span class="sc">^</span><span class="dv">2</span>, <span class="st">")"</span>),</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Média Amostral (x̄)"</span>,</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Densidade"</span>,</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"A linha vermelha representa a distribuição teórica N(170, 4)"</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Escolher um tema</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>() <span class="sc">+</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Ajustes finos no tema para melhor legibilidade</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">16</span>),</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>)</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo4_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="exercício" class="level3">
+<h3 class="anchored" data-anchor-id="exercício">Exercício</h3>
+<p>Considere que <span class="math inline">\(X_1, X_2, \cdots,  X_n\)</span> seja uma amostra aleatória de tamanho <span class="math inline">\(n = 10\)</span> de uma população com distribuição Normal <span class="math inline">\((\mu= 80, \sigma^2= 64)\)</span>.</p>
+<ul>
+<li><ol type="a">
+<li>Qual é a distribuição teórica da média amostral <span class="math inline">\(\bar{X}\)</span>?</li>
+</ol></li>
+<li><ol start="2" type="a">
+<li>Simule <span class="math inline">\(B = 1000\)</span> amostras dessa população e mostre, computacionalmente, que a distribuição empírica de <span class="math inline">\(\bar{X}\)</span> se aproxima da distribuição teórica.</li>
+</ol></li>
+</ul>
+<p>## Teorema Central do Limite</p>
+<p>Seja <span class="math inline">\(X_1, X_2, \cdots, X_n\)</span> uma amostra aleatória simples de tamanho n, com as seguintes propriedades:</p>
+<ul>
+<li>As variáveis <span class="math inline">\(X_i\)</span> são independentes e identicamente distribuídas (i.i.d.).</li>
+<li>Todas possuem a mesma esperança <span class="math inline">\(\mu\)</span> e variância finita <span class="math inline">\(\sigma^2\)</span>.</li>
+</ul>
+<p>Então, o Teorema Central do Limite afirma que, à medida que o tamanho da amostra <span class="math inline">\(n\)</span> cresce indefinidamente, a distribuição da média amostral <span class="math inline">\(\bar{X}_n\)</span> se aproxima de uma distribuição normal com média <span class="math inline">\(\mu\)</span> e variância <span class="math inline">\(\frac{\sigma^2}{n}\)</span>:</p>
+<p><span class="math display">\[
+\bar{X}_n \xrightarrow{d} N\left(\mu, \frac{\sigma^2}{n}\right) \quad \text{quando } n \to \infty
+\]</span></p>
+<p>Embora o Teorema Central do Limite garanta que a distribuição da média amostral tende à normalidade à medida de <span class="math inline">\(n \to \infty\)</span>, na prática é comum encontrar a recomendação de que uma amostra de tamanho <span class="math inline">\(n \geq 30\)</span> já seria “suficientemente grande” para aplicar aproximações normais. Essa regra prática, porém, é controversa. O valor n=30 não possui uma justificativa teórica universal: o quão rapidamente a média amostral se aproxima da normalidade depende da forma da distribuição original.</p>
+<ul>
+<li>Se a distribuição populacional for simétrica e pouco assimétrica, valores menores de <span class="math inline">\(n\)</span> podem ser suficientes.</li>
+<li>Por outro lado, se a distribuição for altamente assimétrica ou com caudas pesadas, pode-se exigir amostras muito maiores para que a aproximação normal seja razoável.</li>
+</ul>
+<p>Assim, o uso do <span class="math inline">\(n=30\)</span> como critério fixo deve ser visto com cautela, sendo mais prudente considerar as características da distribuição original e, se possível, avaliar a aproximação por meio de simulações ou métodos computacionais.</p>
+<p>O resultado do TCL é surpreendente e fundamental porque:</p>
+<ul>
+<li>Ele vale independentemente da distribuição original da população (desde que <span class="math inline">\(\mu\)</span> e <span class="math inline">\(\sigma^2\)</span> existam e sejam finitos).</li>
+<li>Permite o uso da distribuição normal para aproximar a distribuição da média amostral mesmo quando a população não é normal.</li>
+<li>Justifica o uso da normalidade em muitas aplicações da inferência estatística (intervalos de confiança, testes de hipótese, etc.).</li>
+</ul>
+<p>No exemplo e exercícios a seguir, vamos supor que a população é caracterizada por diferentes distribuições e vamos comprovar o Teorema Central do Limite, em cada caso.</p>
+</section>
+<section id="exemplo-distribuição-exponencial" class="level3">
+<h3 class="anchored" data-anchor-id="exemplo-distribuição-exponencial">Exemplo: Distribuição Exponencial</h3>
+<p>Para ilustrar o teorema central do limite, vamos fazer um exemplo assumindo que <span class="math inline">\(X_1, X_2, \cdots, X_n\)</span> seja uma amostra aleatória de uma população com distribuição Exponencial com parâmetro <span class="math inline">\(\lambda\)</span>. Sabemos que:</p>
+<p><span class="math display">\[
+\begin{align}
+E(X) = \frac{1}{\lambda} \\
+Var(X) = \frac{1}{\lambda^2}
+\end{align}
+\]</span></p>
+<p>De acordo com o teorema central do limite (TCL), temos que a média amostral <span class="math inline">\(\bar{X}\)</span> tem distribuição aproximadamente normal com média <span class="math inline">\(\mu = \frac{1}{\lambda}\)</span> e variância <span class="math inline">\(\frac{1}{n \lambda^2}\)</span>, isto é:</p>
+<p><span class="math display">\[
+\bar{X} \sim N\left(\frac{1}{\lambda}, \frac{1}{n \lambda^2}\right)
+\]</span></p>
+<p>No nosso estudo, vamos considerar que <span class="math inline">\(\lambda = 6\)</span> e <span class="math inline">\(n = 36\)</span>. Assim, a distribuição aproximada de <span class="math inline">\(\bar{X}\)</span> será:</p>
+<p><span class="math display">\[
+\bar{X} \sim N \left(\frac{1}{\lambda}, \frac{1}{n \lambda^2}\right) = N\left(\frac{1}{6}, \frac{1}{36 \cdot 36}\right)
+\]</span></p>
+<p>Seguem os comandos:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parâmetros populacionais de X</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>lambda_real <span class="ot">=</span> <span class="dv">6</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Tamanho da amostra</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>n <span class="ot">=</span> <span class="dv">36</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Parâmetros populacionais de Xbarra (TCL)</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>media_real_x_barra <span class="ot">=</span> <span class="dv">1</span><span class="sc">/</span>lambda_real</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>sigma_real_x_barra <span class="ot">=</span> <span class="fu">sqrt</span>(<span class="dv">1</span><span class="sc">/</span>(lambda_real<span class="sc">^</span><span class="dv">2</span><span class="sc">*</span>n))</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Quantidade de réplicas</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>B <span class="ot">=</span> <span class="dv">1000</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Cria o vetor de B médias amostrais da população teórica</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>medias <span class="ot">=</span> <span class="fu">replicate</span>(B,<span class="fu">mean</span>(<span class="fu">rexp</span>(n,<span class="at">rate=</span>lambda_real)))</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar data frame</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">medias =</span> medias)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar data frame das probabilidades teóricas</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>seq <span class="ot">=</span> <span class="fu">seq</span>(<span class="fu">min</span>(medias),<span class="fu">max</span>(medias), <span class="at">length.out =</span> <span class="dv">500</span>)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>df_teorico <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">medias =</span> seq,</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">dens =</span> <span class="fu">dnorm</span>(seq, <span class="at">mean=</span>media_real_x_barra,</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sd=</span>sigma_real_x_barra)</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar o gráfico</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> medias)) <span class="sc">+</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># histograma</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> ..density..), </span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>                   <span class="at">fill =</span> <span class="st">"lightblue"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># gráfico de linha</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">data =</span> df_teorico, <span class="fu">aes</span>(<span class="at">x =</span> medias, <span class="at">y =</span> dens), </span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Distribuição da média amostral"</span>,</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="st">"Valores"</span>, <span class="at">y =</span> <span class="st">"Densidade"</span>) <span class="sc">+</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The dot-dot notation (`..density..`) was deprecated in ggplot2 3.4.0.
+ℹ Please use `after_stat(density)` instead.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo4_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="exercício-distribuição-uniforme" class="level3">
+<h3 class="anchored" data-anchor-id="exercício-distribuição-uniforme">Exercício: Distribuição Uniforme</h3>
+<p>Para ilustrar o Teorema Central do Limite (TCL), considere que <span class="math inline">\(X_1, X_2, \cdots, X_n\)</span> seja uma amostra aleatória de uma população com distribuição Uniforme no intervalo <span class="math inline">\((a,b)\)</span>. Sabemos que:</p>
+<p><span class="math display">\[
+\begin{align}
+E(X) = \frac{a+b}{2} \\
+Var(X) = \frac{(b-a)^2}{12}
+\end{align}
+\]</span></p>
+<p>Se <span class="math inline">\(n =  49\)</span>, <span class="math inline">\(a = 2\)</span>, <span class="math inline">\(b = 5\)</span>:</p>
+<ul>
+<li><ol type="a">
+<li>Qual é a distribuição teórica da média amostral <span class="math inline">\(\bar{X}\)</span>?</li>
+</ol></li>
+<li><ol start="2" type="a">
+<li>Simule <span class="math inline">\(B = 1000\)</span> amostras dessa população e mostre, computacionalmente, que a distribuição empírica de <span class="math inline">\(\bar{X}\)</span> se aproxima da distribuição teórica.</li>
+</ol></li>
+</ul>
+</section>
+</section>
+<section id="aplicativo-shiny" class="level2">
+<h2 class="anchored" data-anchor-id="aplicativo-shiny">Aplicativo Shiny</h2>
+<p>Este aplicativo Shiny foi desenvolvido para ilustrar, de forma interativa e visual, o Teorema Central do Limite (TCL) — um dos pilares da inferência estatística. A partir da simulação de amostras de diferentes distribuições, o usuário pode observar como a distribuição da média amostral tende a uma distribuição normal à medida que o tamanho da amostra aumenta, independentemente da forma da distribuição original. Explore diferentes cenários, escolha a distribuição populacional, defina parâmetros, o tamanho da amostra e o número de repetições, e veja o TCL em ação: [Simulação TCL](https://guilhermeuff.shinyapps.io/TEOREMA_TCL/)</p>
+</section>
+<section id="distribuição-amostral-da-proporção" class="level2">
+<h2 class="anchored" data-anchor-id="distribuição-amostral-da-proporção">Distribuição Amostral da Proporção</h2>
+<p>Considere uma variável aleatória <span class="math inline">\(X \sim \text{Bernoulli}(p)\)</span> com:</p>
+<p><span class="math display">\[
+P(X = 1) = p \quad \text{e} \quad P(X = 0) = 1 - p, \quad \text{com } 0 &lt; p &lt; 1
+\]</span></p>
+<p>Sejam <span class="math inline">\(X_1, X_2, \cdots, X_n\)</span> uma amostra aleatória simples de tamanho n, i.i.d., com:</p>
+<p><span class="math display">\[
+X_i \sim \text{Bernoulli}(p), \quad i = 1, 2, \cdots, n
+\]</span></p>
+<p>A proporção amostral <span class="math inline">\(\hat{p}\)</span> é definida como:</p>
+<p><span class="math display">\[
+\hat{p} = \frac{1}{n} \sum_{i=1}^{n} X_i
+\]</span></p>
+<p>Ou seja, <span class="math inline">\(\hat{p}\)</span> é a fração de sucessos observados na amostra. Ela é, basicamente, uma média amostral. De acordo com o teorema central do limite, a proporção amostral <span class="math inline">\(\hat{p}\)</span> pode ser aproximada por uma normal:</p>
+<p><span class="math display">\[
+\hat{p} \sim N\left(p, \frac{p(1-p)}{n}\right)
+\]</span></p>
+<p>Essa distribuição pode ser aproximada por uma normal quando as seguintes condições são satisfeitas:</p>
+<p><span class="math display">\[
+n \cdot p \geq 5 \quad \text{e} \quad n \cdot (1 - p) \geq 5
+\]</span></p>
+<p>Essa regra garante que há eventos e não-eventos suficientes na amostra para que a distribuição de p^ seja aproximadamente simétrica.</p>
+<section id="exemplo-1" class="level3">
+<h3 class="anchored" data-anchor-id="exemplo-1">Exemplo</h3>
+<p>Para ilustrar este resultado, vamos considerar que <span class="math inline">\(X_1, X_2, \cdots, X_n\)</span> seja uma amostra aleatória de tamanho <span class="math inline">\(n=40\)</span> de uma população com distribuição Bernoulli com parâmetro <span class="math inline">\(p=0,5\)</span>. Assim, a distribuição da proporção amostral <span class="math inline">\(\hat{p}\)</span> é aproximada por:</p>
+<p><span class="math display">\[
+\hat{p} \sim N\left(0,5, \frac{0,5 \cdot (1-0,5)}{40}\right) = N\left(0,5, 0,00625\right)
+\]</span></p>
+<p>Note que <span class="math inline">\(np = 40 \cdot 0.5 = 20 \geq 5\)</span> e <span class="math inline">\(n(1-p) = 40 \cdot (1-0.5) = 20 \geq 5\)</span>. Assim, a aproximação deve ser satisfeita. Vamos investigar esse contexto com os seguintes códigos:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parâmetros populacionais de X</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">=</span> <span class="fl">0.5</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Tamanho da amostra</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>n <span class="ot">=</span> <span class="dv">40</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Parâmetros populacionais de Xbarra (TCL)</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>media_real_prop <span class="ot">=</span> p</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>sigma_real_prop <span class="ot">=</span> <span class="fu">sqrt</span>((p<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>p))<span class="sc">/</span>n)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Quantidade de réplicas</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>B <span class="ot">=</span> <span class="dv">1000</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Cria o vetor de B médias amostrais da população teórica</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>props <span class="ot">=</span> <span class="fu">replicate</span>(B,<span class="fu">mean</span>(<span class="fu">rbinom</span>(n,<span class="at">size=</span><span class="dv">1</span>,<span class="at">p=</span>p)))</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar data frame</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">props =</span> props)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar data frame das probabilidades teóricas</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>seq <span class="ot">=</span> <span class="fu">seq</span>(<span class="fu">min</span>(props),<span class="fu">max</span>(props), <span class="at">length.out =</span> <span class="dv">500</span>)</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>df_teorico <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">props =</span> seq,</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">dens =</span> <span class="fu">dnorm</span>(seq, <span class="at">mean=</span>media_real_prop,</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sd=</span>sigma_real_prop)</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar o gráfico</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> props)) <span class="sc">+</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># histograma</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> ..density..), <span class="at">bins =</span> <span class="fu">nclass.Sturges</span>(df<span class="sc">$</span>props),</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>                   <span class="at">fill =</span> <span class="st">"lightblue"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># gráfico de linha</span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">data =</span> df_teorico, <span class="fu">aes</span>(<span class="at">x =</span> props, <span class="at">y =</span> dens), </span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Distribuição da proporção amostral"</span>,</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="st">"Valores"</span>, <span class="at">y =</span> <span class="st">"Densidade"</span>) <span class="sc">+</span></span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo4_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="exercício-1" class="level3">
+<h3 class="anchored" data-anchor-id="exercício-1">Exercício</h3>
+<p>Considere que <span class="math inline">\(X_1, X_2, \cdots, X_n\)</span> seja uma amostra aleatória de tamanho <span class="math inline">\(n=36\)</span> de uma população com distribuição Bernoulli com parâmetro <span class="math inline">\(p=0,9\)</span>.</p>
+<ul>
+<li><ol type="a">
+<li>O Teorema Central do Limite será satisfeito?</li>
+</ol></li>
+<li><ol start="2" type="a">
+<li>Prove isto, computacionalmente. Considere <span class="math inline">\(B=1000\)</span>.</li>
+</ol></li>
+</ul>
+</section>
+</section>
+<section id="distribuição-amostral-da-variância-caso-normal" class="level2">
+<h2 class="anchored" data-anchor-id="distribuição-amostral-da-variância-caso-normal">Distribuição Amostral da Variância (Caso Normal)</h2>
+<p>Seja <span class="math inline">\(X_1, X_2, \cdtos, X_n\)</span> uma amostra aleatória simples de tamanho <span class="math inline">\(n\)</span> proveniente de uma população com distribuição normal:</p>
+<p><span class="math display">\[
+S^2 = \frac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{X})^2
+\]</span></p>
+<p>A estatística</p>
+<p><span class="math display">\[
+\frac{(n-1)S^2}{\sigma^2}
+\]</span></p>
+<p>segue uma distribuição qui-quadrado com <span class="math inline">\(n-1\)</span> graus de liberdade:</p>
+<p><span class="math display">\[
+\frac{(n-1)S^2}{\sigma^2} \sim \chi^2_{n-1}
+\]</span></p>
+<p>Este resultado é exato somente sob a suposição de normalidade da população. O Teorema Central do Limite não se aplica neste caso.</p>
+<section id="exercício-2" class="level3">
+<h3 class="anchored" data-anchor-id="exercício-2">Exercício</h3>
+<p>Considere que <span class="math inline">\(X_1, X_2, \cdots, X_n\)</span> seja uma amostra aleatória de tamanho <span class="math inline">\(n=16\)</span> de uma população com distribuição Normal com parâmetros <span class="math inline">\(\mu=170\)</span> e <span class="math inline">\(\sigma^2=100\)</span>. Considerando <span class="math inline">\(B=1000\)</span> verifique, computacionalmente, se a distribuição da estatística <span class="math inline">\((n−1)S^2\sigma^2\)</span> tem distribuição qui-quadrado com <span class="math inline">\(n−1\)</span> graus de liberdade. <a href="https://guilhermeuff.shinyapps.io/TEOREMA_TCL/" title="Simulação TCL">Simulação TCL</a></p>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
