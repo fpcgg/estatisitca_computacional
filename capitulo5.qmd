@@ -1,3 +1,7 @@
+```{r message=FALSE, warning=FALSE}
+library(ggplot2)
+```
+
 # Inferência para Uma População
 
 Ao estudarmos a distribuição amostral de um estimador, demos um passo importante para responder a uma pergunta central da inferência estatística: “Quão confiável é o valor obtido a partir de uma única amostra?”
