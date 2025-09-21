@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt" xml:lang="pt"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.23">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>2&nbsp; Distribuições de Probabilidade – Estatística Computacional</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<link href="./capitulo3.html" rel="next">
+<link href="./capitulo1.html" rel="prev">
+<link href="./favicon.jpg" rel="icon" type="image/jpeg">
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-1fe81d0376b2c50856e68e651e390326.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-70a47bd5681a7291082a5b9f83d58762.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "language": {
+    "search-no-results-text": "Nenhum resultado",
+    "search-matching-documents-text": "documentos correspondentes",
+    "search-copy-link-title": "Copiar link para a busca",
+    "search-hide-matches-text": "Esconder correspondências adicionais",
+    "search-more-match-text": "mais correspondência neste documento",
+    "search-more-matches-text": "mais correspondências neste documento",
+    "search-clear-button-title": "Limpar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Procurar"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./capitulo2.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Distribuições de Probabilidade</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./index.html" class="sidebar-logo-link">
+      </a>
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Aulas</a> 
+    </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefácio</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Revisão do R-Studio</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo2.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Distribuições de Probabilidade</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Estimadores Pontuais e sua Propriedades</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Inferência para Uma População</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Conteúdo</h2>
+   
+  <ul>
+  <li><a href="#distribuições-de-probabilidade-discretas" id="toc-distribuições-de-probabilidade-discretas" class="nav-link active" data-scroll-target="#distribuições-de-probabilidade-discretas"><span class="header-section-number">2.1</span> Distribuições de Probabilidade Discretas</a>
+  <ul>
+  <li><a href="#distribuição-binomial" id="toc-distribuição-binomial" class="nav-link" data-scroll-target="#distribuição-binomial"><span class="header-section-number">2.1.1</span> Distribuição Binomial</a></li>
+  <li><a href="#distribuição-de-poisson" id="toc-distribuição-de-poisson" class="nav-link" data-scroll-target="#distribuição-de-poisson"><span class="header-section-number">2.1.2</span> Distribuição de Poisson</a></li>
+  <li><a href="#aproximação-da-distribuição-binomial-pela-poisson" id="toc-aproximação-da-distribuição-binomial-pela-poisson" class="nav-link" data-scroll-target="#aproximação-da-distribuição-binomial-pela-poisson"><span class="header-section-number">2.1.3</span> Aproximação da Distribuição Binomial pela Poisson</a>
+  <ul class="collapse">
+  <li><a href="#exercício" id="toc-exercício" class="nav-link" data-scroll-target="#exercício"><span class="header-section-number">2.1.3.1</span> Exercício</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#distribuições-de-probabilidade-contínuas" id="toc-distribuições-de-probabilidade-contínuas" class="nav-link" data-scroll-target="#distribuições-de-probabilidade-contínuas"><span class="header-section-number">2.2</span> Distribuições de Probabilidade Contínuas</a>
+  <ul>
+  <li><a href="#distribuição-exponencial" id="toc-distribuição-exponencial" class="nav-link" data-scroll-target="#distribuição-exponencial"><span class="header-section-number">2.2.1</span> Distribuição Exponencial</a>
+  <ul class="collapse">
+  <li><a href="#perda-de-memória" id="toc-perda-de-memória" class="nav-link" data-scroll-target="#perda-de-memória"><span class="header-section-number">2.2.1.1</span> Perda de Memória</a></li>
+  <li><a href="#exercício-1" id="toc-exercício-1" class="nav-link" data-scroll-target="#exercício-1"><span class="header-section-number">2.2.1.2</span> Exercício</a></li>
+  </ul></li>
+  <li><a href="#distribuição-normal" id="toc-distribuição-normal" class="nav-link" data-scroll-target="#distribuição-normal"><span class="header-section-number">2.2.2</span> Distribuição Normal</a></li>
+  <li><a href="#distribuição-gama" id="toc-distribuição-gama" class="nav-link" data-scroll-target="#distribuição-gama"><span class="header-section-number">2.2.3</span> Distribuição Gama</a>
+  <ul class="collapse">
+  <li><a href="#exercícios" id="toc-exercícios" class="nav-link" data-scroll-target="#exercícios"><span class="header-section-number">2.2.3.1</span> Exercícios</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#simulando-resultados-teóricos-distribuição-t-student" id="toc-simulando-resultados-teóricos-distribuição-t-student" class="nav-link" data-scroll-target="#simulando-resultados-teóricos-distribuição-t-student"><span class="header-section-number">2.3</span> Simulando Resultados Teóricos: Distribuição T-Student</a>
+  <ul>
+  <li><a href="#exercícios-1" id="toc-exercícios-1" class="nav-link" data-scroll-target="#exercícios-1"><span class="header-section-number">2.3.1</span> Exercícios</a></li>
+  </ul></li>
+  <li><a href="#como-o-r-gera-valores-de-distribuições-de-probabilidade" id="toc-como-o-r-gera-valores-de-distribuições-de-probabilidade" class="nav-link" data-scroll-target="#como-o-r-gera-valores-de-distribuições-de-probabilidade"><span class="header-section-number">2.4</span> Como o R gera valores de distribuições de probabilidade</a>
+  <ul>
+  <li><a href="#números-pseudoaleatórios-e-sementes" id="toc-números-pseudoaleatórios-e-sementes" class="nav-link" data-scroll-target="#números-pseudoaleatórios-e-sementes"><span class="header-section-number">2.4.1</span> Números Pseudoaleatórios e Sementes</a></li>
+  <li><a href="#o-papel-da-distribuição-uniforme-com-parâmetros-01" id="toc-o-papel-da-distribuição-uniforme-com-parâmetros-01" class="nav-link" data-scroll-target="#o-papel-da-distribuição-uniforme-com-parâmetros-01"><span class="header-section-number">2.4.2</span> O Papel da Distribuição Uniforme com Parâmetros (0,1)</a></li>
+  <li><a href="#método-da-transformação-inversa" id="toc-método-da-transformação-inversa" class="nav-link" data-scroll-target="#método-da-transformação-inversa"><span class="header-section-number">2.4.3</span> Método da Transformação Inversa</a></li>
+  <li><a href="#exemplo-distribuição-exponencial" id="toc-exemplo-distribuição-exponencial" class="nav-link" data-scroll-target="#exemplo-distribuição-exponencial"><span class="header-section-number">2.4.4</span> Exemplo: Distribuição Exponencial</a></li>
+  <li><a href="#distribuição-cauchy" id="toc-distribuição-cauchy" class="nav-link" data-scroll-target="#distribuição-cauchy"><span class="header-section-number">2.4.5</span> Distribuição Cauchy</a></li>
+  <li><a href="#exercício-2" id="toc-exercício-2" class="nav-link" data-scroll-target="#exercício-2"><span class="header-section-number">2.4.6</span> Exercício</a></li>
+  <li><a href="#outros-métodos-de-geração" id="toc-outros-métodos-de-geração" class="nav-link" data-scroll-target="#outros-métodos-de-geração"><span class="header-section-number">2.4.7</span> Outros Métodos de Geração</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Distribuições de Probabilidade</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Um dos pilares da estatística é a teoria das distribuições de probabilidade, que descreve o comportamento dos dados e nos permite fazer previsões e inferências. Mas por que estudá-las computacionalmente?</p>
+<ul>
+<li>Exploração visual e interativa</li>
+<li>Simulação de Fenômenos Reais</li>
+<li>Inferência Estatística e Modelagem</li>
+<li>Tomada de Decisão Baseada em Probabilidade</li>
+</ul>
+<p>Essa abordagem permite que vejamos a estatistica além das fórmulas, transformando conceitos abstratos em algo visual e intuitivo.</p>
+<p>Dito isso, no R temos uma família de funções que nos permitem trabalhar com distribuições de probabilidade. Essas funções são divididas em quatro categorias principais:</p>
+<ul>
+<li><strong>d</strong>: Função de densidade de probabilidade</li>
+<li><strong>p</strong>: Função de distribuição acumulada</li>
+<li><strong>q</strong>: Função quantil</li>
+<li><strong>r</strong>: Função de geração de números aleatórios</li>
+</ul>
+<p>Essas funções são aplicáveis a diversas distribuições, como Normal, Binomial, Poisson, entre outras. Vamos explorar cada uma delas com exemplos práticos.</p>
+<section id="distribuições-de-probabilidade-discretas" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="distribuições-de-probabilidade-discretas"><span class="header-section-number">2.1</span> Distribuições de Probabilidade Discretas</h2>
+<p>Nesta seção, vamos dedicar nosso estudo ao estudo computacional de duas distribuições discretas: Binomial e Poisson.</p>
+<section id="distribuição-binomial" class="level3" data-number="2.1.1">
+<h3 data-number="2.1.1" class="anchored" data-anchor-id="distribuição-binomial"><span class="header-section-number">2.1.1</span> Distribuição Binomial</h3>
+<p>A distribuição binomial é uma distribuição discreta que modela o número de sucessos em n tentativas independentes de um experimento de Bernoulli (experimento 0 ou 1), onde cada tentativa tem apenas dois possíveis resultados: sucesso ou fracasso. A distribuição binomial é amplamente usada em situações onde há repetição de experimentos independentes, como:</p>
+<ul>
+<li>O número de vezes que um aluno acerta uma questão em uma prova de múltipla escolha com alternativas ao acaso.</li>
+<li>O número de clientes que compram um produto entre os que entram em uma loja.</li>
+<li>O número de peças defeituosas em um lote de produção.</li>
+</ul>
+<p>A função de probabilidade de uma variável aleatória X com distribuição binomial é dada por:</p>
+<p><span class="math display">\[
+P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}, \quad x = 0,1,2,\ldots,n
+\]</span></p>
+<p>em que o parâmetro p é a probabilidade de sucesso. Além disso, as fórmulas da média e variância associadas a essa distribuição são</p>
+<p><span class="math display">\[
+E(X) = n \cdot p
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+Var(X) = n \cdot p \cdot (1-p)
+\]</span></p>
+<p>respectivamente, onde n é o número de tentativas.</p>
+<p>Agora, vamos para um exemplo. Considere a seguinte situação problema: Uma empresa realiza uma pesquisa de satisfação com seus clientes. Sabe-se que cada cliente tem uma probabilidade <code>p</code> de estar satisfeito com o produto ou serviço prestado. A empresa decide amostrar <code>n</code> clientes aleatoriamente para avaliar sua satisfação. Podemos modelar o número de clientes satisfeitos na amostra como uma distribuição binomial. Vamos considerar, inicialmente, que o tamanho da amostra seja n=10 e o parâmetro p seja igual a 0,50. Dessa forma, tem-se um valor esperado de 5 pessoas satisfeitas nessa amostra. Podemos usar as funções <code>d</code>, <code>p</code> e <code>q</code> para calcular quantidades de interesse sobre esta distribuição. Para a utilização dessas funções, os argumentos que representam os parâmetros da distribuição binomial são o <code>size</code> e <code>prob</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Definindo os parâmetros da distribuição binomial</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">10</span>  <span class="co"># número de tentativas</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fl">0.5</span> <span class="co"># probabilidade de sucesso</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># A probabilidade de exatamente 4 clientes estarem satisfeitos</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">dbinom</span>(<span class="dv">4</span>, <span class="at">size =</span> n, <span class="at">prob =</span> p)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.2050781</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A probabilidade de que menos de 6 clientes estejam satisfeitos:</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pbinom</span>(<span class="dv">5</span>,<span class="at">size=</span><span class="dv">10</span>,<span class="at">p=</span><span class="fl">0.5</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.6230469</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A probabilidade de que mais de 9 clientes estejam satisfeitos:</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span><span class="sc">-</span><span class="fu">pbinom</span>(<span class="dv">9</span>,<span class="at">size=</span><span class="dv">10</span>,<span class="at">p=</span><span class="fl">0.5</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.0009765625</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A probabilidade de que mais de 9 clientes estejam satisfeitos:</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pbinom</span>(<span class="dv">9</span>,<span class="at">size=</span><span class="dv">10</span>,<span class="at">p=</span><span class="fl">0.5</span>,<span class="at">lower.tail=</span>F)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.0009765625</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># O percentil 75 do número de clientes satistfeitos:</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">qbinom</span>(<span class="fl">0.75</span>,<span class="at">size=</span><span class="dv">10</span>,<span class="at">p=</span><span class="fl">0.5</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 8</code></pre>
+</div>
+</div>
+<p>Vamos gerar uma amostra desta distribuição com a função r e visualizá-la graficamente.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tamanho da amostra gerada</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>n_amostra<span class="ot">=</span><span class="dv">100</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># media verdadeira</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>media <span class="ot">=</span> <span class="dv">10</span><span class="sc">*</span><span class="fl">0.5</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># gerando os dados</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>) <span class="co"># Fixar a semente para gerarmos juntos as mesmas amostras</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>dados <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n_amostra, <span class="at">size=</span><span class="dv">10</span>,<span class="at">p=</span><span class="fl">0.5</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar data frame</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">valor =</span> dados)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar data frame das probabilidades teóricas</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>df_teorico <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">valor =</span> <span class="fu">min</span>(dados)<span class="sc">:</span><span class="fu">max</span>(dados),</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">prob =</span> <span class="fu">dbinom</span>(<span class="fu">min</span>(dados)<span class="sc">:</span><span class="fu">max</span>(dados), <span class="at">size=</span><span class="dv">10</span>,<span class="at">p=</span><span class="fl">0.5</span>)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar o gráfico</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> valor)) <span class="sc">+</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># histograma</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> ..count..<span class="sc">/</span><span class="fu">sum</span>(..count..)), <span class="at">binwidth =</span> <span class="dv">1</span>, </span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>                   <span class="at">fill =</span> <span class="st">"lightblue"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ponto e segmento</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data =</span> df_teorico, <span class="fu">aes</span>(<span class="at">x =</span> valor, <span class="at">y =</span> prob), </span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_segment</span>(<span class="at">data =</span> df_teorico, <span class="fu">aes</span>(<span class="at">x =</span> valor, <span class="at">xend =</span> valor, </span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">y =</span> <span class="dv">0</span>, <span class="at">yend =</span> prob),<span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># acrescentar a média verdadeira em uma linha vertical</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> media, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color=</span><span class="st">"blue"</span>,<span class="at">size=</span><span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Binomial (10,0.5)"</span>,</span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="st">"Valores"</span>, <span class="at">y =</span> <span class="st">"Probabilidade"</span>) <span class="sc">+</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() </span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo2_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Para finalizar, vamos investigar o efeito de diferentes valores de n e p para esta situação problema.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Carregar os pacotes necessários</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Função para gerar o gráfico (com a correção final)</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>gerar_grafico <span class="ot">&lt;-</span> <span class="cf">function</span>(size, p) {</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Tamanho da amostra </span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  n_amostra <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Gerar amostra da distribuição Binomial</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">2025</span>) <span class="co"># Fixar a semente para gerarmos juntos as mesmas amostras</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  dados <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n_amostra, <span class="at">size =</span> size, <span class="at">p =</span> p)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Criar data frame</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">valor =</span> dados)</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Criar data frame das probabilidades teóricas</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>  df_teorico <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">valor =</span> <span class="dv">0</span><span class="sc">:</span>size,</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">prob =</span> <span class="fu">dbinom</span>(<span class="dv">0</span><span class="sc">:</span>size, <span class="at">size =</span> size, <span class="at">p =</span> p)</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calcular a média da distribuição Binomial</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>  media <span class="ot">&lt;-</span> size <span class="sc">*</span> p </span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Criar o gráfico</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> valor)) <span class="sc">+</span></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># histograma</span></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># CORREÇÃO FINAL: Usando after_stat(density) com binwidth = 1</span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)), <span class="at">binwidth =</span> <span class="dv">1</span>, </span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>                     <span class="at">fill =</span> <span class="st">"lightblue"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ponto e segmento para a probabilidade teórica</span></span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data =</span> df_teorico, <span class="fu">aes</span>(<span class="at">x =</span> valor, <span class="at">y =</span> prob), </span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_segment</span>(<span class="at">data =</span> df_teorico, <span class="fu">aes</span>(<span class="at">x =</span> valor, <span class="at">xend =</span> valor, </span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">y =</span> <span class="dv">0</span>, <span class="at">yend =</span> prob), <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># acrescentar a média verdadeira em uma linha vertical</span></span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> media, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Rótulos</span></span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"Binomial("</span>, size, <span class="st">","</span>, p, <span class="st">")"</span>, <span class="at">sep =</span> <span class="st">""</span>),</span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="st">"Valores"</span>, <span class="at">y =</span> <span class="st">"Densidade / Probabilidade"</span>) <span class="sc">+</span></span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> scales<span class="sc">::</span><span class="fu">pretty_breaks</span>())</span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a><span class="co"># Definir os valores de n e p</span></span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a>size <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">20</span>)</span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.25</span>, <span class="fl">0.50</span>, <span class="fl">0.75</span>)</span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar todas as combinações possíveis de n e p</span></span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a>combinacoes <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">size =</span> size, <span class="at">p =</span> p)</span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a><span class="co"># Aplicar a função gerar_grafico para cada combinação</span></span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a>graficos <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(combinacoes), <span class="cf">function</span>(i) {</span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gerar_grafico</span>(combinacoes<span class="sc">$</span>size[i], combinacoes<span class="sc">$</span>p[i]) </span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a><span class="co"># Combinar os gráficos usando patchwork</span></span>
+<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a>layout_graficos <span class="ot">&lt;-</span> (graficos[[<span class="dv">1</span>]] <span class="sc">|</span> graficos[[<span class="dv">3</span>]] <span class="sc">|</span> graficos[[<span class="dv">5</span>]]) <span class="sc">/</span></span>
+<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a>                   (graficos[[<span class="dv">2</span>]] <span class="sc">|</span> graficos[[<span class="dv">4</span>]] <span class="sc">|</span> graficos[[<span class="dv">6</span>]])</span>
+<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a><span class="co"># Exibir o conjunto de gráficos</span></span>
+<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a>layout_graficos</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo2_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>O efeito gráfico das mudanças de n e p na distribuição binomial pode ser analisado separadamente para cada parâmetro:</p>
+<ul>
+<li><strong>Aumento de n</strong>: A distribuição se espalha mais, pois a variância da binomial é np(1-p), que cresce com n (mantendo p constante). Visualmente, o histograma se alarga e se torna mais suave, se aproximando de uma curva contínua.</li>
+<li><strong>Aumento de p</strong>: A distribuição se desloca para a direita, pois a média da binomial é np. Visualmente, a moda da distribuição se move para valores mais altos.</li>
+</ul>
+</section>
+<section id="distribuição-de-poisson" class="level3" data-number="2.1.2">
+<h3 data-number="2.1.2" class="anchored" data-anchor-id="distribuição-de-poisson"><span class="header-section-number">2.1.2</span> Distribuição de Poisson</h3>
+<p>A distribuição Poisson é uma distribuição de probabilidade discreta que descreve o número de eventos que ocorrem em um intervalo fixo de tempo ou espaço, assumindo que esses eventos ocorrem com uma taxa constante e independentemente uns dos outros. Alguns exemplos clássicos de aplicação incluem:</p>
+<ul>
+<li>Número de chamadas recebidas por um call center por minuto;</li>
+<li>Número de defeitos em um metro quadrado de tecido;</li>
+<li>Número de acidentes de trânsito em um cruzamento por dia;</li>
+<li>Número de mutações genéticas em um trecho específico de DNA.</li>
+</ul>
+<p>A função de probabilidade de uma variável aleatória X com distribuição Poisson é dada por:</p>
+<p><span class="math display">\[
+P(X = x) = \frac{\lambda^x e^{-\lambda}}{x!}, \quad x = 0,1,2,\ldots
+\]</span></p>
+<p>em que <span class="math inline">\(\lambda\)</span> é o parâmetro da distribuição e representa a intensidade ou taxa de ocorrência. Por fim, lembre-se que os valores da média e variância associados a essa distribuição são:</p>
+<p><span class="math display">\[
+\begin{align*}
+E(X) &amp;= \lambda \\
+Var(X) &amp;= \lambda
+\end{align*}
+\]</span></p>
+<p>A <strong>equidispersão</strong> é uma característica fundamental da distribuição Poisson e significa que <strong>a variância é igual à média</strong>. Isso implica que a dispersão dos dados <strong>aumenta proporcionalmente ao valor médio de eventos</strong>.</p>
+<p>Para os estudos computacionais, suponha o seguinte exemplo: Uma central de atendimento recebe chamadas de clientes durante o dia. O número de chamadas por minuto pode variar, mas em média, a central recebe um número constante de chamadas por minuto. Esse tipo de fenômeno, onde os eventos (no caso, chamadas) ocorrem aleatoriamente, mas a uma taxa constante, pode ser modelado por uma distribuição Poisson. Vamos considerar, inicialmente, que o parâmetro <span class="math inline">\(\lambda\)</span> seja igual a 5. Dessa forma, tem-se uma média de 5 chamadas por minuto. Podemos usar as funções d, p e q para calcular quantidades de interesse sobre esta distribuição. Cada uma dessas funções têm o argumento lambda para a distribuição Poisson.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A probabilidade de exatamente 10 chamadas por minuto</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dpois</span>(<span class="dv">10</span>, <span class="at">lambda =</span> <span class="dv">5</span>) </span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.01813279</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A probabilidade de receber 3 ou menos chamadas por minuto</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ppois</span>(<span class="dv">3</span>, <span class="at">lambda =</span> <span class="dv">5</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.2650259</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A probabilidade de receber mais de 8 chamadas por minuto</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">-</span> <span class="fu">ppois</span>(<span class="dv">8</span>, <span class="at">lambda =</span> <span class="dv">5</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.06809363</code></pre>
+</div>
+</div>
+<p>uma forma alternativa de calcular a probabilidade de receber mais de 8 chamadas por minuto é:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A probabilidade de receber mais de 8 chamadas por minuto</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ppois</span>(<span class="dv">8</span>,<span class="at">lambda=</span><span class="dv">5</span>,<span class="at">lower.tail=</span>F)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.06809363</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># O percentil 80 do número de chamadas recebidas por minuto</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">qpois</span>(<span class="fl">0.80</span>, <span class="at">lambda =</span> <span class="dv">5</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 7</code></pre>
+</div>
+</div>
+<p>Vamos gerar uma amostra desta distribuição com a função r e visualizá-la graficamente:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tamanho da amostra  </span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>n_amostra<span class="ot">=</span><span class="dv">100</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># media verdadeira</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>media <span class="ot">=</span> <span class="dv">5</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co"># gerando os dados</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>) <span class="co"># Fixar a semente para gerarmos juntos as mesmas amostras</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>dados <span class="ot">&lt;-</span> <span class="fu">rpois</span>(n_amostra, <span class="at">lambda=</span><span class="dv">5</span>)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar data frame</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">valor =</span> dados)</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar data frame das probabilidades teóricas</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>df_teorico <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">valor =</span> <span class="fu">min</span>(dados)<span class="sc">:</span><span class="fu">max</span>(dados),</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">prob =</span> <span class="fu">dpois</span>(<span class="fu">min</span>(dados)<span class="sc">:</span><span class="fu">max</span>(dados), <span class="at">lambda=</span><span class="dv">5</span>)</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar o gráfico</span></span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> valor)) <span class="sc">+</span></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># histograma</span></span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> ..count..<span class="sc">/</span><span class="fu">sum</span>(..count..)), <span class="at">binwidth =</span> <span class="dv">1</span>, </span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>                   <span class="at">fill =</span> <span class="st">"lightblue"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ponto e segmento</span></span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data =</span> df_teorico, <span class="fu">aes</span>(<span class="at">x =</span> valor, <span class="at">y =</span> prob), </span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_segment</span>(<span class="at">data =</span> df_teorico, <span class="fu">aes</span>(<span class="at">x =</span> valor, <span class="at">xend =</span> valor, </span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">y =</span> <span class="dv">0</span>, <span class="at">yend =</span> prob),<span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># acrescentar a média verdadeira em uma linha vertical</span></span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> media, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color=</span><span class="st">"blue"</span>,<span class="at">size=</span><span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Poisson(5)"</span>,</span>
+<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="st">"Valores"</span>, <span class="at">y =</span> <span class="st">"Probabilidade"</span>) <span class="sc">+</span></span>
+<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() </span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo2_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Para finalizar, vamos investigar o efeito de diferentes valores de λ para esta situação problema:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Função para gerar o gráfico</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>gerar_grafico <span class="ot">&lt;-</span> <span class="cf">function</span>(lambda) {</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Tamanho da amostra </span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  n_sample<span class="ot">=</span><span class="dv">100</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Gerar amostra da distribuição Poisson</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">2025</span>) <span class="co"># Fixar a semente para gerarmos juntos as mesmas amostras</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  dados <span class="ot">&lt;-</span> <span class="fu">rpois</span>(n_sample, <span class="at">lambda=</span>lambda)</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Criar data frame</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">valor =</span> dados)</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Criar data frame das probabilidades teóricas</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  df_teorico <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">valor =</span> <span class="fu">min</span>(dados)<span class="sc">:</span><span class="fu">max</span>(dados),</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">prob =</span> <span class="fu">dpois</span>(<span class="fu">min</span>(dados)<span class="sc">:</span><span class="fu">max</span>(dados), <span class="at">lambda=</span>lambda)</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calcular a média da distribuição Poisson</span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>  media <span class="ot">&lt;-</span> lambda  </span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Criar o gráfico</span></span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> valor)) <span class="sc">+</span></span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># histograma</span></span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> ..count..<span class="sc">/</span><span class="fu">sum</span>(..count..)), <span class="at">binwidth =</span> <span class="dv">1</span>, </span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>                   <span class="at">fill =</span> <span class="st">"lightblue"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ponto e segmento</span></span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data =</span> df_teorico, <span class="fu">aes</span>(<span class="at">x =</span> valor, <span class="at">y =</span> prob), </span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_segment</span>(<span class="at">data =</span> df_teorico, <span class="fu">aes</span>(<span class="at">x =</span> valor, <span class="at">xend =</span> valor, </span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">y =</span> <span class="dv">0</span>, <span class="at">yend =</span> prob),<span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>    <span class="co"># acrescentar a média verdadeira em uma linha vertical</span></span>
+<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> media, <span class="at">linetype =</span> <span class="st">"dashed"</span>,<span class="at">color=</span><span class="st">"blue"</span>,<span class="at">size=</span><span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"Poisson("</span>, lambda, <span class="st">")"</span>, <span class="at">sep =</span> <span class="st">""</span>),</span>
+<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="st">"Valores"</span>, <span class="at">y =</span> <span class="st">"Probabilidade"</span>) <span class="sc">+</span></span>
+<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()  <span class="sc">+</span></span>
+<span id="cb24-40"><a href="#cb24-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">30</span>))  </span>
+<span id="cb24-41"><a href="#cb24-41" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb24-42"><a href="#cb24-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-43"><a href="#cb24-43" aria-hidden="true" tabindex="-1"></a><span class="co"># Usar lapply para gerar os gráficos para diferentes valores de lambda</span></span>
+<span id="cb24-44"><a href="#cb24-44" aria-hidden="true" tabindex="-1"></a>lambdas <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">15</span>)</span>
+<span id="cb24-45"><a href="#cb24-45" aria-hidden="true" tabindex="-1"></a>graficos <span class="ot">&lt;-</span> <span class="fu">lapply</span>(lambdas, gerar_grafico)</span>
+<span id="cb24-46"><a href="#cb24-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-47"><a href="#cb24-47" aria-hidden="true" tabindex="-1"></a><span class="co"># Combinar os gráficos com patchwork</span></span>
+<span id="cb24-48"><a href="#cb24-48" aria-hidden="true" tabindex="-1"></a>graficos[[<span class="dv">1</span>]] <span class="sc">+</span> graficos[[<span class="dv">2</span>]] <span class="sc">+</span> graficos[[<span class="dv">3</span>]] <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">ncol =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo2_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Podemos observar que quanto mairo o valor de <span class="math inline">\(\lambda\)</span> na distribuição Poisson:</p>
+<ul>
+<li>A média e a variância aumentam: Como a média e a variância de uma distribuição Poisson são iguais a λ, aumentar λ resulta em uma distribuição com maior média e maior variabilidade.</li>
+<li>A distribuição fica mais simétrica: Para valores pequenos de λ, a distribuição é assimétrica, com um pico mais próximo de 0 e caudas assimétricas à direita. À medida que λ aumenta, a distribuição torna-se mais simétrica.</li>
+<li>O pico da distribuição se desloca para valores maiores: O valor mais provável (a moda) se aproxima de λ, então, à medida que λ aumenta, o pico da distribuição se desloca para a direita. Isso implica que, à medida que λ cresce, o número de eventos mais provável se desloca para valores mais altos.</li>
+<li>O intervalo de valores possíveis se expande: Para valores grandes de λ, a distribuição Poisson abrange um intervalo maior de valores possíveis, com a maior parte da probabilidade concentrada em torno de λ, mas com mais probabilidade de ocorrerem valores bem distantes da média.</li>
+<li>Probabilidade de 0 eventos diminui: A probabilidade de observar 0 eventos diminui com o aumento de λ.</li>
+</ul>
+</section>
+<section id="aproximação-da-distribuição-binomial-pela-poisson" class="level3" data-number="2.1.3">
+<h3 data-number="2.1.3" class="anchored" data-anchor-id="aproximação-da-distribuição-binomial-pela-poisson"><span class="header-section-number">2.1.3</span> Aproximação da Distribuição Binomial pela Poisson</h3>
+<p>A aproximação Poisson para a distribuição binomial é relevante porque permite simplificar cálculos probabilísticos quando n (o número de tentativas) é grande e p (a probabilidade de sucesso em cada tentativa) é pequeno. Em muitos contextos práticos, como na modelagem de eventos raros (por exemplo, número de falhas em um sistema ou mutações genéticas em um DNA), a distribuição binomial é a escolha natural, mas seu cálculo direto pode ser computacionalmente custoso para valores altos de n.</p>
+<p>A distribuição Poisson fornece uma aproximação útil nesses casos, já que seu formato matemático é mais simples e os cálculos de probabilidade podem ser realizados sem recorrer a fatoriais ou coeficientes binomiais, que podem ser complicados para números grandes.</p>
+<p>A aproximação Poisson para uma variável aleatória <span class="math inline">\(X \sim \mathrm{Bin}(n, p)\)</span> é dada por:</p>
+<p><span class="math display">\[
+X \approx Y \sim \mathrm{Poisson}(\lambda = np)
+\]</span></p>
+<p>A aproximação é boa quando <span class="math inline">\(n\)</span> é grande e <span class="math inline">\(p\)</span> é pequeno, de modo que <span class="math inline">\(np\)</span> (a média da binomial) se mantenha em um valor moderado (tipicamente menor que 10). Embora não haja um limite rígido, costuma-se considerar <span class="math inline">\(n \geq 30\)</span> e <span class="math inline">\(p \leq 0.1\)</span>. Dessa forma, a aproximação Poisson funciona bem quando <span class="math inline">\(np \leq 5\)</span> ou, em alguns casos, até <span class="math inline">\(np \leq 10\)</span>.</p>
+<section id="exercício" class="level4" data-number="2.1.3.1">
+<h4 data-number="2.1.3.1" class="anchored" data-anchor-id="exercício"><span class="header-section-number">2.1.3.1</span> Exercício</h4>
+<p>Gere uma amostra de tamanho 200 de uma variável aleatória Binomial(n=50,p=0.05). Faça o histograma dessa amostra e acrescente a função de probabilidade da aproximação pela distribuição Poisson. Verifique se a aproximação é boa.</p>
+</section>
+</section>
+</section>
+<section id="distribuições-de-probabilidade-contínuas" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="distribuições-de-probabilidade-contínuas"><span class="header-section-number">2.2</span> Distribuições de Probabilidade Contínuas</h2>
+<p>Esta seção é dedicada ao estudo computacional de algumas distribuições contínuas, sendo elas a Exponencial, Normal e Gama.</p>
+<section id="distribuição-exponencial" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="distribuição-exponencial"><span class="header-section-number">2.2.1</span> Distribuição Exponencial</h3>
+<p>A distribuição exponencial é amplamente utilizada em estatística e probabilidade, principalmente para modelar o tempo entre eventos, que ocorre de maneira contínua e independente ao longo do tempo. Aqui estão algumas aplicações básicas dessa distribuição:</p>
+<ul>
+<li>Tempo de espera entre as ligações recebidas em um call center</li>
+<li>Tempo até até a falha de um sistema ou produto</li>
+<li>Tempo de decaimento de partículas radioativas.</li>
+</ul>
+<p>A função de densidade de probabilidade de uma variável aleatória X com distribuição exponencial é dada por:</p>
+<p><span class="math display">\[
+f(x) = \lambda e^{-\lambda x}, \quad x \geq 0, \quad \lambda &gt; 0
+\]</span></p>
+<p>em que o parâmetro <span class="math inline">\(\lambda\)</span> controla a <strong>taxa de ocorrência dos eventos</strong>. Ele está <strong>diretamente relacionado à frequência</strong> com que os eventos ocorrem ao longo do tempo. Por fim, lembre-se que os valores da média e variância associados a essa distribuição são:</p>
+<p><span class="math display">\[
+\begin{align*}
+E(X) &amp;= \frac{1}{\lambda} \\
+Var(X) &amp;= \frac{1}{\lambda^2}
+\end{align*}
+\]</span></p>
+<p>Uma situação clássica onde a distribuição exponencial é aplicável é o tempo entre chegadas de clientes no caixa de uma loja. Suponha que em este tempo, em minutos, seja modelado por uma distribuição exponencial com parâmetro <span class="math inline">\(\lambda\)</span>. Inicialmente, suponha que <span class="math inline">\(\lambda = 1/2\)</span> e, dessa forma, temos um tempo médio de 2 minutos entre as chegadas dos clientes. Podemos usar as funções <code>d</code>, <code>p</code> e <code>q</code> para calcular quantidades de interesse sobre esta distribuição. Para utilizar estas funções, o argumento que representa o parâmetro da distribuição exponencial é denotado por rate.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A probabilidade de que o tempo entre chegada de clientes é maior que 10 minutos</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span><span class="sc">-</span><span class="fu">pexp</span>(<span class="dv">10</span>,<span class="at">rate =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.006737947</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A probabilidade de que o tempo entre chegada de clientes é maior que 10 minutos</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pexp</span>(<span class="dv">10</span>,<span class="at">rate =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>,<span class="at">lower.tail=</span>F)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.006737947</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A probabilidade de que o tempo entre chegada de clientes é menor que 4 minutos</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pexp</span>(<span class="dv">4</span>,<span class="at">rate =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.8646647</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A mediana do tempo entre chegada de clientes:</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">qexp</span>(<span class="fl">0.5</span>,<span class="at">rate =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.386294</code></pre>
+</div>
+</div>
+<p>Vamos gerar uma amostra desta distribuição com a função <code>r</code> e visualizá-la graficamente:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tamanho da amostra gerada</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>n_amostra<span class="ot">=</span><span class="dv">100</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="co"># media verdadeira</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>media <span class="ot">=</span> <span class="dv">2</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co"># gerando os dados</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>) <span class="co"># Fixar a semente para gerarmos juntos as mesmas amostras</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>dados <span class="ot">&lt;-</span> <span class="fu">rexp</span>(n_amostra, <span class="at">rate =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>)</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar data frame</span></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">valor =</span> dados)</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar data frame das probabilidades teóricas</span></span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>df_teorico <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">valor =</span> <span class="fu">seq</span>(<span class="fu">min</span>(dados),<span class="fu">max</span>(dados),<span class="fl">0.1</span>),</span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">dens =</span> <span class="fu">dexp</span>(<span class="fu">seq</span>(<span class="fu">min</span>(dados),<span class="fu">max</span>(dados),<span class="fl">0.1</span>), <span class="at">rate =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>)</span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar o gráfico</span></span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> valor)) <span class="sc">+</span></span>
+<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># histograma</span></span>
+<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> ..density..), </span>
+<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a>                   <span class="at">fill =</span> <span class="st">"lightblue"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb33-26"><a href="#cb33-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb33-27"><a href="#cb33-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># gráfico de linha</span></span>
+<span id="cb33-28"><a href="#cb33-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">data =</span> df_teorico, <span class="fu">aes</span>(<span class="at">x =</span> valor, <span class="at">y =</span> dens), </span>
+<span id="cb33-29"><a href="#cb33-29" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb33-30"><a href="#cb33-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb33-31"><a href="#cb33-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># acrescentar a média verdadeira em uma linha vertical</span></span>
+<span id="cb33-32"><a href="#cb33-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> media, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color=</span><span class="st">"blue"</span>,<span class="at">size=</span><span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb33-33"><a href="#cb33-33" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb33-34"><a href="#cb33-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Exponencial (1/2)"</span>,</span>
+<span id="cb33-35"><a href="#cb33-35" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="st">"Valores"</span>, <span class="at">y =</span> <span class="st">"Densidade"</span>) <span class="sc">+</span></span>
+<span id="cb33-36"><a href="#cb33-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb33-37"><a href="#cb33-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xlim</span>(<span class="dv">0</span>,<span class="dv">10</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo2_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Para finalizar, vamos investigar o efeito de diferentes valores de <span class="math inline">\(\lambda\)</span> para esta situação problema:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Função para gerar o gráfico</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>gerar_grafico <span class="ot">&lt;-</span> <span class="cf">function</span>(rate) {</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Tamanho da amostra </span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  n_sample<span class="ot">=</span><span class="dv">100</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Gerar amostra da distribuição Exponencial</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">2025</span>) <span class="co"># Fixar a semente para gerarmos juntos as mesmas amostras</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>  dados <span class="ot">&lt;-</span> <span class="fu">rexp</span>(n_sample, <span class="at">rate=</span>rate)</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Criar data frame</span></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">valor =</span> dados)</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Criar data frame das probabilidades teóricas</span></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>  df_teorico <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">valor =</span> <span class="fu">seq</span>(<span class="fu">min</span>(dados),<span class="fu">max</span>(dados),<span class="fl">0.1</span>),</span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">dens =</span> <span class="fu">dexp</span>(<span class="fu">seq</span>(<span class="fu">min</span>(dados),<span class="fu">max</span>(dados),<span class="fl">0.1</span>), <span class="at">rate=</span>rate)</span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calcular a média da distribuição Exponencial</span></span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>  media <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">/</span>rate  </span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Criar o gráfico</span></span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> valor)) <span class="sc">+</span></span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># histograma</span></span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> ..density..),  </span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a>                   <span class="at">fill =</span> <span class="st">"lightblue"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># gráfico de linha</span></span>
+<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">data =</span> df_teorico, <span class="fu">aes</span>(<span class="at">x =</span> valor, <span class="at">y =</span> dens), </span>
+<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-32"><a href="#cb34-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># acrescentar a média verdadeira em uma linha vertical</span></span>
+<span id="cb34-33"><a href="#cb34-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> media, <span class="at">linetype =</span> <span class="st">"dashed"</span>,<span class="at">color=</span><span class="st">"blue"</span>,<span class="at">size=</span><span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb34-34"><a href="#cb34-34" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-35"><a href="#cb34-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"Exponencial ("</span>, rate, <span class="st">")"</span>, <span class="at">sep =</span> <span class="st">""</span>),</span>
+<span id="cb34-36"><a href="#cb34-36" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="st">"Valores"</span>, <span class="at">y =</span> <span class="st">"Densidade"</span>) <span class="sc">+</span></span>
+<span id="cb34-37"><a href="#cb34-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()  <span class="sc">+</span></span>
+<span id="cb34-38"><a href="#cb34-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>))  </span>
+<span id="cb34-39"><a href="#cb34-39" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb34-40"><a href="#cb34-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-41"><a href="#cb34-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Usar lapply para gerar os gráficos para diferentes valores de rate</span></span>
+<span id="cb34-42"><a href="#cb34-42" aria-hidden="true" tabindex="-1"></a>rates <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb34-43"><a href="#cb34-43" aria-hidden="true" tabindex="-1"></a>graficos <span class="ot">&lt;-</span> <span class="fu">lapply</span>(rates, gerar_grafico)</span>
+<span id="cb34-44"><a href="#cb34-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-45"><a href="#cb34-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Combinar os gráficos com patchwork</span></span>
+<span id="cb34-46"><a href="#cb34-46" aria-hidden="true" tabindex="-1"></a>graficos[[<span class="dv">1</span>]] <span class="sc">+</span> graficos[[<span class="dv">2</span>]] <span class="sc">+</span> graficos[[<span class="dv">3</span>]] <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">ncol =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo2_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Nota-se que, com o aumento de <span class="math inline">\(\lambda\)</span>:</p>
+<ul>
+<li><strong>Concentração perto de zero</strong>: À medida que λ cresce, os valores pequenos da variável tornam-se mais prováveis.</li>
+<li><strong>Decaimento mais rápido</strong>: A curva da f.d.p. cai mais rapidamente para valores maiores da variável, indicando que a probabilidade de valores altos é menor.</li>
+<li><strong>Média e dispersão</strong>: A média e a variância diminuem com o aumento de λ, indicando que a distribuição fica mais concentrada perto de zero.</li>
+</ul>
+<section id="perda-de-memória" class="level4" data-number="2.2.1.1">
+<h4 data-number="2.2.1.1" class="anchored" data-anchor-id="perda-de-memória"><span class="header-section-number">2.2.1.1</span> Perda de Memória</h4>
+<p>A propriedade de perda de memória (ou sem memória) da distribuição exponencial é uma característica importante e única dessa distribuição. Ela diz que a probabilidade de um evento ocorrer após um determinado tempo não depende do tempo que já passou sem o evento ocorrer. Formalmente, a propriedade de perda de memória pode ser enunciada da seguinte forma:</p>
+<p>Se X é uma variável aleatória com distribuição exponencial, então para quaisquer <span class="math inline">\(s, t \geq 0\)</span>:</p>
+<p><span class="math display">\[
+P(X &gt; t + s \mid X &gt; t) = P(X &gt; s)
+\]</span></p>
+<p>Para ilustrar, considere X um tempo de falha, em dias, exponencialmente distribuido. A propriedade da perda de memória diz que dado um tempo de falha maior do que <span class="math inline">\(t\)</span>, a probabilidade de ele ser maior que <span class="math inline">\(t+s\)</span> é igual a probabilidade de que ele seja somente maior que <span class="math inline">\(s\)</span>. Isto é como se o relógio começasse a contar novamente a partir de <span class="math inline">\(t\)</span>.</p>
+</section>
+<section id="exercício-1" class="level4" data-number="2.2.1.2">
+<h4 data-number="2.2.1.2" class="anchored" data-anchor-id="exercício-1"><span class="header-section-number">2.2.1.2</span> Exercício</h4>
+<p>Use o R, para mostrar que se <span class="math inline">\(X \sim \text{exp}(\lambda = 1/100)\)</span>, então <span class="math inline">\(P(X &gt; 150 | X &gt; 100) = P(X &gt; 50)\)</span>.</p>
+</section>
+</section>
+<section id="distribuição-normal" class="level3" data-number="2.2.2">
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="distribuição-normal"><span class="header-section-number">2.2.2</span> Distribuição Normal</h3>
+<p>A distribuição normal, também conhecida como distribuição de Gauss, é uma das distribuições mais importantes da estatística. Ela é uma distribuição contínua e simétrica em torno da média, modelando fenômenos naturais e diversas variáveis em contextos estatísticos.</p>
+<p>Ela pode ser aplicada em diversas situações, como:</p>
+<ul>
+<li>Distribuição de alturas de uma população;</li>
+<li>Distribuição de erros de medição;</li>
+<li>Distribuição de notas em uma prova.</li>
+</ul>
+<p>A função densidade de probabilidade de uma variável aleatória X com distribuição normal é dada por:</p>
+<p><span class="math display">\[
+f(x) = \frac{1}{\sqrt{2\pi\sigma^2}} exp\left(-\frac{(x - \mu)^2}{2\sigma^2}\right) \quad x \in \mathbb{R}
+\]</span></p>
+<p>onde <span class="math inline">\(\mu\)</span> é a média e <span class="math inline">\(\sigma^2\)</span> é a variância da distribuição.</p>
+<p>Um exemplo clássico de situação prática modelada pela distribuição normal é a altura de adultos em uma população. Se você medir a altura de um grande número de adultos de um mesmo grupo populacional (por exemplo, homens brasileiros adultos), perceberá que <strong>os valores tendem a se concentrar em torno de uma média</strong>, com poucas pessoas sendo muito mais altas ou muito mais baixas. Esse <strong>padrão simétrico</strong>, com a maioria dos valores próximos à média e <strong>caudas que se afunilam para os extremos</strong>, é característico da distribuição normal. Dessa forma, suponha que determinada população tenha a altura modelada pela distribuição normal com média <span class="math inline">\(\mu = 170\)</span> e desvio padrão <span class="math inline">\(\sigma = 7 cm\)</span>. Podemos usar as funções <code>d</code>, <code>p</code> e <code>q</code> para calcular quantidades de interesse sobre esta distribuição. Nessas funções, os argumentos que representam os parâmetros da distribuição são <code>mean</code> e <code>sd</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A probabilidade de que a altura de uma pessoa da população seja maior que 180 cm</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span><span class="sc">-</span><span class="fu">pnorm</span>(<span class="dv">180</span>,<span class="at">mean=</span><span class="dv">170</span>,<span class="at">sd=</span><span class="dv">7</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.07656373</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A probabilidade de que a altura de uma pessoa da população seja maior que 180 cm</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pnorm</span>(<span class="dv">180</span>,<span class="at">mean=</span><span class="dv">170</span>,<span class="at">sd=</span><span class="dv">7</span>,<span class="at">lower.tail=</span>F)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.07656373</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A probabilidade de que a altura de uma pessoa da população seja menor que 150 cm</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pnorm</span>(<span class="dv">150</span>,<span class="at">mean=</span><span class="dv">170</span>,<span class="at">sd=</span><span class="dv">7</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.002137367</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A probabilidade de que a altura de uma pessoa da população esteja entre 140 cm e 150 cm</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pnorm</span>(<span class="dv">150</span>,<span class="at">mean=</span><span class="dv">170</span>,<span class="at">sd=</span><span class="dv">7</span>)<span class="sc">-</span><span class="fu">pnorm</span>(<span class="dv">140</span>,<span class="at">mean=</span><span class="dv">170</span>,<span class="at">sd=</span><span class="dv">7</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.002128259</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># O percentil 95 do da altura de uma pessoa da população:</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">qnorm</span>(<span class="fl">0.95</span>,<span class="at">mean=</span><span class="dv">170</span>,<span class="at">sd=</span><span class="dv">7</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 181.514</code></pre>
+</div>
+</div>
+<p>Vamos gerar uma amostra desta distribuição e visualizá-la graficamente:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tamanho da amostra gerada</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>n_amostra<span class="ot">=</span><span class="dv">100</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="co"># media verdadeira</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>media <span class="ot">=</span> <span class="dv">170</span></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a><span class="co"># gerando os dados</span></span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>) <span class="co"># Fixar a semente para gerarmos juntos as mesmas amostras</span></span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>dados <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_amostra, <span class="at">mean=</span><span class="dv">170</span>,<span class="at">sd=</span><span class="dv">7</span>)</span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar data frame</span></span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">valor =</span> dados)</span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar data frame das probabilidades teóricas</span></span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>df_teorico <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">valor =</span> <span class="fu">seq</span>(<span class="fu">min</span>(dados),<span class="fu">max</span>(dados),<span class="fl">0.1</span>),</span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">dens =</span> <span class="fu">dnorm</span>(<span class="fu">seq</span>(<span class="fu">min</span>(dados),<span class="fu">max</span>(dados),<span class="fl">0.1</span>), <span class="at">mean=</span><span class="dv">170</span>,<span class="at">sd=</span><span class="dv">7</span>)</span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar o gráfico</span></span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> valor)) <span class="sc">+</span></span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># histograma</span></span>
+<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> ..density..),  </span>
+<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a>                   <span class="at">fill =</span> <span class="st">"lightblue"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb45-27"><a href="#cb45-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># gráfico de linha</span></span>
+<span id="cb45-28"><a href="#cb45-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">data =</span> df_teorico, <span class="fu">aes</span>(<span class="at">x =</span> valor, <span class="at">y =</span> dens), </span>
+<span id="cb45-29"><a href="#cb45-29" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb45-30"><a href="#cb45-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb45-31"><a href="#cb45-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># acrescentar a média verdadeira em uma linha vertical</span></span>
+<span id="cb45-32"><a href="#cb45-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> media, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color=</span><span class="st">"blue"</span>,<span class="at">size=</span><span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb45-33"><a href="#cb45-33" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb45-34"><a href="#cb45-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Normal (170,7)"</span>,</span>
+<span id="cb45-35"><a href="#cb45-35" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="st">"Valores"</span>, <span class="at">y =</span> <span class="st">"Densidade"</span>) <span class="sc">+</span></span>
+<span id="cb45-36"><a href="#cb45-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo2_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Para finalizar, vamos investigar o efeito de diferentes valores de <code>mean</code> e <code>sd</code> para esta situação problema:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Função para gerar o gráfico</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>gerar_grafico <span class="ot">&lt;-</span> <span class="cf">function</span>(mean,sd) {</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Tamanho da amostra </span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  n_amostra<span class="ot">=</span><span class="dv">100</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Gerar amostra da distribuição de Normal</span></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">2025</span>) <span class="co"># Fixar a semente para gerarmos juntos as mesmas amostras</span></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>  dados <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_amostra, <span class="at">mean=</span>mean,<span class="at">sd=</span>sd)</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Criar data frame</span></span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">valor =</span> dados)</span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Criar data frame das probabilidades teóricas</span></span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>  df_teorico <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">valor =</span> <span class="fu">seq</span>(<span class="fu">min</span>(dados),<span class="fu">max</span>(dados),<span class="fl">0.1</span>),</span>
+<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">dens =</span> <span class="fu">dnorm</span>(<span class="fu">seq</span>(<span class="fu">min</span>(dados),<span class="fu">max</span>(dados),<span class="fl">0.1</span>), <span class="at">mean=</span>mean,<span class="at">sd=</span>sd)</span>
+<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calcular a média da distribuição Normal</span></span>
+<span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a>  media <span class="ot">&lt;-</span> mean</span>
+<span id="cb46-21"><a href="#cb46-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb46-22"><a href="#cb46-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Criar o gráfico</span></span>
+<span id="cb46-23"><a href="#cb46-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> valor)) <span class="sc">+</span></span>
+<span id="cb46-24"><a href="#cb46-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># histograma</span></span>
+<span id="cb46-25"><a href="#cb46-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span>..density..), </span>
+<span id="cb46-26"><a href="#cb46-26" aria-hidden="true" tabindex="-1"></a>                   <span class="at">fill =</span> <span class="st">"lightblue"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb46-27"><a href="#cb46-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb46-28"><a href="#cb46-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># gráfico de linha</span></span>
+<span id="cb46-29"><a href="#cb46-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">data =</span> df_teorico, <span class="fu">aes</span>(<span class="at">x =</span> valor, <span class="at">y =</span> dens), </span>
+<span id="cb46-30"><a href="#cb46-30" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb46-31"><a href="#cb46-31" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb46-32"><a href="#cb46-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># acrescentar a média verdadeira em uma linha vertical</span></span>
+<span id="cb46-33"><a href="#cb46-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> media, <span class="at">linetype =</span> <span class="st">"dashed"</span>,<span class="at">color=</span><span class="st">"blue"</span>,<span class="at">size=</span><span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb46-34"><a href="#cb46-34" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb46-35"><a href="#cb46-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"Normal("</span>, mean,<span class="st">","</span>, sd, <span class="st">")"</span>, <span class="at">sep =</span> <span class="st">""</span>),</span>
+<span id="cb46-36"><a href="#cb46-36" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="st">"Valores"</span>, <span class="at">y =</span> <span class="st">"Densidade"</span>) <span class="sc">+</span></span>
+<span id="cb46-37"><a href="#cb46-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()  <span class="sc">+</span></span>
+<span id="cb46-38"><a href="#cb46-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">135</span>,<span class="dv">200</span>))  </span>
+<span id="cb46-39"><a href="#cb46-39" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb46-40"><a href="#cb46-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-41"><a href="#cb46-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Definir os valores de mu e sigma</span></span>
+<span id="cb46-42"><a href="#cb46-42" aria-hidden="true" tabindex="-1"></a>mean <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">160</span>, <span class="dv">170</span>)</span>
+<span id="cb46-43"><a href="#cb46-43" aria-hidden="true" tabindex="-1"></a>sd <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">10</span>)</span>
+<span id="cb46-44"><a href="#cb46-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-45"><a href="#cb46-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar todas as combinações possíveis de mu e sigma</span></span>
+<span id="cb46-46"><a href="#cb46-46" aria-hidden="true" tabindex="-1"></a>combinacoes <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">mean =</span> mean, <span class="at">sd =</span> sd)</span>
+<span id="cb46-47"><a href="#cb46-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-48"><a href="#cb46-48" aria-hidden="true" tabindex="-1"></a><span class="co"># Aplicar a função gerar_grafico para cada combinação</span></span>
+<span id="cb46-49"><a href="#cb46-49" aria-hidden="true" tabindex="-1"></a>graficos <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(combinacoes), <span class="cf">function</span>(i) {</span>
+<span id="cb46-50"><a href="#cb46-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gerar_grafico</span>(combinacoes<span class="sc">$</span>mean[i], combinacoes<span class="sc">$</span>sd[i]) </span>
+<span id="cb46-51"><a href="#cb46-51" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb46-52"><a href="#cb46-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-53"><a href="#cb46-53" aria-hidden="true" tabindex="-1"></a><span class="co"># Combinar os gráficos usando patchwork</span></span>
+<span id="cb46-54"><a href="#cb46-54" aria-hidden="true" tabindex="-1"></a>layout_graficos <span class="ot">&lt;-</span> (graficos[[<span class="dv">1</span>]] <span class="sc">|</span> graficos[[<span class="dv">3</span>]] <span class="sc">|</span> graficos[[<span class="dv">5</span>]]) <span class="sc">/</span></span>
+<span id="cb46-55"><a href="#cb46-55" aria-hidden="true" tabindex="-1"></a>                   (graficos[[<span class="dv">2</span>]] <span class="sc">|</span> graficos[[<span class="dv">4</span>]] <span class="sc">|</span> graficos[[<span class="dv">6</span>]])</span>
+<span id="cb46-56"><a href="#cb46-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-57"><a href="#cb46-57" aria-hidden="true" tabindex="-1"></a><span class="co"># Exibir o conjunto de gráficos</span></span>
+<span id="cb46-58"><a href="#cb46-58" aria-hidden="true" tabindex="-1"></a>layout_graficos</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo2_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>O efeito do aumento de <span class="math inline">\(\mu\)</span> e <span class="math inline">\(\sigma\)</span> na função densidade de probabilidade de uma distribuição normal pode ser analisado assim:</p>
+<ul>
+<li>Aumento de <span class="math inline">\(\mu\)</span>: A curva se desloca horizontalmente para a direita, mantendo a mesma forma. Isso ocorre porque <span class="math inline">\(\mu\)</span> define a localização central da distribuição.</li>
+<li>Aumento de <span class="math inline">\(\sigma\)</span>: A curva se alarga e abaixa, espalhando os valores por uma faixa maior. Isso acontece porque <span class="math inline">\(\sigma\)</span> controla a dispersão: valores mais altos significam maior variação nos dados.</li>
+</ul>
+</section>
+<section id="distribuição-gama" class="level3" data-number="2.2.3">
+<h3 data-number="2.2.3" class="anchored" data-anchor-id="distribuição-gama"><span class="header-section-number">2.2.3</span> Distribuição Gama</h3>
+<p>A distribuição Gamma é utilizada em diversas áreas quando se deseja modelar tempos de espera e tempos de vida.</p>
+<p>Ela pode ser aplicada em diversas situações, como:</p>
+<ul>
+<li>Tempo de vida de um componente eletrônico;</li>
+<li>Tempo de espera até a ocorrência de um evento raro;</li>
+<li>Tempo de espera entre chegadas de clientes em um sistema.</li>
+</ul>
+<p>A função densidade de probabilidade de uma variável aleatória X com distribuição gama é dada por:</p>
+<p><span class="math display">\[
+f(x) = \frac{\beta^\alpha}{\Gamma(\alpha)} x^{\alpha-1} e^{-\frac{x}{\beta}}
+\]</span></p>
+<p>em que o parâmetro <span class="math inline">\(\alpha\)</span> é o parâmetro de forma (shape) e o parâmetro <span class="math inline">\(\beta\)</span> é a taxa (rate). Os valores da média e variância associados a essa distribuição são:</p>
+<p><span class="math display">\[
+\begin{align*}
+E(X) &amp;= \alpha \cdot \beta \\
+Var(X) &amp;= \alpha \cdot \beta^2
+\end{align*}
+\]</span></p>
+<p>Utilizaremos, portanto, as funções <code>rgamma</code>, <code>dgamma</code>, <code>pgamma</code> e <code>qgamma</code> com os argumentos <code>shape</code> e <code>rate</code>.</p>
+<p>Um hospital quer modelar o tempo de atendimento de pacientes na emergência. Sabe-se que o tempo total de atendimento depende de várias etapas, como triagem, consulta e exames. Esse tipo de fenômeno pode ser bem modelado pela distribuição Gamma, pois o tempo total até a conclusão de várias etapas sucessivas frequentemente segue essa distribuição. Considere, portanto, que o tempo total de atendimento, em horas, tem uma distribuição Gama com parâmetros <span class="math inline">\(\alpha=2\)</span> e <span class="math inline">\(\beta=1\)</span>. Dessa forma, tem-se um tempo médio de atendimento de <span class="math inline">\(\alpha/\beta=2\)</span> horas.</p>
+<section id="exercícios" class="level4" data-number="2.2.3.1">
+<h4 data-number="2.2.3.1" class="anchored" data-anchor-id="exercícios"><span class="header-section-number">2.2.3.1</span> Exercícios</h4>
+<p>1- Calcule as seguintes probabilidades: a) Qual a probabilidade de o tempo total de atendimento ser superior a 4 horas? b) Qual a probabilidade de o tempo total de atendimento estar entre 1 e 2 horas? c) Qual o tempo total de atendimento mediano? d) Determine o tempo t tal que 25% dos atendimentos no hospital levam mais que t horas para serem concluídos.</p>
+<p>2- Simule uma amostra de tamanho 100 desta distribuição. Faça o histograma e acrescente a densidade verdadeira.</p>
+<p>3- Considere agora um estudo computacional com amostras de tamanho 100 para avaliar o efeito dos parâmetros α e β. Neste estudo, envolva as distribuições:</p>
+<ul>
+<li>Gama(<span class="math inline">\(\alpha = 1\)</span>, <span class="math inline">\(\beta = 1\)</span>)</li>
+<li>Gama(<span class="math inline">\(\alpha = 1\)</span>, <span class="math inline">\(\beta = 2\)</span>)</li>
+<li>Gama(<span class="math inline">\(\alpha = 2\)</span>, <span class="math inline">\(\beta = 1\)</span>)</li>
+<li>Gama(<span class="math inline">\(\alpha = 2\)</span>, <span class="math inline">\(\beta = 2\)</span>)</li>
+<li>Gama(<span class="math inline">\(\alpha = 3\)</span>, <span class="math inline">\(\beta = 1\)</span>)</li>
+<li>Gama(<span class="math inline">\(\alpha = 3\)</span>, <span class="math inline">\(\beta = 2\)</span>)</li>
+</ul>
+<p>Qual o efeito dos parâmetros na densidade dos dados?</p>
+<p>4- Sabemos que Gama(<span class="math inline">\(\alpha = 1\)</span>, <span class="math inline">\(\beta\)</span>) ≡ Exponencial(<span class="math inline">\(\lambda\)</span>=<span class="math inline">\(\beta\)</span>). Assim, gere uma amostra de tamanho 100 de uma Gama(<span class="math inline">\(\alpha=1\)</span>,<span class="math inline">\(\beta=4\)</span>) e sobreponha a densidade da distribuição Exponencial(<span class="math inline">\(\lambda=4\)</span>).</p>
+</section>
+</section>
+</section>
+<section id="simulando-resultados-teóricos-distribuição-t-student" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="simulando-resultados-teóricos-distribuição-t-student"><span class="header-section-number">2.3</span> Simulando Resultados Teóricos: Distribuição T-Student</h2>
+<p>No estudo de distribuições de probabilidade, é comum encontrar relações matemáticas entre diferentes distribuições. Algumas dessas relações podem ser demonstradas <strong>analiticamente</strong>, enquanto outras podem ser exploradas por meio de <strong>simulações</strong>. O R é uma excelente plataforma para esse tipo de investigação, permitindo gerar <strong>amostras aleatórias</strong>, <strong>visualizar distribuições</strong> e <strong>verificar empiricamente</strong> certas propriedades estatísticas.</p>
+<p>O estudo das relações entre distribuições de probabilidade é fundamental para a estatística teórica e aplicada. Essas conexões permitem desenvolver <strong>métodos estatísticos</strong> mais poderosos, <strong>justificar aproximações</strong>, facilitar cálculos complexos e compreender o comportamento de estimadores e testes estatísticos.</p>
+<p>Dessa forma, a distribuição T de Student surge naturalmente em estatística quando trabalhamos com <strong>amostras finitas</strong> e não conhecemos a <strong>variância populacional</strong>, para <strong>populações normais</strong>. A variável aleatória T que possui distribuição T-student com <span class="math inline">\(v\)</span> graus de liberdade é definida como:</p>
+<p><span class="math display">\[
+T = \frac{\bar{X} - \mu}{S / \sqrt{n}}
+\]</span></p>
+<p>onde:</p>
+<ul>
+<li><span class="math inline">\(Z \sim N(0,1)\)</span> é uma variável aleatória com distribuição normal padrão.</li>
+<li><span class="math inline">\(W \sim \chi^2(v)\)</span> é uma variável aleatória com distribuição qui-quadrado com <span class="math inline">\(v\)</span> graus de liberdade.</li>
+<li><span class="math inline">\(Z\)</span> e <span class="math inline">\(W\)</span> são <strong>independentes</strong>.</li>
+</ul>
+<p>Lembre-se que <span class="math inline">\(E(T)=0\)</span> e <span class="math inline">\(Var(T)=\frac{ν}{ν−2}\)</span>. Vamos gerar uma amostra da distribuição T com <span class="math inline">\(ν=10\)</span> graus de liberdade segundo a fórmula acima e, posteriormente, verificar a aproximação com a densidade verdadeira, a partir da função <code>dt</code>. Para a distribuição qui-quadrado, utilizaremos o comando rchisqcom o argumento df para os graus de liberdade da distribuição</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tamanho da amostra gerada</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>n_amostra<span class="ot">=</span><span class="dv">200</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a><span class="co"># media verdadeira</span></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>media <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a><span class="co"># gerando os dados</span></span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>) <span class="co"># Fixar a semente para gerarmos juntos as mesmas amostras</span></span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Normal padrão</span></span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>dadosZ <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_amostra, <span class="at">mean=</span><span class="dv">0</span>,<span class="at">sd=</span><span class="dv">1</span>)</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Qui-Quadrado</span></span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>dadosChi <span class="ot">&lt;-</span> <span class="fu">rchisq</span>(n_amostra,<span class="at">df=</span><span class="dv">10</span>)</span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a><span class="co"># T-Student</span></span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>dados <span class="ot">&lt;-</span> dadosZ<span class="sc">/</span><span class="fu">sqrt</span>(dadosChi<span class="sc">/</span><span class="dv">10</span>)</span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar data frame</span></span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">valor =</span> dados)</span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar data frame das probabilidades teóricas</span></span>
+<span id="cb47-20"><a href="#cb47-20" aria-hidden="true" tabindex="-1"></a>df_teorico <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb47-21"><a href="#cb47-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">valor =</span> <span class="fu">seq</span>(<span class="fu">min</span>(dados),<span class="fu">max</span>(dados),<span class="fl">0.1</span>),</span>
+<span id="cb47-22"><a href="#cb47-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">dens =</span> <span class="fu">dt</span>(<span class="fu">seq</span>(<span class="fu">min</span>(dados),<span class="fu">max</span>(dados),<span class="fl">0.1</span>), <span class="at">df=</span><span class="dv">10</span>)</span>
+<span id="cb47-23"><a href="#cb47-23" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb47-24"><a href="#cb47-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-25"><a href="#cb47-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar o gráfico</span></span>
+<span id="cb47-26"><a href="#cb47-26" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> valor)) <span class="sc">+</span></span>
+<span id="cb47-27"><a href="#cb47-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-28"><a href="#cb47-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># histograma</span></span>
+<span id="cb47-29"><a href="#cb47-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> ..density..), </span>
+<span id="cb47-30"><a href="#cb47-30" aria-hidden="true" tabindex="-1"></a>                   <span class="at">fill =</span> <span class="st">"lightblue"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb47-31"><a href="#cb47-31" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-32"><a href="#cb47-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># gráfico de linha</span></span>
+<span id="cb47-33"><a href="#cb47-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">data =</span> df_teorico, <span class="fu">aes</span>(<span class="at">x =</span> valor, <span class="at">y =</span> dens), </span>
+<span id="cb47-34"><a href="#cb47-34" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb47-35"><a href="#cb47-35" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-36"><a href="#cb47-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># acrescentar a média verdadeira em uma linha vertical</span></span>
+<span id="cb47-37"><a href="#cb47-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> media, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color=</span><span class="st">"blue"</span>,<span class="at">size=</span><span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb47-38"><a href="#cb47-38" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-39"><a href="#cb47-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"T-student (10)"</span>,</span>
+<span id="cb47-40"><a href="#cb47-40" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="st">"Valores"</span>, <span class="at">y =</span> <span class="st">"Densidade"</span>) <span class="sc">+</span></span>
+<span id="cb47-41"><a href="#cb47-41" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo2_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="exercícios-1" class="level3" data-number="2.3.1">
+<h3 data-number="2.3.1" class="anchored" data-anchor-id="exercícios-1"><span class="header-section-number">2.3.1</span> Exercícios</h3>
+<p>1- Se <span class="math inline">\(Y \sim Unif(0,1)\)</span>, então <span class="math inline">\(-log(Y) \sim Exp(1)\)</span>. Use a função <code>runif</code> para a distribuição uniforme.</p>
+<p>2- A soma de variáveis normais independentes também segue uma normal. Se <span class="math inline">\(X1, X2, \ldots, Xn \sim N(\mu, \sigma^2)\)</span>, então <span class="math inline">\(S = X1 + X2 + \ldots + Xn \sim N(n\mu, n\sigma^2)\)</span>. Para este exemplo, adote <span class="math inline">\(n = 12, \mu = 10, \sigma = 2\)</span>.</p>
+</section>
+</section>
+<section id="como-o-r-gera-valores-de-distribuições-de-probabilidade" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="como-o-r-gera-valores-de-distribuições-de-probabilidade"><span class="header-section-number">2.4</span> Como o R gera valores de distribuições de probabilidade</h2>
+<p>A geração de números aleatórios é um componente essencial da Estatística Computacional e da Simulação. Sempre que usamos funções como <code>rnorm()</code>, <code>rexp()</code> ou <code>rbinom()</code> no R, estamos gerando números de distribuições específicas. Mas como o R consegue criar números que seguem uma determinada distribuição de probabilidade?</p>
+<p>A resposta está na geração de números pseudoaleatórios e em métodos matemáticos que transformam esses números para se adequarem a distribuições desejadas. O principal método utilizado para essa transformação é o método da <strong>transformação inversa</strong>, que exploraremos em detalhes nesta seção.</p>
+<section id="números-pseudoaleatórios-e-sementes" class="level3" data-number="2.4.1">
+<h3 data-number="2.4.1" class="anchored" data-anchor-id="números-pseudoaleatórios-e-sementes"><span class="header-section-number">2.4.1</span> Números Pseudoaleatórios e Sementes</h3>
+<p>Antes de falar sobre a <strong>transformação inversa</strong>, precisamos entender como os números “aleatórios” são gerados em um computador. Nesse sentido, vamos entender a diferença entre números verdadeiramente aleatórios e números <strong>pseudoaleatórios</strong>.</p>
+<ul>
+<li><strong>Números aleatórios</strong> vêm de fenômenos físicos imprevisíveis, como ruído térmico ou decaimento radioativo.</li>
+<li><strong>Números pseudoaleatórios</strong> são gerados por algoritmos determinísticos, que produzem sequências de números que parecem aleatórias, mas que na verdade são <strong>completamente previsíveis</strong> se a <strong>semente inicial</strong> (ou “seed”) for conhecida.</li>
+</ul>
+<p>Os números gerados no R (e em praticamente todas as linguagens de programação) são pseudoaleatórios, pois vêm de um gerador de números pseudoaleatórios (PRNG - Pseudo Random Number Generator).</p>
+<p>O gerador de números aleatórios do R baseia-se no algoritmo <strong>Mersenne Twister</strong>, que é um dos geradores de números pseudoaleatórios mais utilizados devido à sua longa sequência periódica e boas propriedades estatísticas.</p>
+<p>A <strong>semente</strong> (<code>set.seed()</code>) é um <strong>número inicial</strong> que determina o estado do PRNG. Se usarmos a mesma semente, o R produzirá exatamente os mesmos números aleatórios, o que é essencial para <strong>reprodutibilidade</strong> em estudos computacionais.</p>
+</section>
+<section id="o-papel-da-distribuição-uniforme-com-parâmetros-01" class="level3" data-number="2.4.2">
+<h3 data-number="2.4.2" class="anchored" data-anchor-id="o-papel-da-distribuição-uniforme-com-parâmetros-01"><span class="header-section-number">2.4.2</span> O Papel da Distribuição Uniforme com Parâmetros (0,1)</h3>
+<p>A distribuição uniforme contínua no intervalo (0,1) tem um papel central na geração de números aleatórios. Isso acontece porque:</p>
+<ul>
+<li>Ela é fácil de gerar computacionalmente.</li>
+<li>Podemos transformá-la em muitas outras distribuições usando funções matemáticas adequadas.</li>
+</ul>
+<p>No R, trabalhamos com essa distribuição a partir das funções <code>dunif</code>, <code>punif</code>, <code>qunif</code> e <code>runif</code>. Os argumentos dessa distribuição são <code>min</code> e <code>max</code> e, para o caso da uniform(0,1) geramos valores dessa distribuição com o seguinte comando:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gerando 10 valores de uma distribuição Uniforme(0,1)</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>) <span class="co"># Define uma semente para reprodutibilidade</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>Amostra <span class="ot">=</span> <span class="fu">runif</span>(<span class="dv">10</span>, <span class="at">min=</span><span class="dv">0</span>, <span class="at">max=</span><span class="dv">1</span>) <span class="co"># Gera 10 números aleatórios de U(0,1)</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(Amostra)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] 0.9148060 0.9370754 0.2861395 0.8304476 0.6417455 0.5190959 0.7365883
+ [8] 0.1346666 0.6569923 0.7050648</code></pre>
+</div>
+</div>
+<p>Para gerar os dados de uma distribuição uniforme (0,1) o R, em sequência:</p>
+<ol type="1">
+<li><strong>Semente inicial</strong>: O gerador inicia com uma semente (definida pelo usuário via set.seed() ou aleatória). No caso de semente aleatória, o R pega um estado aleatório baseado no relógio do sistema, gerando sequências diferentes a cada execução.</li>
+<li>De acordo com o estado inicial (fixado ou aleatório) o R gera uma sequência de números <strong>pseudoaleatórios</strong> <span class="math inline">\(K1,K2,K3,\ldots\)</span></li>
+<li>Os números gerados são transformados para o intervalo (0,1) ao serem divididos pelo <strong>maior valor possível</strong> que o gerador pode produzir.</li>
+</ol>
+<p>Uma vez que temos valores da distribuição Uniforme(0,1), podemos usar técnicas para convertê-los em amostras de outras distribuições. A mais conhecida dessas técnicas é o método da <strong>transformação inversa</strong>.</p>
+</section>
+<section id="método-da-transformação-inversa" class="level3" data-number="2.4.3">
+<h3 data-number="2.4.3" class="anchored" data-anchor-id="método-da-transformação-inversa"><span class="header-section-number">2.4.3</span> Método da Transformação Inversa</h3>
+<p>O método da transformação inversa é uma técnica fundamental para gerar valores de distribuições arbitrárias a partir da distribuição uniforme U(0,1). Ele é amplamente usado porque permite transformar facilmente um gerador de números pseudoaleatórios uniforme em valores de determinadas distribuições.</p>
+<p>A ideia central do método é a seguinte:</p>
+<ol type="1">
+<li><strong>Gerar um número aleatório</strong> <span class="math inline">\(u\)</span> de uma distribuição uniforme U(0,1).</li>
+<li>Transformamos <span class="math inline">\(u\)</span> aplicando a inversa da função de distribuição acumulada <span class="math inline">\(F\)</span>, denotada por <span class="math inline">\(F^{-1}(.)\)</span>, para obter um valor da distribuição desejada. Matematicamente, o valor <span class="math inline">\(x\)</span>, gerado da distribuição de interesse, será dado por:</li>
+</ol>
+<p><span class="math display">\[
+x = F^{-1}(u)
+\]</span></p>
+<p>Esse método funciona porque a função <span class="math inline">\(F\)</span> de qualquer distribuição mapeia o intervalo (0,1) no suporte da variável aleatória. Assim, quando aplicamos sua inversa, obtemos valores com <strong>a mesma distribuição da variável original</strong>. Graficamente, temos a seguinte situação:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cap2/trans_inv.png" class="img-fluid figure-img"></p>
+<figcaption>Método da Transformação Inversa</figcaption>
+</figure>
+</div>
+</section>
+<section id="exemplo-distribuição-exponencial" class="level3" data-number="2.4.4">
+<h3 data-number="2.4.4" class="anchored" data-anchor-id="exemplo-distribuição-exponencial"><span class="header-section-number">2.4.4</span> Exemplo: Distribuição Exponencial</h3>
+<p>A função de distribuição F de uma distribuição exponencial é obtida fazendo:</p>
+<p><span class="math display">\[
+F(x) = \int_0^x \lambda e^{-\lambda t} dt = 1 - e^{-\lambda x}, \quad x \geq 0
+\]</span></p>
+<p>Na sequência, precisamos gerar valores <span class="math inline">\(x\)</span> dessa variável aleatória segundo o método da <strong>transformação inversa</strong>. Para um valor <span class="math inline">\(u\)</span>, gerado a partir da distribuição uniforme(0,1), temos que encontrar <span class="math inline">\(x=F^{-1}(u)\)</span>. Para isto, tem-se o seguinte raciocínio:</p>
+<p><span class="math display">\[
+F(x) = u \implies 1 - e^{-\lambda x} = u \implies e^{-\lambda x} = 1 - u \implies -\lambda x = \log(1 - u) \implies x = -\frac{1}{\lambda} \log(1 - u) \implies x = F^{-1}(u)
+\]</span></p>
+<p>Assim, geramos o valor <span class="math inline">\(x\)</span> da distribuição exponencial, ao aplicar o valor <span class="math inline">\(u\)</span> na função <span class="math inline">\(F^{-1}(u)\)</span>.</p>
+<p>No R, vamos criar uma função para gerar os valores da distribuição exponencial dessa forma e, na sequência, gerar uma amostra de tamanho 100:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gerando 100 valores de uma distribuição exponencial pelo método da transformação inversa</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)  <span class="co"># Define uma semente para reprodutibilidade</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Função Inversa</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>inv_exp <span class="ot">=</span> <span class="cf">function</span>(u,rate)</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="sc">-</span>(<span class="dv">1</span><span class="sc">/</span>rate)<span class="sc">*</span><span class="fu">log</span>(<span class="dv">1</span><span class="sc">-</span>u))</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Gerando a amostra</span></span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>n_amostra <span class="ot">=</span> <span class="dv">100</span></span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>u <span class="ot">=</span> <span class="fu">runif</span>(n_amostra,<span class="at">min=</span><span class="dv">0</span>,<span class="at">max=</span><span class="dv">1</span>)</span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a>dados <span class="ot">=</span> <span class="fu">inv_exp</span>(<span class="at">u=</span>u,<span class="at">rate=</span><span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>)</span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-13"><a href="#cb50-13" aria-hidden="true" tabindex="-1"></a><span class="co"># media verdadeira</span></span>
+<span id="cb50-14"><a href="#cb50-14" aria-hidden="true" tabindex="-1"></a>media <span class="ot">=</span> <span class="dv">2</span></span>
+<span id="cb50-15"><a href="#cb50-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-16"><a href="#cb50-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar data frame</span></span>
+<span id="cb50-17"><a href="#cb50-17" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">valor =</span> dados)</span>
+<span id="cb50-18"><a href="#cb50-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb50-19"><a href="#cb50-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar data frame das probabilidades teóricas</span></span>
+<span id="cb50-20"><a href="#cb50-20" aria-hidden="true" tabindex="-1"></a>df_teorico <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb50-21"><a href="#cb50-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">valor =</span> <span class="fu">seq</span>(<span class="fu">min</span>(dados),<span class="fu">max</span>(dados),<span class="fl">0.1</span>),</span>
+<span id="cb50-22"><a href="#cb50-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">dens =</span> <span class="fu">dexp</span>(<span class="fu">seq</span>(<span class="fu">min</span>(dados),<span class="fu">max</span>(dados),<span class="fl">0.1</span>), <span class="at">rate=</span><span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>)</span>
+<span id="cb50-23"><a href="#cb50-23" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb50-24"><a href="#cb50-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb50-25"><a href="#cb50-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Criar o gráfico</span></span>
+<span id="cb50-26"><a href="#cb50-26" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> valor)) <span class="sc">+</span></span>
+<span id="cb50-27"><a href="#cb50-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb50-28"><a href="#cb50-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># histograma</span></span>
+<span id="cb50-29"><a href="#cb50-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> ..density..), </span>
+<span id="cb50-30"><a href="#cb50-30" aria-hidden="true" tabindex="-1"></a>                   <span class="at">fill =</span> <span class="st">"lightblue"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb50-31"><a href="#cb50-31" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb50-32"><a href="#cb50-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># gráfico de linha</span></span>
+<span id="cb50-33"><a href="#cb50-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">data =</span> df_teorico, <span class="fu">aes</span>(<span class="at">x =</span> valor, <span class="at">y =</span> dens), </span>
+<span id="cb50-34"><a href="#cb50-34" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb50-35"><a href="#cb50-35" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb50-36"><a href="#cb50-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># acrescentar a média verdadeira em uma linha vertical</span></span>
+<span id="cb50-37"><a href="#cb50-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> media, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color=</span><span class="st">"blue"</span>,<span class="at">size=</span><span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb50-38"><a href="#cb50-38" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb50-39"><a href="#cb50-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Exponencial (1/2)"</span>,</span>
+<span id="cb50-40"><a href="#cb50-40" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="st">"Valores"</span>, <span class="at">y =</span> <span class="st">"Densidade"</span>) <span class="sc">+</span></span>
+<span id="cb50-41"><a href="#cb50-41" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb50-42"><a href="#cb50-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xlim</span>(<span class="dv">0</span>,<span class="dv">10</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo2_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Acabamos de fazer, portanto, o que a função <code>rexp()</code> faz automaticamente.</p>
+</section>
+<section id="distribuição-cauchy" class="level3" data-number="2.4.5">
+<h3 data-number="2.4.5" class="anchored" data-anchor-id="distribuição-cauchy"><span class="header-section-number">2.4.5</span> Distribuição Cauchy</h3>
+<p>A <strong>distribuição Cauchy</strong> é uma distribuição de probabilidade <strong>contínua</strong> famosa por seu comportamento peculiar, especialmente porque <strong>não possui média nem variância definidas</strong>. Isso a torna um exemplo clássico de distribuição com <strong>caudas pesadas</strong>, usada em diversas aplicações teóricas e práticas. Suas aplicabilidades mais comuns são:</p>
+<ul>
+<li><strong>Processos físicos</strong>: descreve a ressonância de partículas na mecânica quântica.</li>
+<li><strong>Robustez estatística</strong>: usada para testar métodos estatísticos.</li>
+<li><strong>Regressão robusta</strong>: a distribuição Cauchy pode modelar erros com caudas pesadas.</li>
+<li><strong>Aplicações em telecomunicações</strong>: usada em modelos de interferência.</li>
+</ul>
+<p>Particularmente, a função densidade de probabilidade de uma variável aleatória X com distribuição Cauchy é:</p>
+<p><span class="math display">\[
+f(x) = \frac{1}{\pi} \frac{\gamma}{(x - x_0)^2 + \gamma^2}, \quad -\infty &lt; x &lt; \infty
+\]</span></p>
+<p>onde <span class="math inline">\(x_0\)</span> é a localização da mediana e <span class="math inline">\(\gamma\)</span> é a escala, que determina a largura da distribuição.</p>
+<p>O nosso objetivo é utilizar o método da transformação inversa para gerar dessa distribuição. Mas antes será necessário introduzir a distribuição Cauchy Padrão, que possui θ=0 e γ=1. A função densidade de probabilidade de uma variável aleatória Y com distribuição Cauchy padrão é:</p>
+<p><span class="math display">\[
+f(y) = \frac{1}{\pi} \frac{1}{y^2 + 1}, \quad -\infty &lt; y &lt; \infty
+\]</span></p>
+<p>A função de distribuição dessa variável é:</p>
+<p><span class="math display">\[
+F(y) = \frac{1}{2} + \frac{1}{\pi} \tan^{-1}(y) \quad y \in \mathbb{R}
+\]</span></p>
+<p>Existe um resultado, advindo de propriedades de distribuições da família locação-escala, que relaciona uma distribuição cauchy genérica com a distribuição cauchy padrão. Se <span class="math inline">\(Y \sim Cauchy(0,1)\)</span>, então a variável <span class="math inline">\(X=\theta+\gamma Y\)</span> tem distribuição <span class="math inline">\(Cauchy(\theta,\gamma)\)</span>.</p>
+</section>
+<section id="exercício-2" class="level3" data-number="2.4.6">
+<h3 data-number="2.4.6" class="anchored" data-anchor-id="exercício-2"><span class="header-section-number">2.4.6</span> Exercício</h3>
+<p>Imagine que um atirador esteja utilizando um rifle de precisão, mas que, devido a um problema na calibração da mira, seus tiros tendam a atingir um ponto ligeiramente deslocado para a direita do alvo. Além disso, variações imprevisíveis no vento, pequenas oscilações na mão do atirador e imperfeições no equipamento ainda afetam a dispersão dos impactos. Nesse cenário, uma distribuição normal não seria adequada, pois presume que a variabilidade dos erros segue uma estrutura bem comportada com momentos finitos. No entanto, na prática, grandes desvios ocasionais podem ocorrer, como quando uma rajada de vento inesperada desvia um disparo para longe. Esse comportamento sugere que a distribuição Cauchy seja uma boa modelagem para o erro do impacto na horizontal.</p>
+<p>Definição dos Parâmetros:</p>
+<ul>
+<li>Parâmetro de localização <span class="math inline">\(\theta\)</span> = 8 cm: Devido à calibração inadequada, o atirador tende a acertar, em média, 8 cm à direita do centro do alvo.</li>
+<li>Parâmetro de escala <span class="math inline">\(\gamma\)</span> = 5 cm: Este parâmetro reflete a dispersão dos impactos.</li>
+</ul>
+<p>1- Use o método da <strong>transformação inversa</strong> para gerar uma amostra de tamanho 100 da distribuição cauchy padrão.</p>
+<p>2- Use a propriedade <span class="math inline">\(X=\theta+\gamma Y\)</span>, para gerar a distribuição Cauchy(<span class="math inline">\(\theta=8\)</span>,<span class="math inline">\(\gamma=5\)</span>).</p>
+<p>3- Use a função <code>dcauchy</code> para checar se a sua amostra foi bem gerada. Essa função tem como argumentos <code>location</code> e <code>scale</code>.</p>
+</section>
+<section id="outros-métodos-de-geração" class="level3" data-number="2.4.7">
+<h3 data-number="2.4.7" class="anchored" data-anchor-id="outros-métodos-de-geração"><span class="header-section-number">2.4.7</span> Outros Métodos de Geração</h3>
+<p>O método da <strong>transformação inversa</strong> é uma abordagem fundamental para gerar amostras aleatórias a partir de distribuições de probabilidade arbitrárias. Como vimos, ele se baseia na <strong>inversão da função de distribuição acumulada</strong>, transformando números <strong>uniformemente distribuídos</strong> em números que seguem a distribuição desejada. O R usa este método para gerar as seguintes distribuições:</p>
+<ul>
+<li>Exponencial</li>
+<li>Cauchy</li>
+<li>Gumbel</li>
+<li>Laplace</li>
+<li>Pareto</li>
+<li>Weibull</li>
+</ul>
+<p>Por depender, analiticamente, da função <span class="math inline">\(F\)</span>, o método da transformação inversa possui algumas desvantagens. Para muitas distribuições, <strong>a inversa não possui uma forma fechada</strong>, o que pode dificultar ou até inviabilizar a implementação direta do método. Quando a inversa da FDA não tem uma forma analítica simples, precisamos recorrer a métodos numéricos (como <strong>bissecção</strong> ou <strong>Newton-Raphson</strong>) para encontrar <span class="math inline">\(F^{-1}(u)\)</span>. Isso pode ser computacionalmente custoso, especialmente para distribuições complexas ou quando precisamos gerar um grande número de amostras rapidamente. Além disso, podem ocorrer erros de arredondamento, impactando a qualidade das amostras geradas. Se a distribuição tem múltiplos picos (multimodalidade), o método da transformação inversa pode ser ineficiente porque pode ser difícil encontrar a inversa de <span class="math inline">\(F\)</span> com precisão.</p>
+<p>O R não usa <strong>métodos numéricos</strong> para calcular a inversa da função de distribuição acumulada ao gerar amostras de distribuições. Quando a inversa de <span class="math inline">\(F\)</span> não tem uma forma fechada, o R geralmente adota outros métodos mais eficientes:</p>
+<ul>
+<li>Método de Box Muller ou Método polar de Marsaglia: Normal</li>
+<li>Método de Aceitação-Rejeição: Gama, Beta, T, Qui-Quadrado e F</li>
+<li>Método da Decomposição: Binomial e Poisson.</li>
+</ul>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiada");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiada");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./capitulo1.html" class="pagination-link" aria-label="Revisão do R-Studio">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Revisão do R-Studio</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./capitulo3.html" class="pagination-link" aria-label="Estimadores Pontuais e sua Propriedades">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Estimadores Pontuais e sua Propriedades</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -388,3 +388,5 @@ Este resultado é exato somente sob a suposição de normalidade da população.
 ### Exercício
 
 Considere que $X_1, X_2, \cdots, X_n$ seja uma amostra aleatória de tamanho $n=16$ de uma população com distribuição Normal com parâmetros $\mu=170$ e $\sigma^2=100$. Considerando $B=1000$ verifique, computacionalmente, se a distribuição da estatística $(n−1)S^2\sigma^2$ tem distribuição qui-quadrado com $n−1$ graus de liberdade. 
+
+# tes
