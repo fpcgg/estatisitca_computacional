@@ -413,3 +413,269 @@ Considere que $X_1, X_2, ..., X_n$ seja uma amostra aleatória de uma populaçã
 1- Gere $B=100$ amostras de tamanho $n=22$ dessa população e, para cada amostra, obtenha o intervalo com 95% de confiança para a variância populacional $\sigma^2$.
 2- Faça o gráfico da cobertura dos intervalos gerados e calcule a porcentagem de cobertura.
 3- Altere o valor de $\sigma^2$ para 25 e observe o que muda.
+
+## Testes de Hipótese
+
+Diante da incerteza sobre o verdadeiro valor de um parâmetro populacional $\beta$, como a média, proporção ou variância, o teste de hipóteses nos fornece uma estrutura formal para avaliar uma suposição sobre esse parâmetro com base em dados amostrais.
+
+Começamos formulando duas hipóteses estatísticas mutuamente exclusivas:
+
+-   Hipótese nula ($H_0$): Representa a suposição inicial que queremos testar;
+-   Hipótese alternativa ($H_a$): Representa a suposição que queremos investigar, sugerindo uma diferença ou efeito. Pode ser unilateral (por exemplo, $H_a: \beta > \beta_0$) ou bilateral (por exemplo, $H_a: \beta \neq \beta_0$).
+
+Com uma amostra aleatória $X=(X_1, X_2, …, X_n)$, calculamos uma estatística de teste $T(X)$, escolhida de forma que valores extremos de $T(X)$ forneçam evidência contra $H0$. Com base em $T(X)$, definimos uma região crítica $C$, tal que:
+
+$$
+\text{Rejeitamos} H_0 \text{ se } T(X) \in C
+$$
+
+Essa decisão envolve incertezas, que podem ser quantificadas por dois tipos de erro:
+
+ -   Erro tipo I ($\alpha$): Rejeitar $H_0$ quando ela é verdadeira. A probabilidade desse erro é o nível de significância do teste.
+
+$$
+\alpha = P(T(X) \in C | H_0 \text{ é verdadeira})
+$$
+
+ -   Erro tipo II ($\beta$): Não rejeitar $H_0$ quando $H_1$ é verdadeira. A probabilidade desse erro depende do verdadeiro valor do parâmetro sob $H_a$.
+
+$$
+\beta = P(T(X) \notin C | H_1 \text{ é verdadeira})
+$$
+
+ - Poder do teste ($1 - \beta$): A probabilidade de corretamente rejeitar $H_0$ quando $H_1$ é verdadeira. Um teste poderoso tem um baixo valor de $\beta$.
+
+$$
+1 - \beta = P(T(X) \in C | H_1 \text{ é verdadeira})
+$$
+
+Uma forma amplamente utilizada para tomar a decisão sobre rejeitar ou não $H0$ é por meio do p-valor, que representa a probabilidade de observarmos um valor tão extremo quanto o valor observado da estatística de teste, sob a suposição de que $H0$ é verdadeira. Assim:
+
+ - Calculamos o p-valor com base na estatística de teste observada;
+ - Comparamos o p-valor com o nível de significância $\alpha$;
+ - Rejeitamos $H0$ se o p-valor for menor ou igual a $\alpha$; 
+
+ Com o apoio de ferramentas computacionais, é possível simular o comportamento da estatística de teste sob diferentes cenários, o que permite investigar de forma prática as probabilidades dos erros tipo I e tipo II, avaliar o poder do teste e explorar o efeito de diferentes hipóteses alternativas.
+
+## Média Populacional (caso normal com variância conhecida)
+
+Vamos começar estudando a construção de testes de hipóteses para a média populacional $\mu$, assumindo que:
+
+ - Os dados vêm de uma população com distribuição normal $N(\mu,\sigma^2)$;
+ - A variância populacional $\sigma^2$ é conhecida;
+ - A amostra $X_1, X_2, …, X_n$ é aleatória e de tamanho $n$.
+
+### Teste Bilateral
+
+O teste bilateral verifica se a média populacional é igual a um valor específico $\mu_0$ ou diferente, para mais ou para menos.
+
+$$
+\begin{align*}
+H_0 &: \mu = \mu_0  \text{hipótese nula} \\
+H_1 &: \mu \neq \mu_0  \text{hipótese alternativa}
+$$
+
+A estatística de teste usada é a média amostral
+
+$$
+\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i
+$$
+
+Sabemos que:
+
+$$
+\bar{X} \sim N(\mu, \sigma^2/n)
+$$
+
+Sob $H_0$:
+
+$$
+\bar{X} \sim N(\mu_0, \sigma^2/n)
+$$
+
+O nível de significância é $\alpha$. No teste bilateral, rejeitamos $H_0$ se a média amostral estiver muito distante de $\mu_0$:
+
+!["img4"](img/cap5/img5_4.png)
+
+Isto é,
+
+$$
+\text{Rejeitamos} H_0 \text{ se } |\bar{X} - \mu_0| > z_{\alpha/2} \frac{\sigma}{\sqrt{n}}
+$$
+
+Queremos determinar os valores $L$ e $U$ que satisfazem:
+
+$$
+P(\bar{X} \leq L | H_0) = \frac{\alpha}{2} \quad \text{e} \quad P(\bar{X} \geq U | H_0) = \frac{\alpha}{2}
+$$
+
+Sabemos que:
+
+$$
+P(\bar{X} \leq L | H_0) = \frac{\alpha}{2} \to \frac{L-\mu_0}{\sigma/\sqrt{n}} = -z_{\alpha/2} \to L = \mu_0 - z_{\alpha/2} \frac{\sigma}{\sqrt{n}}
+$$
+
+e
+
+$$
+P(\bar{X} \geq U | H_0) = \frac{\alpha}{2} \to \frac{U-\mu_0}{\sigma/\sqrt{n}} = z_{\alpha/2} \to U = \mu_0 + z_{\alpha/2} \frac{\sigma}{\sqrt{n}}
+$$
+
+Portanto, rejeitamos $H_0$ se:
+
+$$
+\bar{X} \leq L = \mu_0 - z_{\alpha/2} \frac{\sigma}{\sqrt{n}} \quad \text{ou} \quad \bar{X} \geq U = \mu_0 + z_{\alpha/2} \frac{\sigma}{\sqrt{n}}
+$$
+
+Exemplo:
+
+Considere que $X_1, X_2, …, X_n$ seja uma amostra aleatória de tamanho $n=16$ de uma população com distribuição Normal com parâmetros $\mu$ e $\sigma^2$, com $\sigma^2=100$. Considere o teste das seguintes hipóteses:
+
+$$
+\begin{align*}
+H_0 &: \mu = 170  \text{hipótese nula} \\
+H_1 &: \mu \neq 170  \text{hipótese alternativa}
+\end{align*}
+$$
+
+Considerando um $\alpha$ de 5%, temos a seguinte região crítica:
+
+$$
+L = \mu_0 - z_{\alpha/2} \frac{\sigma}{\sqrt{n}} = 170 - 1.96 \cdot \frac{10}{4} = 165.1
+$$
+
+e
+
+$$
+U = \mu_0 + z_{\alpha/2} \frac{\sigma}{\sqrt{n}} = 170 + 1.96 \cdot \frac{10}{4} = 174.9
+$$
+
+Portanto, rejeitamos $H_0$ se $\bar{X} \leq 165.1$ ou $\bar{X} \geq 174.9$.
+
+De acordo com $\alpha$, vamos simular $B=1000$ amostras de tamanho $n=16$ de uma população com $\mu = 170$ e $\sigma^2 = 100$ e, para cada amostra, vamos testar as hipóteses acima utilizando o método da região crítica com um nível $\alpha = 5%$, assumindo $\sigma^2$ conhecido. Note que, em todas as réplicas, teremos a mesma região crítica. O objetivo é verificar se em aproximadamente 5% dessas amostras rejeitamos a hipótese nula, quando sabemos que, na verdade, ela é verdadeira (eerro do tipo I). Dessa forma, o nosso objetivo é estimar, empiricamente, o nível $\alpha$:
+
+```{r}
+# Parâmetros populacionais de X
+media_real <- 170
+sigma_real <- 10
+
+# Tamanho da amostra
+n <- 16
+
+# Número de réplicas (simulações)
+B <- 1000
+
+# Nível de significância
+alfa <- 0.05
+
+# Simulação das médias amostrais
+set.seed(2025)
+medias <- replicate(B, mean(rnorm(n, media_real, sigma_real)))
+
+# Z crítico
+z_critico <- qnorm(alfa/2,lower.tail=F)
+
+# valores criticos de xbarra
+L <- media_real-z_critico*sigma_real/sqrt(n)
+U <- media_real+z_critico*sigma_real/sqrt(n)
+
+# Cria um data frame com os valores das medias e decisão do teste
+df <- data.frame(medias = medias) %>%
+  mutate(rejeita_H0 = medias >= U | medias <= L )
+
+# Porcentagem de testes que rejeitaram a hipótese nula
+rejeicao = mean(df$rejeita_H0)
+
+# Gráfico
+ggplot(df, aes(x = medias, fill = rejeita_H0)) +
+  geom_histogram(color = "black") +
+  scale_fill_manual(values = c("FALSE" = "skyblue", "TRUE" = "tomato"),
+                    labels = c("Não rejeita H0", "Rejeita H0"),
+                    name = "Decisão") +
+  labs(title = "Distribuição das médias amostrais",
+       x = "Médias Amostrais",
+       y = "Frequência") +
+  theme_minimal()
+```
+
+Esse gráfico representa a distribuição empírica dos B valores de $\bar{X}$. A quantidade empírica de testes que rejeitaram a hipótese nula é aproximadamente 5%, o nível de significância.
+
+### Teste Unilateral À Direita
+
+O teste unilateral à direita verifica se a média populacional é maior que um valor específico $\mu_0$:
+
+$$
+\begin{align*}
+H_0 &: \mu \leq \mu_0  \text{ (hipótese nula)} \\
+H_1 &: \mu > \mu_0  \text{ (hipótese alternativa)}
+\end{align*}
+$$
+
+A estatística de teste utilizada é a média amostral:
+
+$$
+\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i
+$$
+
+Sabemos que:
+
+$$
+\bar{X} \sim N(\mu, \sigma^2/n)
+$$
+
+Sob $H_0$:
+
+$$
+\bar{X} \sim N(\mu_0, \sigma^2/n)
+$$
+
+O nível de significância é $\alpha$. No teste unilateral à direita, rejeitamos $H_0$ se a média amostral estiver muito maior que $\mu_0$:
+
+!["img5"](img/cap5/img5_5.png)
+
+Isto é,
+
+$$
+\text{Rejeitamos } H_0 \text{ se } \bar{X} > U
+$$
+
+Queremos determinar o valor $U$ tal que:
+
+$$
+P(\bar{X} \geq U | H_0) = \alpha
+$$
+
+Sabemos que:
+
+$$
+P(\bar{X} \geq U | H_0) = \alpha \to \frac{U-\mu_0}{\sigma/\sqrt{n}} = z_{\alpha} \to U = \mu_0 + z_{\alpha} \frac{\sigma}{\sqrt{n}}
+$$
+
+Portanto, rejeitamos $H_0$ se:
+
+$$
+\bar{X} \geq U = \mu_0 + z_{\alpha} \frac{\sigma}{\sqrt{n}}
+$$
+
+Exercício:
+
+Considere que $X_1, X_2, …, X_n$ seja uma amostra aleatória de tamanho n=16 de uma população com distribuição Normal com parâmetros $\mu$ e $\sigma^2$, com $\simga^2=100$. Considere o teste das seguintes hipóteses:
+
+$$
+\begin{align*}
+H_0 &: \mu \leq 170  \text{ (hipótese nula)} \\
+H_1 &: \mu > 170  \text{ (hipótese alternativa)}
+\end{align*}
+$$
+
+Considerando um $\alpha$ de 5%, temos a seguinte região crítica:
+
+$$
+U = \mu_0 + z_{\alpha} \frac{\sigma}{\sqrt{n}} = 170 + 1.645 \cdot \frac{10}{4} = 174.1
+$$
+
+Portanto, rejeitamos $H_0$ se $\bar{X} \geq 174.1$.
+
+Fixado o valor de $\alpha=5%$, simule $B=1000$ amostras de uma população normal $(\mu=170, \alpha2=100)$ e, para cada amostra, teste as hipóteses acima utilizando o método da regiao crítica com um nível $\alpha=5%$, assumindo $\sigma^2$ conhecido. Note que, em todas as réplicas, teremos a mesma região crítica. O objetivo é verificar se em aproximadamente 5% dessas amostras rejeitaremos a hipótese nula, quando sabemos que, na verdade, ela é verdadeira (erro do tipo I). Dessa forma, o nosso objetivo é estimar, empiricamente, o nível $\alpha$.
+
+### ERRO TIPO II E PODER DO TESTE
