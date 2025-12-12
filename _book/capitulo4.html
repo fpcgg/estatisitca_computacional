@@ -1,0 +1,2194 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt" xml:lang="pt"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.23">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>4&nbsp; Inferência para Uma População – Estatística Computacional</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<link href="./capitulo5.html" rel="next">
+<link href="./capitulo3.html" rel="prev">
+<link href="./favicon.jpg" rel="icon" type="image/jpeg">
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-1fe81d0376b2c50856e68e651e390326.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-70a47bd5681a7291082a5b9f83d58762.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "language": {
+    "search-no-results-text": "Nenhum resultado",
+    "search-matching-documents-text": "documentos correspondentes",
+    "search-copy-link-title": "Copiar link para a busca",
+    "search-hide-matches-text": "Esconder correspondências adicionais",
+    "search-more-match-text": "mais correspondência neste documento",
+    "search-more-matches-text": "mais correspondências neste documento",
+    "search-clear-button-title": "Limpar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Procurar"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./capitulo4.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Inferência para Uma População</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./index.html" class="sidebar-logo-link">
+      </a>
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Aulas</a> 
+    </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefácio</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Revisão do R-Studio</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Distribuições de Probabilidade</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Estimadores Pontuais e sua Propriedades</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo4.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Inferência para Uma População</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Funções do R Para Intervalos de Confiança e Testes de Hipóteses (1 e 2 Populações)</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Conteúdo</h2>
+   
+  <ul>
+  <li><a href="#intervalos-de-confiança" id="toc-intervalos-de-confiança" class="nav-link active" data-scroll-target="#intervalos-de-confiança"><span class="header-section-number">4.1</span> Intervalos de Confiança</a></li>
+  <li><a href="#média-populacional-caso-normal-com-variância-conhecida" id="toc-média-populacional-caso-normal-com-variância-conhecida" class="nav-link" data-scroll-target="#média-populacional-caso-normal-com-variância-conhecida"><span class="header-section-number">4.2</span> Média Populacional (caso normal com variância conhecida)</a>
+  <ul>
+  <li><a href="#exemplo" id="toc-exemplo" class="nav-link" data-scroll-target="#exemplo"><span class="header-section-number">4.2.1</span> Exemplo</a></li>
+  <li><a href="#exercício-impacto-do-tamanho-da-amostra" id="toc-exercício-impacto-do-tamanho-da-amostra" class="nav-link" data-scroll-target="#exercício-impacto-do-tamanho-da-amostra"><span class="header-section-number">4.2.2</span> Exercício: impacto do tamanho da amostra</a></li>
+  </ul></li>
+  <li><a href="#média-populacional-caso-normal-com-variância-desconhecida" id="toc-média-populacional-caso-normal-com-variância-desconhecida" class="nav-link" data-scroll-target="#média-populacional-caso-normal-com-variância-desconhecida"><span class="header-section-number">4.3</span> Média Populacional (caso normal com variância desconhecida)</a>
+  <ul>
+  <li><a href="#exemplo-1" id="toc-exemplo-1" class="nav-link" data-scroll-target="#exemplo-1"><span class="header-section-number">4.3.1</span> Exemplo</a></li>
+  <li><a href="#exercício-impacto-do-tamanho-do-nível-de-confiança" id="toc-exercício-impacto-do-tamanho-do-nível-de-confiança" class="nav-link" data-scroll-target="#exercício-impacto-do-tamanho-do-nível-de-confiança"><span class="header-section-number">4.3.2</span> Exercício: impacto do tamanho do nível de confiança</a></li>
+  </ul></li>
+  <li><a href="#média-populacional-caso-amostras-grandes" id="toc-média-populacional-caso-amostras-grandes" class="nav-link" data-scroll-target="#média-populacional-caso-amostras-grandes"><span class="header-section-number">4.4</span> Média Populacional (caso amostras grandes)</a>
+  <ul>
+  <li><a href="#exercício" id="toc-exercício" class="nav-link" data-scroll-target="#exercício"><span class="header-section-number">4.4.1</span> Exercício</a></li>
+  </ul></li>
+  <li><a href="#proporção-populacional" id="toc-proporção-populacional" class="nav-link" data-scroll-target="#proporção-populacional"><span class="header-section-number">4.5</span> Proporção Populacional</a>
+  <ul>
+  <li><a href="#exercício-1" id="toc-exercício-1" class="nav-link" data-scroll-target="#exercício-1"><span class="header-section-number">4.5.1</span> Exercício</a></li>
+  </ul></li>
+  <li><a href="#variância-populacional-caso-normal" id="toc-variância-populacional-caso-normal" class="nav-link" data-scroll-target="#variância-populacional-caso-normal"><span class="header-section-number">4.6</span> Variância Populacional (caso normal)</a>
+  <ul>
+  <li><a href="#exercício-2" id="toc-exercício-2" class="nav-link" data-scroll-target="#exercício-2"><span class="header-section-number">4.6.1</span> Exercício</a></li>
+  </ul></li>
+  <li><a href="#testes-de-hipótese" id="toc-testes-de-hipótese" class="nav-link" data-scroll-target="#testes-de-hipótese"><span class="header-section-number">4.7</span> Testes de Hipótese</a></li>
+  <li><a href="#média-populacional-caso-normal-com-variância-conhecida-1" id="toc-média-populacional-caso-normal-com-variância-conhecida-1" class="nav-link" data-scroll-target="#média-populacional-caso-normal-com-variância-conhecida-1"><span class="header-section-number">4.8</span> Média Populacional (caso normal com variância conhecida)</a>
+  <ul>
+  <li><a href="#teste-bilateral" id="toc-teste-bilateral" class="nav-link" data-scroll-target="#teste-bilateral"><span class="header-section-number">4.8.1</span> Teste Bilateral</a></li>
+  <li><a href="#teste-unilateral-à-direita" id="toc-teste-unilateral-à-direita" class="nav-link" data-scroll-target="#teste-unilateral-à-direita"><span class="header-section-number">4.8.2</span> Teste Unilateral À Direita</a></li>
+  <li><a href="#erro-tipo-ii-e-poder-do-teste" id="toc-erro-tipo-ii-e-poder-do-teste" class="nav-link" data-scroll-target="#erro-tipo-ii-e-poder-do-teste"><span class="header-section-number">4.8.3</span> ERRO TIPO II E PODER DO TESTE</a>
+  <ul class="collapse">
+  <li><a href="#exercício-3" id="toc-exercício-3" class="nav-link" data-scroll-target="#exercício-3"><span class="header-section-number">4.8.3.1</span> Exercício:</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#proporção-populacional-1" id="toc-proporção-populacional-1" class="nav-link" data-scroll-target="#proporção-populacional-1"><span class="header-section-number">4.9</span> Proporção Populacional</a>
+  <ul>
+  <li><a href="#teste-bilateral-1" id="toc-teste-bilateral-1" class="nav-link" data-scroll-target="#teste-bilateral-1"><span class="header-section-number">4.9.1</span> Teste Bilateral</a></li>
+  <li><a href="#teste-unilateral-à-direita-1" id="toc-teste-unilateral-à-direita-1" class="nav-link" data-scroll-target="#teste-unilateral-à-direita-1"><span class="header-section-number">4.9.2</span> Teste Unilateral À Direita</a></li>
+  <li><a href="#erro-tipo-ii-e-poder-do-teste-1" id="toc-erro-tipo-ii-e-poder-do-teste-1" class="nav-link" data-scroll-target="#erro-tipo-ii-e-poder-do-teste-1"><span class="header-section-number">4.9.3</span> Erro Tipo II e Poder do Teste</a></li>
+  </ul></li>
+  <li><a href="#média-populacional-caso-amostral-grande" id="toc-média-populacional-caso-amostral-grande" class="nav-link" data-scroll-target="#média-populacional-caso-amostral-grande"><span class="header-section-number">4.10</span> Média Populacional (caso amostral grande)</a>
+  <ul>
+  <li><a href="#teste-bilateral-2" id="toc-teste-bilateral-2" class="nav-link" data-scroll-target="#teste-bilateral-2"><span class="header-section-number">4.10.1</span> Teste Bilateral</a></li>
+  <li><a href="#teste-unilateral-à-direita-2" id="toc-teste-unilateral-à-direita-2" class="nav-link" data-scroll-target="#teste-unilateral-à-direita-2"><span class="header-section-number">4.10.2</span> Teste Unilateral À Direita</a></li>
+  </ul></li>
+  <li><a href="#média-populacional-caso-normal-com-variância-populacional-desconhecida" id="toc-média-populacional-caso-normal-com-variância-populacional-desconhecida" class="nav-link" data-scroll-target="#média-populacional-caso-normal-com-variância-populacional-desconhecida"><span class="header-section-number">4.11</span> Média Populacional (caso normal com variância populacional desconhecida)</a>
+  <ul>
+  <li><a href="#teste-unilateral-à-direita-3" id="toc-teste-unilateral-à-direita-3" class="nav-link" data-scroll-target="#teste-unilateral-à-direita-3"><span class="header-section-number">4.11.1</span> 4.4.4 Teste Unilateral À Direita</a></li>
+  </ul></li>
+  <li><a href="#variância-populacional-caso-normal-1" id="toc-variância-populacional-caso-normal-1" class="nav-link" data-scroll-target="#variância-populacional-caso-normal-1"><span class="header-section-number">4.12</span> Variância Populacional (caso normal)</a>
+  <ul>
+  <li><a href="#teste-bilateral-3" id="toc-teste-bilateral-3" class="nav-link" data-scroll-target="#teste-bilateral-3"><span class="header-section-number">4.12.1</span> Teste Bilateral</a></li>
+  <li><a href="#teste-unilateral-à-direita-4" id="toc-teste-unilateral-à-direita-4" class="nav-link" data-scroll-target="#teste-unilateral-à-direita-4"><span class="header-section-number">4.12.2</span> Teste Unilateral À Direita</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Inferência para Uma População</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Ao estudarmos a distribuição amostral de um estimador, demos um passo importante para responder a uma pergunta central da inferência estatística: “Quão confiável é o valor obtido a partir de uma única amostra?”</p>
+<p>Agora é hora de usar esse conhecimento para tomar decisões concretas. A partir de uma estimativa pontual (como a média ou a proporção amostral), queremos expressar o grau de incerteza associado a essa estimativa, ou ainda, testar afirmações sobre a população com base nos dados da amostra.</p>
+<p>Essas duas tarefas constituem os pilares da inferência estatística:</p>
+<ul>
+<li>Intervalos de confiança, que fornecem uma faixa de valores plausíveis para o parâmetro populacional, com um certo nível de confiança.</li>
+<li>Testes de hipótese, que avaliam se os dados oferecem ou não evidências suficientes para rejeitar uma suposição sobre a população.</li>
+</ul>
+<p>O raciocínio por trás dessas ferramentas se ancora na distribuição amostral: Se sabemos como o estimador se comporta ao longo de muitas amostras, conseguimos avaliar o quanto o valor observado se desvia (ou não) do que seria esperado sob determinada hipótese. O enfoque computacional traz enormes vantagens para o aprendizado dessa etapa. Com simulações, podemos:</p>
+<ul>
+<li>Construir empiricamente intervalos de confiança, observando em que proporção eles contêm o verdadeiro parâmetro.</li>
+<li>Visualizar a lógica dos testes de hipótese, comparando valores observados com a distribuição sob a hipótese nula.</li>
+<li>Entender o erro tipo I e tipo II de forma intuitiva, simulando diferentes cenários.</li>
+<li>Explorar o impacto do tamanho da amostra, da variabilidade e do nível de significância.</li>
+</ul>
+<p>Nosso foco hoje será nos casos mais importantes da inferência para uma população:</p>
+<ul>
+<li>Intervalos de confiança e testes de hipóteses para a média populacional (caso normal)</li>
+<li>Intervalos de confiança e testes de hipótese para a média populacional (caso amostras grandes)</li>
+<li>Intervalos de confiança e testes para a proporção populacional</li>
+<li>Intervalos de confiança e testes para a variância populacional (caso normal)</li>
+</ul>
+<p>Em todos os casos, vamos alternar entre teoria e prática, reforçando os conceitos com experimentos computacionais no R. Essa abordagem não só facilita o entendimento, como prepara você para aplicar inferência de forma crítica e fundamentada em situações reais. Para finalizar, serão apresentadas as funções automáticas do R que realizam intervalos de confiança e testes de hipóteses para uma população.</p>
+<section id="intervalos-de-confiança" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="intervalos-de-confiança"><span class="header-section-number">4.1</span> Intervalos de Confiança</h2>
+<p>Ao estimarmos um parâmetro populacional <span class="math inline">\(\theta\)</span>, como a média <span class="math inline">\(\mu\)</span> ou a proporção <span class="math inline">\(p\)</span>, a partir de uma amostra aleatória, obtemos apenas uma estimativa pontual <span class="math inline">\(\hat{\theta}\)</span>. No entanto, como essa estimativa depende da amostra coletada, ela está sujeita à variabilidade amostral. Para expressar essa incerteza, utilizamos intervalos de confiança, que fornecem um intervalo de valores plausíveis para o parâmetro desconhecido <span class="math inline">\(\theta\)</span>, com base nas propriedades de distribuição do estimador <span class="math inline">\(\hat{\theta}\)</span>.</p>
+<p>Formalmente, um intervalo de confiança bilateral com nível de confiança <span class="math inline">\((1-\alpha)\)</span> é construído a partir de dois limites, <span class="math inline">\(L(X)\)</span> e <span class="math inline">\(U(X)\)</span>, que são funções da amostra <span class="math inline">\(X\)</span>. Esses limites são, portanto, variáveis aleatórias, e o intervalo <span class="math inline">\([L(X), U(X)]\)</span> deve satisfazer:</p>
+<p><span class="math display">\[
+\mathbb{P}(L(X) \leq \theta \leq U(X)) = 1 - \alpha
+\]</span></p>
+<p>onde:</p>
+<ul>
+<li><span class="math inline">\(\theta\)</span> é o parâmetro populacional desconhecido</li>
+<li><span class="math inline">\(L(X)\)</span> e <span class="math inline">\(U(X)\)</span> são, respectivamente, o limite inferior e superior do intervalo de confiança</li>
+<li><span class="math inline">\(\alpha\)</span> é o nível de significância, isto é, a probabilidade de que o intervalo não contenha o parâmetro verdadeiro</li>
+</ul>
+<p>Dessa forma, interpretamos o nível de confiança <span class="math inline">\(1 - \alpha\)</span> como a proporção de vezes (no longo prazo) em que o intervalo <span class="math inline">\([L(X), U(X)]\)</span>, construído da mesma maneira a partir de amostras aleatórias independentes, conteria verdadeiro valor de <span class="math inline">\(\theta\)</span>.</p>
+<p>Nesta seção, abordaremos a construção de intervalos de confiança bilaterais tanto por métodos analíticos quanto por simulações, desenvolvendo uma compreensão intuitiva e rigorosa de sua interpretação e uso. Os casos unilaterais serão explorados posteriormente, na Lista 2.</p>
+</section>
+<section id="média-populacional-caso-normal-com-variância-conhecida" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="média-populacional-caso-normal-com-variância-conhecida"><span class="header-section-number">4.2</span> Média Populacional (caso normal com variância conhecida)</h2>
+<p>Vamos começar estudando a construção do intervalo de confiança para a média populacional <span class="math inline">\(\mu\)</span>, assumindo que:</p>
+<ul>
+<li>Os dados vêm de uma população com distribuição normal <span class="math inline">\(N(\mu,\sigma^2)\)</span></li>
+<li>A variância populacional <span class="math inline">\(\sigma^2\)</span> é conhecida</li>
+<li>A amostra <span class="math inline">\(X_1, X_2, …, X_n\)</span> é aleatória e de tamanho <span class="math inline">\(n\)</span>.</li>
+</ul>
+<p>Sabemos que, sob essas condições, a média amostral <span class="math inline">\(\bat{X}\)</span> segue uma distribuição normal:</p>
+<p><span class="math display">\[
+\bar{X} \sim N(\mu, \sigma^2/n)
+\]</span></p>
+<p>Usando a padronização da média amostral, temos:</p>
+<p><span class="math display">\[
+Z = \frac{\bar{X} - \mu}{\sigma/\sqrt{n}} \sim N(0,1)
+\]</span></p>
+<p>Para construir um intervalo de confiança bilateral com nível de confiança <span class="math inline">\(1 − \alpha\)</span> (por exemplo, 95%), utilizamos o quantil <span class="math inline">\(z_{\alpha/2}\)</span> da distribuição normal padrão. A figura a seguir retrata essa quantidade:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cap5/img5.png" class="img-fluid figure-img"></p>
+<figcaption>“img1”</figcaption>
+</figure>
+</div>
+<p>No <span class="math inline">\(R\)</span>, esse valor crítico é obtido da seguinte forma (para uma confiança de 95%, por exemplo):</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Nível de confiança</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>conf <span class="ot">=</span> <span class="fl">0.95</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Nível de significância</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>alfa <span class="ot">=</span> <span class="dv">1</span><span class="sc">-</span>conf</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Valor crítico</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>z_critico <span class="ot">=</span> <span class="fu">qnorm</span>(alfa<span class="sc">/</span><span class="dv">2</span>,<span class="at">lower.tail=</span>F)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Isso nos leva ao seguinte intervalo com confiança <span class="math inline">\(1−\alpha\)</span> para a média populacional <span class="math inline">\(\mu\)</span>:</p>
+<p><span class="math display">\[
+IC_{1-\alpha}(\mu) = \left[ \bar{X} - z_{\alpha/2} \frac{\sigma}{\sqrt{n}}, \; \bar{X} + z_{\alpha/2} \frac{\sigma}{\sqrt{n}} \right]
+\]</span></p>
+<p>A interpretação correta é: se repetíssemos o processo de amostragem muitas vezes, cerca de <span class="math inline">\(100 \cdot (1−\alpha)%\)</span> dos intervalos construídos conteriam o verdadeiro valor de <span class="math inline">\(\mu\)</span>. Na próxima etapa, vamos explorar computacionalmente como esse tipo de intervalo se comporta na prática, usando simulações para verificar sua frequência de acerto e o impacto de diferentes parâmetros.</p>
+<section id="exemplo" class="level3" data-number="4.2.1">
+<h3 data-number="4.2.1" class="anchored" data-anchor-id="exemplo"><span class="header-section-number">4.2.1</span> Exemplo</h3>
+<p>Considere que <span class="math inline">\(X_1, X_2, …, X_n\)</span> seja uma amostra aleatória de tamanho <span class="math inline">\(n = 25\)</span> de uma população com distribuição Normal com parâmetros <span class="math inline">\(\mu = 170\)</span> e <span class="math inline">\(\sigma^2 = 100\)</span>. Vamos simular <span class="math inline">\(B = 100\)</span> amostras dessa população e, para cada amostra, vamos construir o intervalo de confiança com 95% de confiança, assumindo que a variância é conhecida.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parâmetros populacionais de X</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>media_real <span class="ot">=</span> <span class="dv">170</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>sigma_real <span class="ot">=</span> <span class="dv">10</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Tamanho da amostra</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>n <span class="ot">=</span> <span class="dv">25</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Quantidade de réplicas</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>B <span class="ot">=</span> <span class="dv">100</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Nível de confiança</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>Conf <span class="ot">=</span> <span class="fl">0.95</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Nível de signifiância</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>Alfa <span class="ot">=</span> <span class="dv">1</span><span class="sc">-</span>Conf</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Cria o vetor de B médias amostrais da população teórica</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>medias <span class="ot">=</span> <span class="fu">replicate</span>(B, <span class="fu">mean</span>(<span class="fu">rnorm</span>(n, media_real, sigma_real)))</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Z crítico e erro padrão</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>z_critico <span class="ot">=</span> <span class="fu">qnorm</span>(Alfa<span class="sc">/</span><span class="dv">2</span>,<span class="at">lower.tail=</span>F)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>erro_padrao <span class="ot">=</span> sigma_real <span class="sc">/</span> <span class="fu">sqrt</span>(n)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Intervalos de confiança</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>inferior <span class="ot">=</span> medias <span class="sc">-</span> z_critico <span class="sc">*</span> erro_padrao</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>superior <span class="ot">=</span> medias <span class="sc">+</span> z_critico <span class="sc">*</span> erro_padrao</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Verifica se o intervalo contém o valor verdadeiro</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>Contem <span class="ot">=</span> inferior <span class="sc">&lt;=</span> media_real <span class="sc">&amp;</span> superior <span class="sc">&gt;=</span> media_real</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Cobertura dos intervalos</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>Cobertura <span class="ot">=</span> <span class="fu">sum</span>(Contem)<span class="sc">/</span><span class="fu">length</span>(Contem)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Dados para o gráfico</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>dados <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">Replica =</span> <span class="dv">1</span><span class="sc">:</span>B,</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">Inferior =</span> inferior,</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">Superior =</span> superior,</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">Contem =</span> Contem</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dados, <span class="fu">aes</span>(<span class="at">x =</span> Replica)) <span class="sc">+</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> Replica, <span class="at">y =</span> Inferior, <span class="at">yend =</span> Superior, <span class="at">color =</span> Contem), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> media_real, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"TRUE"</span> <span class="ot">=</span> <span class="st">"blue"</span>, <span class="st">"FALSE"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="at">title =</span> <span class="fu">expression</span>(<span class="st">"IC para "</span> <span class="sc">*</span> mu <span class="sc">*</span> <span class="st">" (caso normal e "</span> <span class="sc">*</span> sigma<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> <span class="st">" conhecida)"</span>),</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Replicações"</span>,</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Intervalo de Confiança"</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()<span class="sc">+</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo4_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Assim, conseguimos uma cobertura de 96% dos intervalos (próxima do valor verdadeiro de 95%). Essa cobertura vai se aproximando cada vez mais do valor de 95% à medida que aumentamos o valor de <span class="math inline">\(B\)</span> (Experimente alterar <span class="math inline">\(B\)</span> para 10000).</p>
+</section>
+<section id="exercício-impacto-do-tamanho-da-amostra" class="level3" data-number="4.2.2">
+<h3 data-number="4.2.2" class="anchored" data-anchor-id="exercício-impacto-do-tamanho-da-amostra"><span class="header-section-number">4.2.2</span> Exercício: impacto do tamanho da amostra</h3>
+<p>Retorne ao exemplo anterior e troque o tamanho da amostra de <span class="math inline">\(n=25\)</span> para <span class="math inline">\(n=100\)</span>. Compare os dois gráficos. O que você nota de diferente?</p>
+</section>
+</section>
+<section id="média-populacional-caso-normal-com-variância-desconhecida" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="média-populacional-caso-normal-com-variância-desconhecida"><span class="header-section-number">4.3</span> Média Populacional (caso normal com variância desconhecida)</h2>
+<p>Vamos agora estudar a construção do intervalo de confiança para a média populacional μ, assumindo que:</p>
+<ul>
+<li>Os dados vêm de uma população com distribuição normal <span class="math inline">\(N(\mu,\sigma^2)\)</span></li>
+<li>A variância populacional σ² é desconhecida</li>
+<li>A amostra <span class="math inline">\(X_1, X_2, …, X_n\)</span> é aleatória e de tamanho n, com n pequeno <span class="math inline">\((n&lt;30)\)</span>.</li>
+</ul>
+<p>Nesse caso, como não conhecemos <span class="math inline">\(\sigma\)</span>, utilizamos o desvio padrão amostral <span class="math inline">\(S\)</span>, definido por:</p>
+<p><span class="math display">\[
+S = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{X})^2}
+\]</span></p>
+<p>A média amostral <span class="math inline">\(\bar{X}\)</span> ainda é um estimador de <span class="math inline">\(\mu\)</span>, mas a distribuição agora que é utilizada é a <span class="math inline">\(T\)</span> de Student com <span class="math inline">\(n−1\)</span> graus de liberdade:</p>
+<p><span class="math display">\[
+T = \frac{\bar{X} - \mu}{S/\sqrt{n}} \sim t(n-1)
+\]</span></p>
+<p>Essa variabilidade adicional alarga a cauda da distribuição, e isso é capturado pela distribuição T de Student, que possui as seguintes características:</p>
+<ul>
+<li>Média zero, como a normal;</li>
+<li>Caudas mais pesadas, ou seja, maior probabilidade de valores extremos;</li>
+<li>Depende de um parâmetro: os graus de liberdade <span class="math inline">\(n−1\)</span></li>
+</ul>
+<p>À medida que o tamanho da amostra aumenta <span class="math inline">\((n \to \infty)\)</span>, a distribuição <span class="math inline">\(T\)</span> se aproxima da distribuição normal. Por isso, com amostras grandes, o uso da normal ou da <span class="math inline">\(T\)</span> costuma levar a resultados semelhantes. Para construir um intervalo de confiança bilateral com nível de confiança <span class="math inline">\(1−α\)</span> (por exemplo, 95%), utilizamos o quantil <span class="math inline">\(t_{n-1, α/2}\)</span> da distribuição <span class="math inline">\(T\)</span> de Student com <span class="math inline">\(n−1\)</span> graus de liberdade. Veja na figura a seguir:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cap5/img5_2.png" class="img-fluid figure-img"></p>
+<figcaption>“img2”</figcaption>
+</figure>
+</div>
+<p>No <span class="math inline">\(R\)</span>, esse valor crítico é obtido da seguinte forma (para uma confiança de 95%, por exemplo):</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tamanho da amostra</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">=</span> <span class="fu">length</span>(dados)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Nível de confiança</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>conf <span class="ot">=</span> <span class="fl">0.95</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Nível de significância</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>alfa <span class="ot">=</span> <span class="dv">1</span><span class="sc">-</span>conf</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Valor crítico</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>t_critico <span class="ot">=</span> <span class="fu">qt</span>(alfa<span class="sc">/</span><span class="dv">2</span>,<span class="at">df=</span>n<span class="dv">-1</span>,<span class="at">lower.tail=</span>F)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Isso nos leva ao seguinte intervalo confiança para <span class="math inline">\(\mu\)</span> com nível de confiança <span class="math inline">\(1 − \alpha\)</span> é dado por:</p>
+<p><span class="math display">\[
+IC_{1-\alpha}(\mu) = \left[ \bar{X} - t_{n-1, \alpha/2} \frac{S}{\sqrt{n}}, \; \bar{X} + t_{n-1, \alpha/2} \frac{S}{\sqrt{n}} \right]
+\]</span></p>
+<p>A interpretação correta permanece: se repetíssemos o processo de amostragem muitas vezes, cerca de <span class="math inline">\(100 \cdot (1−\alpha)%\)</span> dos intervalos construídos conteriam o verdadeiro valor de <span class="math inline">\(\mu\)</span>. Na próxima etapa, vamos explorar computacionalmente como esse tipo de intervalo se comporta na prática, usando simulações para verificar sua frequência de acerto e o impacto de diferentes parâmetros.</p>
+<section id="exemplo-1" class="level3" data-number="4.3.1">
+<h3 data-number="4.3.1" class="anchored" data-anchor-id="exemplo-1"><span class="header-section-number">4.3.1</span> Exemplo</h3>
+<p>Considere que <span class="math inline">\(X_1, X_2, \cdots, X_n\)</span> seja uma amostra aleatória de tamanho n=25 de uma população com distribuição Normal com parâmetros μ=170 e σ2=100. Vamos simular B=100 amostras dessa população e, para cada amostra, vamos construir o intervalo de confiança com 95% de confiança, assumindo que a variância é desconhecida.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parâmetros populacionais de X</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>media_real <span class="ot">=</span> <span class="dv">170</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>sigma_real <span class="ot">=</span> <span class="dv">10</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Tamanho da amostra</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>n <span class="ot">=</span> <span class="dv">25</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Quantidade de réplicas</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>B <span class="ot">=</span> <span class="dv">100</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Nível de confiança</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>Conf <span class="ot">=</span> <span class="fl">0.95</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Nível de signifiância</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>Alfa <span class="ot">=</span> <span class="dv">1</span><span class="sc">-</span>Conf</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Cria o vetor de B médias amostrais da população teórica</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>medias <span class="ot">=</span> <span class="fu">replicate</span>(B, <span class="fu">mean</span>(<span class="fu">rnorm</span>(n, media_real, sigma_real)))</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Cria o vetor de B desvios padrões amostrais da população teórica</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>desvios_padroes <span class="ot">=</span> <span class="fu">replicate</span>(B, <span class="fu">sd</span>(<span class="fu">rnorm</span>(n, media_real, sigma_real)))</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co"># T crítico e erros padrões</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>t_critico <span class="ot">=</span> <span class="fu">qt</span>(Alfa<span class="sc">/</span><span class="dv">2</span>,<span class="at">df=</span>n<span class="dv">-1</span>,<span class="at">lower.tail=</span>F)</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>erros_padroes <span class="ot">=</span> desvios_padroes <span class="sc">/</span> <span class="fu">sqrt</span>(n)</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Intervalos de confiança</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>inferior <span class="ot">=</span> medias <span class="sc">-</span> t_critico <span class="sc">*</span> erros_padroes</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>superior <span class="ot">=</span> medias <span class="sc">+</span> t_critico <span class="sc">*</span> erros_padroes</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Verifica se o intervalo Contem o valor verdadeiro</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>Contem <span class="ot">=</span> inferior <span class="sc">&lt;=</span> media_real <span class="sc">&amp;</span> superior <span class="sc">&gt;=</span> media_real</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Cobertura dos intervalos</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>Cobertura <span class="ot">=</span> <span class="fu">sum</span>(Contem)<span class="sc">/</span><span class="fu">length</span>(Contem)</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Dados para o gráfico</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>dados <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  <span class="at">Replica =</span> <span class="dv">1</span><span class="sc">:</span>B,</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>  <span class="at">Inferior =</span> inferior,</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>  <span class="at">Superior =</span> superior,</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>  <span class="at">Contem =</span> Contem</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dados, <span class="fu">aes</span>(<span class="at">x =</span> Replica)) <span class="sc">+</span></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> Replica, <span class="at">y =</span> Inferior, <span class="at">yend =</span> Superior, <span class="at">color =</span> Contem), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> media_real, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"TRUE"</span> <span class="ot">=</span> <span class="st">"blue"</span>, <span class="st">"FALSE"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a><span class="at">title =</span> <span class="fu">expression</span>(<span class="st">"IC para "</span> <span class="sc">*</span> mu <span class="sc">*</span> <span class="st">" (caso normal e "</span> <span class="sc">*</span> sigma<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> <span class="st">" desconhecida)"</span>),</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Replicações"</span>,</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Intervalo de Confiança"</span></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()<span class="sc">+</span></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo4_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Assim, conseguimos, novamente, uma cobertura de 96% dos intervalos (próxima do valor verdadeiro de 95%). Essa cobertura vai se aproximando cada vez mais do valor de 95% à medida que aumentamos o valor de <span class="math inline">\(B\)</span>.</p>
+</section>
+<section id="exercício-impacto-do-tamanho-do-nível-de-confiança" class="level3" data-number="4.3.2">
+<h3 data-number="4.3.2" class="anchored" data-anchor-id="exercício-impacto-do-tamanho-do-nível-de-confiança"><span class="header-section-number">4.3.2</span> Exercício: impacto do tamanho do nível de confiança</h3>
+<p>Retorne ao exemplo anterior e troque o nível de confiança de 95% para 80%. Compare os dois gráficos. O que você nota de diferente?</p>
+</section>
+</section>
+<section id="média-populacional-caso-amostras-grandes" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="média-populacional-caso-amostras-grandes"><span class="header-section-number">4.4</span> Média Populacional (caso amostras grandes)</h2>
+<p>Vamos estudar a construção do intervalo de confiança para a média populacional <span class="math inline">\(\mu\)</span>, assumindo que:</p>
+<ul>
+<li>Os dados vêm de uma população com distribuição qualquer, com média <span class="math inline">\(\mu\)</span> e variância <span class="math inline">\(\sigma^2\)</span>;</li>
+<li>A variância populacional <span class="math inline">\(\sigma^2\)</span> é desconhecida;</li>
+<li>A amostra <span class="math inline">\(X_1, X_2, …, X_n\)</span> é aleatória e de tamanho <span class="math inline">\(n\)</span>.</li>
+</ul>
+<p>Como a variância populacional é desconhecida, usamos a variância amostral <span class="math inline">\(s^2\)</span> para estimar <span class="math inline">\(\sigma^2\)</span>. Além disso, como n é grande, podemos aplicar o Teorema Central do Limite para afirmar que a média amostral <span class="math inline">\(\bar{X}\)</span> é aproximadamente normal:</p>
+<p><span class="math display">\[
+\bar{X} \sim N(\mu, \sigma^2/n)
+\]</span></p>
+<p>Substituindo <span class="math inline">\(\sigma\)</span> por <span class="math inline">\(s\)</span>, a estatística</p>
+<p><span class="math display">\[
+Z \sim \frac{\bar{X} - \mu}{s/\sqrt{n}}
+\]</span></p>
+<p>pode ser aproximada por uma distribuição normal padrão <span class="math inline">\(N(0,1)\)</span>, quando <span class="math inline">\(n\)</span> é grande. Assim, o intervalo de confiança para <span class="math inline">\(\mu\)</span>, com nível de confiança <span class="math inline">\(1 − \alpha\)</span>, é dado por:</p>
+<p><span class="math display">\[
+IC_{1 - \alpha}(\mu) = \left[ \bar{X} - z_{\alpha/2} \frac{s}{\sqrt{n}}, \; \bar{X} + z_{\alpha/2} \frac{s}{\sqrt{n}} \right]
+\]</span></p>
+<p>Note que usamos o quantil <span class="math inline">\(z_{\alpha/2}\)</span> da normal padrão, e não o <span class="math inline">\(t\)</span>, porque a aproximação normal é válida para amostras grandes, mesmo com variância desconhecida. A interpretação permanece: se repetíssemos o processo de amostragem muitas vezes, aproximadamente <span class="math inline">\(100 \cdot (1 − \alpha)\)</span>% dos intervalos construídos conteriam o verdadeiro valor de <span class="math inline">\(\mu\)</span>.</p>
+<p>Na próxima etapa, vamos investigar computacionalmente como esse intervalo se comporta na prática, verificando sua frequência de acerto para diferentes distribuições populacionais e tamanhos amostrais.</p>
+<section id="exercício" class="level3" data-number="4.4.1">
+<h3 data-number="4.4.1" class="anchored" data-anchor-id="exercício"><span class="header-section-number">4.4.1</span> Exercício</h3>
+<p>Considere que <span class="math inline">\(X_1, X_2, ..., X_n\)</span> seja uma amostra aleatória de uma população com distribuição Exponencial com parâmetro <span class="math inline">\(\lambda\)</span>. Considerando <span class="math inline">\(n=48\)</span> e <span class="math inline">\(\lambda=6\)</span>, faça, em sequência:</p>
+<p>1- Gere <span class="math inline">\(B=100\)</span> amostras de tamanho <span class="math inline">\(n=48\)</span> dessa população e, para cada amostra, obtenha o intervalo com 90% de confiança para a média populacional <span class="math inline">\(\mu\)</span>.</p>
+<p>2- Faça o gráfico da cobertura dos intervalos gerados e calcule a porcentagem de cobertura.</p>
+<p>3- Altere o valor do nível de confiança para 80% e veja o que muda no gráfico.</p>
+<p>4- Altere o valor o tamanho da amostra para <span class="math inline">\(n=100\)</span> e veja o que muda no gráfico.</p>
+</section>
+</section>
+<section id="proporção-populacional" class="level2" data-number="4.5">
+<h2 data-number="4.5" class="anchored" data-anchor-id="proporção-populacional"><span class="header-section-number">4.5</span> Proporção Populacional</h2>
+<p>Vamos estudar a construção do intervalo de confiança para a proporção populacional <span class="math inline">\(p\)</span>, assumindo que:</p>
+<ul>
+<li>Os dados vêm de uma variável aleatória binária (por exemplo, sucesso/falha) com proporção de sucessos <span class="math inline">\(p\)</span>;</li>
+<li>A amostra <span class="math inline">\(X_1, X_2, …, X_n\)</span> é aleatória e de tamanho <span class="math inline">\(n\)</span>;</li>
+<li>A proporção populacional <span class="math inline">\(p\)</span> é desconhecida, e será estimada pela proporção amostral <span class="math inline">\(\hat{p}\)</span>.</li>
+</ul>
+<p>Como <span class="math inline">\(n\)</span> é grande, podemos aplicar o Teorema Central do Limite para afirmar que a proporção amostral <span class="math inline">\(\hat{p}\)</span> é aproximadamente normal:</p>
+<p><span class="math display">\[
+\hat{p} \sim N\left(p, \frac{p(1-p)}{n}\right)
+\]</span></p>
+<p>Como <span class="math inline">\(p\)</span> é desconhecido, substituímos pela estimativa <span class="math inline">\(\hat{p}\)</span>, obtendo a estatística:</p>
+<p><span class="math display">\[
+Z = \frac{\hat{p} - p}{\sqrt{\hat{p}(1-\hat{p})/n}} \sim N(0,1)
+\]</span></p>
+<p>que pode ser aproximada por uma distribuição normal padrão <span class="math inline">\(N(0,1)\)</span>. Essa aproximação acontece, principalmente, se:</p>
+<p><span class="math display">\[
+n\hat{p} \geq 5 \quad \text{e} \quad n(1-\hat{p}) \geq 5
+\]</span></p>
+<p>Assim, o intervalo de confiança para <span class="math inline">\(p\)</span>, com nível de confiança <span class="math inline">\(1 − \alpha\)</span>, é dado por:</p>
+<p><span class="math display">\[
+IC_{1 - \alpha}(p) = \left[ \hat{p} - z_{\alpha/2} \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}, \; \hat{p} + z_{\alpha/2} \sqrt{\frac{\hat{p}(1-\hat{p})}{n}} \right]
+\]</span></p>
+<p>Esse intervalo é conhecido como intervalo de Wald. Ele é simples de calcular, mas pode ter desempenho ruim quando a proporção está muito próxima de 0 ou 1, ou quando o tamanho amostral é pequeno. Por isso, a importância das condições acima. A interpretação permanece: se repetíssemos o processo de amostragem muitas vezes, aproximadamente <span class="math inline">\(100 \cdot (1− \alpha)\)</span>% dos intervalos construídos conteriam o verdadeiro valor de <span class="math inline">\(p\)</span>.</p>
+<p>Na próxima etapa, vamos investigar computacionalmente como esse intervalo se comporta na prática, verificando sua frequência de acerto para diferentes valores de <span class="math inline">\(p\)</span> e tamanhos amostrais.</p>
+<section id="exercício-1" class="level3" data-number="4.5.1">
+<h3 data-number="4.5.1" class="anchored" data-anchor-id="exercício-1"><span class="header-section-number">4.5.1</span> Exercício</h3>
+<p>Considere que <span class="math inline">\(X_1, X_2, …, X_n\)</span> seja uma amostra aleatória de uma população com distribuição Bernouli com parâmetro <span class="math inline">\(p\)</span>. Considerando <span class="math inline">\(n=64\)</span> e <span class="math inline">\(p=0.6\)</span>, faça, em sequência:</p>
+<p>1- Gere <span class="math inline">\(B=100\)</span> amostras de tamanho <span class="math inline">\(n=64\)</span> dessa população e, para cada amostra, obtenha o intervalo com 95% de confiança para a proporção populacional <span class="math inline">\(p\)</span>.</p>
+<p>2- Faça o gráfico da cobertura dos intervalos gerados e calcule a porcentagem de cobertura.</p>
+<p>3- Altere o valor de <span class="math inline">\(p\)</span> para <span class="math inline">\(p=0.9\)</span> e observe o que muda.</p>
+</section>
+</section>
+<section id="variância-populacional-caso-normal" class="level2" data-number="4.6">
+<h2 data-number="4.6" class="anchored" data-anchor-id="variância-populacional-caso-normal"><span class="header-section-number">4.6</span> Variância Populacional (caso normal)</h2>
+<p>Vamos estudar a construção do intervalo de confiança para a variância populacional <span class="math inline">\(\sigma^2\)</span>, assumindo que:</p>
+<ul>
+<li>Os dados vêm de uma população com distribuição normal <span class="math inline">\(N(\mu,\sigma^2)\)</span>;</li>
+<li>A amostra <span class="math inline">\(X_1, X_2, …, X_n\)</span> é aleatória e de tamanho <span class="math inline">\(n\)</span>.</li>
+</ul>
+<p>Como a população é assumida normal, temos uma distribuição exata para a estatística baseada na variância amostral <span class="math inline">\(S^2\)</span>:</p>
+<p><span class="math display">\[
+\frac{(n-1)S^2}{\sigma^2} \sim \chi^2(n-1)
+\]</span></p>
+<p>Ou seja, a razão entre a soma dos quadrados centrados da amostra e a variância populacional segue uma distribuição qui-quadrado com <span class="math inline">\(n−1\)</span> graus de liberdade.</p>
+<p>Para construir um intervalo de confiança bilateral com nível de confiança <span class="math inline">\(1−\alpha\)</span> (por exemplo, 95%), utilizamos os quantis <span class="math inline">\(χ^2_{n−1, α/2}\)</span> e <span class="math inline">\(χ^2_{n−1,1−α/2}\)</span> da distribuição chi-quadrado com <span class="math inline">\(n−1\)</span> graus de liberdade. Veja na figura a seguir:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cap5/img5_3.png" class="img-fluid figure-img"></p>
+<figcaption>“img3”</figcaption>
+</figure>
+</div>
+<p>No <code>R</code>, esses valores críticos são obtidos da seguinte forma (para uma confiança de 95%, por exemplo):</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tamanho da amostra</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">=</span> <span class="fu">length</span>(dados)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Nível de confiança</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>conf <span class="ot">=</span> <span class="fl">0.95</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Nível de significância</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>alfa <span class="ot">=</span> <span class="dv">1</span><span class="sc">-</span>conf</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Valores críticos</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>x_critico1 <span class="ot">=</span> <span class="fu">qchisq</span>(alfa<span class="sc">/</span><span class="dv">2</span>,<span class="at">df=</span>n<span class="dv">-1</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>x_critico2 <span class="ot">=</span> <span class="fu">qchisq</span>(alfa<span class="sc">/</span><span class="dv">2</span>,<span class="at">df=</span>n<span class="dv">-1</span>,<span class="at">lower.tail=</span>F)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Com isso, podemos construir um intervalo de confiança para <span class="math inline">\(\sigma^2\)</span>, com nível de confiança <span class="math inline">\(1−\alpha\)</span>, utilizando os quantis da distribuição qui-quadrado:</p>
+<p><span class="math display">\[
+IC_{1 - \alpha}(\sigma^2) = \left[ \frac{(n-1)S^2}{\chi^2_{n-1, 1-\alpha/2}}, \; \frac{(n-1)S^2}{\chi^2_{n-1, \alpha/2}} \right]
+\]</span></p>
+<p>Note que <strong>a ordem dos quantis é invertida</strong>, pois a distribuição qui-quadrado é assimétrica. A <strong>interpretação permanece</strong>: se repetíssemos o processo de amostragem muitas vezes, aproximadamente <span class="math inline">\(100⋅(1−\alpha)\)</span>% dos intervalos construídos conteriam o verdadeiro valor de <span class="math inline">\(\alpha\)</span>.</p>
+<p>Na próxima etapa, vamos investigar computacionalmente como esse intervalo se comporta na prática, verificando sua frequência de acerto para diferentes valores de <span class="math inline">\(\sigma^2\)</span> e tamanhos amostrais.</p>
+<section id="exercício-2" class="level3" data-number="4.6.1">
+<h3 data-number="4.6.1" class="anchored" data-anchor-id="exercício-2"><span class="header-section-number">4.6.1</span> Exercício</h3>
+<p>Considere que <span class="math inline">\(X_1, X_2, ..., X_n\)</span> seja uma amostra aleatória de uma população com distribuição Normal com parâmetros <span class="math inline">\(\mu = 170\)</span> e <span class="math inline">\(\sigma^2 = 100\)</span>. Considerando <span class="math inline">\(n=22\)</span>, faça, em sequência:</p>
+<p>1- Gere <span class="math inline">\(B=100\)</span> amostras de tamanho <span class="math inline">\(n=22\)</span> dessa população e, para cada amostra, obtenha o intervalo com 95% de confiança para a variância populacional <span class="math inline">\(\sigma^2\)</span>. 2- Faça o gráfico da cobertura dos intervalos gerados e calcule a porcentagem de cobertura. 3- Altere o valor de <span class="math inline">\(\sigma^2\)</span> para 25 e observe o que muda.</p>
+</section>
+</section>
+<section id="testes-de-hipótese" class="level2" data-number="4.7">
+<h2 data-number="4.7" class="anchored" data-anchor-id="testes-de-hipótese"><span class="header-section-number">4.7</span> Testes de Hipótese</h2>
+<p>Diante da incerteza sobre o verdadeiro valor de um parâmetro populacional <span class="math inline">\(\beta\)</span>, como a média, proporção ou variância, o teste de hipóteses nos fornece uma estrutura formal para avaliar uma suposição sobre esse parâmetro com base em dados amostrais.</p>
+<p>Começamos formulando duas hipóteses estatísticas mutuamente exclusivas:</p>
+<ul>
+<li>Hipótese nula (<span class="math inline">\(H_0\)</span>): Representa a suposição inicial que queremos testar;</li>
+<li>Hipótese alternativa (<span class="math inline">\(H_a\)</span>): Representa a suposição que queremos investigar, sugerindo uma diferença ou efeito. Pode ser unilateral (por exemplo, <span class="math inline">\(H_a: \beta &gt; \beta_0\)</span>) ou bilateral (por exemplo, <span class="math inline">\(H_a: \beta \neq \beta_0\)</span>).</li>
+</ul>
+<p>Com uma amostra aleatória <span class="math inline">\(X=(X_1, X_2, …, X_n)\)</span>, calculamos uma estatística de teste <span class="math inline">\(T(X)\)</span>, escolhida de forma que valores extremos de <span class="math inline">\(T(X)\)</span> forneçam evidência contra <span class="math inline">\(H0\)</span>. Com base em <span class="math inline">\(T(X)\)</span>, definimos uma região crítica <span class="math inline">\(C\)</span>, tal que:</p>
+<p><span class="math display">\[
+\text{Rejeitamos} H_0 \text{ se } T(X) \in C
+\]</span></p>
+<p>Essa decisão envolve incertezas, que podem ser quantificadas por dois tipos de erro:</p>
+<ul>
+<li>Erro tipo I (<span class="math inline">\(\alpha\)</span>): Rejeitar <span class="math inline">\(H_0\)</span> quando ela é verdadeira. A probabilidade desse erro é o nível de significância do teste.</li>
+</ul>
+<p><span class="math display">\[
+\alpha = P(T(X) \in C | H_0 \text{ é verdadeira})
+\]</span></p>
+<ul>
+<li>Erro tipo II (<span class="math inline">\(\beta\)</span>): Não rejeitar <span class="math inline">\(H_0\)</span> quando <span class="math inline">\(H_1\)</span> é verdadeira. A probabilidade desse erro depende do verdadeiro valor do parâmetro sob <span class="math inline">\(H_a\)</span>.</li>
+</ul>
+<p><span class="math display">\[
+\beta = P(T(X) \notin C | H_1 \text{ é verdadeira})
+\]</span></p>
+<ul>
+<li>Poder do teste (<span class="math inline">\(1 - \beta\)</span>): A probabilidade de corretamente rejeitar <span class="math inline">\(H_0\)</span> quando <span class="math inline">\(H_1\)</span> é verdadeira. Um teste poderoso tem um baixo valor de <span class="math inline">\(\beta\)</span>.</li>
+</ul>
+<p><span class="math display">\[
+1 - \beta = P(T(X) \in C | H_1 \text{ é verdadeira})
+\]</span></p>
+<p>Uma forma amplamente utilizada para tomar a decisão sobre rejeitar ou não <span class="math inline">\(H0\)</span> é por meio do p-valor, que representa a probabilidade de observarmos um valor tão extremo quanto o valor observado da estatística de teste, sob a suposição de que <span class="math inline">\(H0\)</span> é verdadeira. Assim:</p>
+<ul>
+<li>Calculamos o p-valor com base na estatística de teste observada;</li>
+<li>Comparamos o p-valor com o nível de significância <span class="math inline">\(\alpha\)</span>;</li>
+<li>Rejeitamos <span class="math inline">\(H0\)</span> se o p-valor for menor ou igual a <span class="math inline">\(\alpha\)</span>;</li>
+</ul>
+<p>Com o apoio de ferramentas computacionais, é possível simular o comportamento da estatística de teste sob diferentes cenários, o que permite investigar de forma prática as probabilidades dos erros tipo I e tipo II, avaliar o poder do teste e explorar o efeito de diferentes hipóteses alternativas.</p>
+</section>
+<section id="média-populacional-caso-normal-com-variância-conhecida-1" class="level2" data-number="4.8">
+<h2 data-number="4.8" class="anchored" data-anchor-id="média-populacional-caso-normal-com-variância-conhecida-1"><span class="header-section-number">4.8</span> Média Populacional (caso normal com variância conhecida)</h2>
+<p>Vamos começar estudando a construção de testes de hipóteses para a média populacional <span class="math inline">\(\mu\)</span>, assumindo que:</p>
+<ul>
+<li>Os dados vêm de uma população com distribuição normal <span class="math inline">\(N(\mu,\sigma^2)\)</span>;</li>
+<li>A variância populacional <span class="math inline">\(\sigma^2\)</span> é conhecida;</li>
+<li>A amostra <span class="math inline">\(X_1, X_2, …, X_n\)</span> é aleatória e de tamanho <span class="math inline">\(n\)</span>.</li>
+</ul>
+<section id="teste-bilateral" class="level3" data-number="4.8.1">
+<h3 data-number="4.8.1" class="anchored" data-anchor-id="teste-bilateral"><span class="header-section-number">4.8.1</span> Teste Bilateral</h3>
+<p>O teste bilateral verifica se a média populacional é igual a um valor específico <span class="math inline">\(\mu_0\)</span> ou diferente, para mais ou para menos.</p>
+<p><span class="math display">\[
+\begin{align*}
+H_0 &amp;: \mu = \mu_0  \text{hipótese nula} \\
+H_1 &amp;: \mu \neq \mu_0  \text{hipótese alternativa}
+\]</span></p>
+<p>A estatística de teste usada é a média amostral</p>
+<p><span class="math display">\[
+\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i
+\]</span></p>
+<p>Sabemos que:</p>
+<p><span class="math display">\[
+\bar{X} \sim N(\mu, \sigma^2/n)
+\]</span></p>
+<p>Sob <span class="math inline">\(H_0\)</span>:</p>
+<p><span class="math display">\[
+\bar{X} \sim N(\mu_0, \sigma^2/n)
+\]</span></p>
+<p>O nível de significância é <span class="math inline">\(\alpha\)</span>. No teste bilateral, rejeitamos <span class="math inline">\(H_0\)</span> se a média amostral estiver muito distante de <span class="math inline">\(\mu_0\)</span>:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cap5/img5_4.png" class="img-fluid figure-img"></p>
+<figcaption>“img4”</figcaption>
+</figure>
+</div>
+<p>Isto é,</p>
+<p><span class="math display">\[
+\text{Rejeitamos} H_0 \text{ se } |\bar{X} - \mu_0| &gt; z_{\alpha/2} \frac{\sigma}{\sqrt{n}}
+\]</span></p>
+<p>Queremos determinar os valores <span class="math inline">\(L\)</span> e <span class="math inline">\(U\)</span> que satisfazem:</p>
+<p><span class="math display">\[
+P(\bar{X} \leq L | H_0) = \frac{\alpha}{2} \quad \text{e} \quad P(\bar{X} \geq U | H_0) = \frac{\alpha}{2}
+\]</span></p>
+<p>Sabemos que:</p>
+<p><span class="math display">\[
+P(\bar{X} \leq L | H_0) = \frac{\alpha}{2} \to \frac{L-\mu_0}{\sigma/\sqrt{n}} = -z_{\alpha/2} \to L = \mu_0 - z_{\alpha/2} \frac{\sigma}{\sqrt{n}}
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+P(\bar{X} \geq U | H_0) = \frac{\alpha}{2} \to \frac{U-\mu_0}{\sigma/\sqrt{n}} = z_{\alpha/2} \to U = \mu_0 + z_{\alpha/2} \frac{\sigma}{\sqrt{n}}
+\]</span></p>
+<p>Portanto, rejeitamos <span class="math inline">\(H_0\)</span> se:</p>
+<p><span class="math display">\[
+\bar{X} \leq L = \mu_0 - z_{\alpha/2} \frac{\sigma}{\sqrt{n}} \quad \text{ou} \quad \bar{X} \geq U = \mu_0 + z_{\alpha/2} \frac{\sigma}{\sqrt{n}}
+\]</span></p>
+<p>Exemplo:</p>
+<p>Considere que <span class="math inline">\(X_1, X_2, …, X_n\)</span> seja uma amostra aleatória de tamanho <span class="math inline">\(n=16\)</span> de uma população com distribuição Normal com parâmetros <span class="math inline">\(\mu\)</span> e <span class="math inline">\(\sigma^2\)</span>, com <span class="math inline">\(\sigma^2=100\)</span>. Considere o teste das seguintes hipóteses:</p>
+<p><span class="math display">\[
+\begin{align*}
+H_0 &amp;: \mu = 170  \text{hipótese nula} \\
+H_1 &amp;: \mu \neq 170  \text{hipótese alternativa}
+\end{align*}
+\]</span></p>
+<p>Considerando um <span class="math inline">\(\alpha\)</span> de 5%, temos a seguinte região crítica:</p>
+<p><span class="math display">\[
+L = \mu_0 - z_{\alpha/2} \frac{\sigma}{\sqrt{n}} = 170 - 1.96 \cdot \frac{10}{4} = 165.1
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+U = \mu_0 + z_{\alpha/2} \frac{\sigma}{\sqrt{n}} = 170 + 1.96 \cdot \frac{10}{4} = 174.9
+\]</span></p>
+<p>Portanto, rejeitamos <span class="math inline">\(H_0\)</span> se <span class="math inline">\(\bar{X} \leq 165.1\)</span> ou <span class="math inline">\(\bar{X} \geq 174.9\)</span>.</p>
+<p>De acordo com <span class="math inline">\(\alpha\)</span>, vamos simular <span class="math inline">\(B=1000\)</span> amostras de tamanho <span class="math inline">\(n=16\)</span> de uma população com <span class="math inline">\(\mu = 170\)</span> e <span class="math inline">\(\sigma^2 = 100\)</span> e, para cada amostra, vamos testar as hipóteses acima utilizando o método da região crítica com um nível <span class="math inline">\(\alpha = 5%\)</span>, assumindo <span class="math inline">\(\sigma^2\)</span> conhecido. Note que, em todas as réplicas, teremos a mesma região crítica. O objetivo é verificar se em aproximadamente 5% dessas amostras rejeitamos a hipótese nula, quando sabemos que, na verdade, ela é verdadeira (eerro do tipo I). Dessa forma, o nosso objetivo é estimar, empiricamente, o nível <span class="math inline">\(\alpha\)</span>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parâmetros populacionais de X</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>media_real <span class="ot">&lt;-</span> <span class="dv">170</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>sigma_real <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Tamanho da amostra</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">16</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Número de réplicas (simulações)</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>B <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Nível de significância</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>alfa <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulação das médias amostrais</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>medias <span class="ot">&lt;-</span> <span class="fu">replicate</span>(B, <span class="fu">mean</span>(<span class="fu">rnorm</span>(n, media_real, sigma_real)))</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Z crítico</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>z_critico <span class="ot">&lt;-</span> <span class="fu">qnorm</span>(alfa<span class="sc">/</span><span class="dv">2</span>,<span class="at">lower.tail=</span>F)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co"># valores criticos de xbarra</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>L <span class="ot">&lt;-</span> media_real<span class="sc">-</span>z_critico<span class="sc">*</span>sigma_real<span class="sc">/</span><span class="fu">sqrt</span>(n)</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>U <span class="ot">&lt;-</span> media_real<span class="sc">+</span>z_critico<span class="sc">*</span>sigma_real<span class="sc">/</span><span class="fu">sqrt</span>(n)</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Cria um data frame com os valores das medias e decisão do teste</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">medias =</span> medias) <span class="sc">%&gt;%</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rejeita_H0 =</span> medias <span class="sc">&gt;=</span> U <span class="sc">|</span> medias <span class="sc">&lt;=</span> L )</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Porcentagem de testes que rejeitaram a hipótese nula</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>rejeicao <span class="ot">=</span> <span class="fu">mean</span>(df<span class="sc">$</span>rejeita_H0)</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Gráfico</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> medias, <span class="at">fill =</span> rejeita_H0)) <span class="sc">+</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"FALSE"</span> <span class="ot">=</span> <span class="st">"skyblue"</span>, <span class="st">"TRUE"</span> <span class="ot">=</span> <span class="st">"tomato"</span>),</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>                    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Não rejeita H0"</span>, <span class="st">"Rejeita H0"</span>),</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>                    <span class="at">name =</span> <span class="st">"Decisão"</span>) <span class="sc">+</span></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Distribuição das médias amostrais"</span>,</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Médias Amostrais"</span>,</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Frequência"</span>) <span class="sc">+</span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo4_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Esse gráfico representa a distribuição empírica dos B valores de <span class="math inline">\(\bar{X}\)</span>. A quantidade empírica de testes que rejeitaram a hipótese nula é aproximadamente 5%, o nível de significância.</p>
+</section>
+<section id="teste-unilateral-à-direita" class="level3" data-number="4.8.2">
+<h3 data-number="4.8.2" class="anchored" data-anchor-id="teste-unilateral-à-direita"><span class="header-section-number">4.8.2</span> Teste Unilateral À Direita</h3>
+<p>O teste unilateral à direita verifica se a média populacional é maior que um valor específico <span class="math inline">\(\mu_0\)</span>:</p>
+<p><span class="math display">\[
+\begin{align*}
+H_0 &amp;: \mu \leq \mu_0  \text{ (hipótese nula)} \\
+H_1 &amp;: \mu &gt; \mu_0  \text{ (hipótese alternativa)}
+\end{align*}
+\]</span></p>
+<p>A estatística de teste utilizada é a média amostral:</p>
+<p><span class="math display">\[
+\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i
+\]</span></p>
+<p>Sabemos que:</p>
+<p><span class="math display">\[
+\bar{X} \sim N(\mu, \sigma^2/n)
+\]</span></p>
+<p>Sob <span class="math inline">\(H_0\)</span>:</p>
+<p><span class="math display">\[
+\bar{X} \sim N(\mu_0, \sigma^2/n)
+\]</span></p>
+<p>O nível de significância é <span class="math inline">\(\alpha\)</span>. No teste unilateral à direita, rejeitamos <span class="math inline">\(H_0\)</span> se a média amostral estiver muito maior que <span class="math inline">\(\mu_0\)</span>:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cap5/img5_5.png" class="img-fluid figure-img"></p>
+<figcaption>“img5”</figcaption>
+</figure>
+</div>
+<p>Isto é,</p>
+<p><span class="math display">\[
+\text{Rejeitamos } H_0 \text{ se } \bar{X} &gt; U
+\]</span></p>
+<p>Queremos determinar o valor <span class="math inline">\(U\)</span> tal que:</p>
+<p><span class="math display">\[
+P(\bar{X} \geq U | H_0) = \alpha
+\]</span></p>
+<p>Sabemos que:</p>
+<p><span class="math display">\[
+P(\bar{X} \geq U | H_0) = \alpha \to \frac{U-\mu_0}{\sigma/\sqrt{n}} = z_{\alpha} \to U = \mu_0 + z_{\alpha} \frac{\sigma}{\sqrt{n}}
+\]</span></p>
+<p>Portanto, rejeitamos <span class="math inline">\(H_0\)</span> se:</p>
+<p><span class="math display">\[
+\bar{X} \geq U = \mu_0 + z_{\alpha} \frac{\sigma}{\sqrt{n}}
+\]</span></p>
+<p>Exercício:</p>
+<p>Considere que <span class="math inline">\(X_1, X_2, …, X_n\)</span> seja uma amostra aleatória de tamanho n=16 de uma população com distribuição Normal com parâmetros <span class="math inline">\(\mu\)</span> e <span class="math inline">\(\sigma^2\)</span>, com <span class="math inline">\(\simga^2=100\)</span>. Considere o teste das seguintes hipóteses:</p>
+<p><span class="math display">\[
+\begin{align*}
+H_0 &amp;: \mu \leq 170  \text{ (hipótese nula)} \\
+H_1 &amp;: \mu &gt; 170  \text{ (hipótese alternativa)}
+\end{align*}
+\]</span></p>
+<p>Considerando um <span class="math inline">\(\alpha\)</span> de 5%, temos a seguinte região crítica:</p>
+<p><span class="math display">\[
+U = \mu_0 + z_{\alpha} \frac{\sigma}{\sqrt{n}} = 170 + 1.645 \cdot \frac{10}{4} = 174.1
+\]</span></p>
+<p>Portanto, rejeitamos <span class="math inline">\(H_0\)</span> se <span class="math inline">\(\bar{X} \geq 174.1\)</span>.</p>
+<p>Fixado o valor de <span class="math inline">\(\alpha=5%\)</span>, simule <span class="math inline">\(B=1000\)</span> amostras de uma população normal <span class="math inline">\((\mu=170, \alpha2=100)\)</span> e, para cada amostra, teste as hipóteses acima utilizando o método da regiao crítica com um nível <span class="math inline">\(\alpha=5%\)</span>, assumindo <span class="math inline">\(\sigma^2\)</span> conhecido. Note que, em todas as réplicas, teremos a mesma região crítica. O objetivo é verificar se em aproximadamente 5% dessas amostras rejeitaremos a hipótese nula, quando sabemos que, na verdade, ela é verdadeira (erro do tipo I). Dessa forma, o nosso objetivo é estimar, empiricamente, o nível <span class="math inline">\(\alpha\)</span>.</p>
+</section>
+<section id="erro-tipo-ii-e-poder-do-teste" class="level3" data-number="4.8.3">
+<h3 data-number="4.8.3" class="anchored" data-anchor-id="erro-tipo-ii-e-poder-do-teste"><span class="header-section-number">4.8.3</span> ERRO TIPO II E PODER DO TESTE</h3>
+<p>Vamos investigar o comportamento do erro tipo II e do poder do teste no exemplo do teste bilateral. As hipóteses eram:</p>
+<p><span class="math display">\[
+\begin{align}
+H_0 : p = 0.6 \\
+H_1 : p \neq 0.6
+\end{align}
+\]</span></p>
+<p>Com um tamanho de amostra <span class="math inline">\(n=100\)</span> e considerando um α de <span class="math inline">\(5%\)</span>, obtivemos a seguinte região crítica:</p>
+<p><span class="math display">\[
+C = \hat{p} \leq 0.5039 \quad \text{ou} \quad \hat{p} \geq U = 0.6960
+\]</span></p>
+<p>Dessa forma, o erro tipo II será dado por:</p>
+<p><span class="math display">\[
+\beta = P(\hat{p} \notin C | H_1 \text{verdadeira}) = P(0.5039 &lt; \hat{p} &lt; 0.6960 | p \neq p_a)
+\]</span></p>
+<p>Consequentemente, o poder do teste será dado por:</p>
+<p><span class="math display">\[
+1 - \beta = P(\hat{p} \in C | H_1 \text{verdadeira}) = P(\hat{p} \leq 0.5039 \cup \hat{p} \geq 0.6960 | p \neq p_a)
+\]</span></p>
+<p>Para que <span class="math inline">\(H1\)</span> seja verdadeira, nesse caso, poderemos considerar que a proporção verdadeira p assuma diferentes valores de <span class="math inline">\(0.6\)</span>. Denote por <span class="math inline">\(p_1\)</span> estes valores sob a hipótese alternativa. Segue, o código para a obtenção do erro tipo <span class="math inline">\(II\)</span> e do poder do teste, considerando os valores de n tamanho amostral, <span class="math inline">\(\alpha\)</span> o nível de significância, <span class="math inline">\(p_0\)</span> a proporção sob a hipótese nula e <span class="math inline">\(p_1\)</span> a proporção sob a hipótese alternativa:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ErroTipoII <span class="ot">=</span> <span class="cf">function</span>(n, sigma_real, alfa, mu0, mu1){</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calcula o valor crítico para teste bilateral</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  z_critico <span class="ot">=</span> <span class="fu">qnorm</span>(alfa <span class="sc">/</span> <span class="dv">2</span>, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Define os limites da região crítica</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  L <span class="ot">=</span> mu0 <span class="sc">-</span> z_critico <span class="sc">*</span> sigma_real <span class="sc">/</span> <span class="fu">sqrt</span>(n)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  U <span class="ot">=</span> mu0 <span class="sc">+</span> z_critico <span class="sc">*</span> sigma_real <span class="sc">/</span> <span class="fu">sqrt</span>(n)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calcula o erro tipo II: probabilidade de não rejeitar H0 quando mu = mu1</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  Beta <span class="ot">=</span> <span class="fu">pnorm</span>(U, <span class="at">mean =</span> mu1, <span class="at">sd =</span> sigma_real <span class="sc">/</span> <span class="fu">sqrt</span>(n)) <span class="sc">-</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">pnorm</span>(L, <span class="at">mean =</span> mu1, <span class="at">sd =</span> sigma_real <span class="sc">/</span> <span class="fu">sqrt</span>(n))</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(Beta)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>PoderDoTeste <span class="ot">=</span> <span class="cf">function</span>(n, sigma_real, alfa, mu0, mu1){</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span> <span class="sc">-</span> <span class="fu">ErroTipoII</span>(n, sigma_real, alfa, mu0, mu1)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Vamos avaliar ambas as funções graficamente, considerando <span class="math inline">\(n=16\)</span>, <span class="math inline">\(σ=10\)</span>, <span class="math inline">\(μ0=170\)</span> e <span class="math inline">\(α=5%\)</span>, variando diversos valores possíveis para μ1:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parâmetros fixos</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">16</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>alfa <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>mu0 <span class="ot">&lt;-</span> <span class="dv">170</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>sigma_real <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Variação de mu1</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>mu1_vals <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">150</span>, <span class="dv">190</span>, <span class="at">by =</span> <span class="dv">1</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Erro do tipo II</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>betas <span class="ot">&lt;-</span> <span class="fu">ErroTipoII</span>(<span class="at">n=</span>n, <span class="at">sigma_real=</span>sigma_real, <span class="at">alfa=</span>alfa,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>                        <span class="at">mu0=</span>mu0, <span class="at">mu1=</span>mu1_vals)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Poder do teste</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>poderes <span class="ot">&lt;-</span> <span class="fu">PoderDoTeste</span>(<span class="at">n=</span>n, <span class="at">sigma_real=</span>sigma_real, <span class="at">alfa=</span>alfa,</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>                        <span class="at">mu0=</span>mu0, <span class="at">mu1=</span>mu1_vals)  </span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Data frame para plotagem</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>dados <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">mu1 =</span> mu1_vals,</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>                    <span class="at">betas =</span> betas,</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>                    <span class="at">poderes =</span> poderes)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo4_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cap4/img4_6.png" class="img-fluid figure-img"></p>
+<figcaption>“img6”</figcaption>
+</figure>
+</div>
+<p>Este gráfico apresenta a probabilidade do erro tipo <span class="math inline">\(II\)</span> (linha azul) e o poder do teste (linha verde) em função de diferentes valores da média alternativa <span class="math inline">\(μ_1\)</span></p>
+<p>, ou seja, assume que o teste é para:</p>
+<p><span class="math display">\[
+H_0 : \mu = 170 \quad \text{versus} \quad H_1 : \mu \neq 170
+\]</span></p>
+<p>No eixo x, temos os possíveis valores alternativos de <span class="math inline">\(μ_1\)</span>, variando entre 150 e 190.</p>
+<p>No eixo y, temos as probabilidades:</p>
+<p>A linha vermelha vertical tracejada indica <span class="math inline">\(μ_1\)</span>=<span class="math inline">\(μ_0\)</span>=170. Neste ponto:</p>
+<ul>
+<li>O erro tipo II atinge seu valor máximo=0.95 (nível de confiança)</li>
+<li>O poder do teste é 0.05, como esperado, pois é o nível de significância.</li>
+</ul>
+<p>À medida que <span class="math inline">\(μ_1\)</span> se afasta de 170 (para cima ou para baixo), a:</p>
+<ul>
+<li>Probabilidade de erro tipo II diminui, porque fica mais fácil perceber a diferença entre <span class="math inline">\(μ_1\)</span> e <span class="math inline">\(μ_0\)</span>,</li>
+<li>O poder do teste aumenta, pois se torna mais provável rejeitar corretamente <span class="math inline">\(H_0\)</span>.</li>
+</ul>
+<p>Em <span class="math inline">\(μ_1\)</span> muito distantes (como abaixo de 160 ou acima de 180), o poder do teste se aproxima de 1, e o erro tipo <span class="math inline">\(II\)</span> tende a 0. Isso significa que o teste é muito eficaz para detectar diferenças grandes. O gráfico mostra como a eficácia do teste depende da verdadeira média populacional <span class="math inline">\(μ_1\)</span>.</p>
+<section id="exercício-3" class="level4" data-number="4.8.3.1">
+<h4 data-number="4.8.3.1" class="anchored" data-anchor-id="exercício-3"><span class="header-section-number">4.8.3.1</span> Exercício:</h4>
+<p>Vamos investigar o comportamento do erro tipo <span class="math inline">\(II\)</span> e do poder do teste no exemplo do teste unilateral à direita. As hipóteses eram:</p>
+<p><span class="math display">\[
+\begin{align}
+H0:μ=170 \\
+H1:μ&gt;170
+\end{align}
+\]</span></p>
+<p>Com um tamanho de amostra <span class="math inline">\(n=16\)</span>, <span class="math inline">\(σ=10\)</span> e considerando um <span class="math inline">\(\alpha\)</span></p>
+<p>de 5%, obtivemos a seguinte região crítica:</p>
+<p><span class="math display">\[
+C= \bar{X} \geq 174,1
+\]</span></p>
+<p>Dessa forma, o erro tipo II será dado por:</p>
+<p><span class="math display">\[
+β= P(\bar{X} \notin C∣ \text{H1 verdadeira}) = P(\bar{X} ≤ 174,1|μ≠170)
+\]</span></p>
+<p>Consequentemente, o poder do teste será dado por:</p>
+<p><span class="math display">\[
+1−β=P(\bar{X} ∈C∣ \text{H1 verdadeira})=P(\bar{X}≥174,1|μ≠170)
+\]</span></p>
+<p>Para que H1 seja verdadeira, nesse caso, poderemos considerar que a média verdadeira <span class="math inline">\(\mu\)</span> assuma valores acima de 170. Denote por <span class="math inline">\(\mu_1\)</span> estes valores sob a hipótese alternativa.</p>
+<p>1- Faça o código para a obtenção do erro tipo II e do poder do teste, considerando os valores de n tamanho amostral, <span class="math inline">\(σ\)</span> o desvio padrão populacional, <span class="math inline">\(α\)</span> o nível de significância, <span class="math inline">\(μ_0\)</span> a média sob a hipótese nula e <span class="math inline">\(μ_1\)</span> a média sob a hipótese alternativa</p>
+<p>2- Avalie ambas as funções graficamente, considerando <span class="math inline">\(n=16\)</span>, <span class="math inline">\(σ=10\)</span>, <span class="math inline">\(μ0=170\)</span> e <span class="math inline">\(α=5%\)</span>, variando diversos valores possíveis para <span class="math inline">\(μ_1\)</span>, de acordo com a hipótese alternativa.</p>
+</section>
+</section>
+</section>
+<section id="proporção-populacional-1" class="level2" data-number="4.9">
+<h2 data-number="4.9" class="anchored" data-anchor-id="proporção-populacional-1"><span class="header-section-number">4.9</span> Proporção Populacional</h2>
+<p>Agora vamos para o estudo da construção de testes de hipóteses para a proporção populacional <span class="math inline">\(p\)</span>, assumindo que:</p>
+<ul>
+<li>Os dados vêm de uma população com distribuição Bernoulli (p);</li>
+<li>A amostra <span class="math inline">\(X_1,X_2, \cdots ,X_n\)</span> aleatória e de tamanho <span class="math inline">\(n\)</span> grande é selecionada dessa população.</li>
+</ul>
+<section id="teste-bilateral-1" class="level3" data-number="4.9.1">
+<h3 data-number="4.9.1" class="anchored" data-anchor-id="teste-bilateral-1"><span class="header-section-number">4.9.1</span> Teste Bilateral</h3>
+<p>O teste bilateral verifica se a proporção populacional é igual a um valor específico <span class="math inline">\(p_0\)</span> ou diferente, para mais ou para menos.</p>
+<p><span class="math display">\[
+\begin{align}
+H_0 &amp;: p = p_0  \quad \text{(hipótese nula)} \\
+H_1 &amp;: p \neq p_0  \quad \text{(hipótese alternativa)}
+\end{align}
+\]</span></p>
+<p>A estatística de teste usada é a proporção amostral</p>
+<p><span class="math display">\[
+\hat{p} = \frac{1}{n} \sum_{i=1}^{n} X_i
+\]</span></p>
+<p>Sabemos que (segundo o TCL):</p>
+<p><span class="math display">\[
+\hat{p} \sim N\left(p, \frac{p(1-p)}{n}\right)
+\]</span></p>
+<p>Sob <span class="math inline">\(H_0\)</span>:</p>
+<p><span class="math display">\[
+\hat{p} \sim N\left(p_0, \frac{p_0(1-p_0)}{n}\right)
+\]</span></p>
+<p>O nível de significância é <span class="math inline">\(\alpha\)</span>. No teste bilateral, rejeitamos <span class="math inline">\(H_0\)</span> se a proporção amostral estiver muito distante de <span class="math inline">\(p_0\)</span>:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cap4/img4_7.png" class="img-fluid figure-img"></p>
+<figcaption>“img7”</figcaption>
+</figure>
+</div>
+<p>Isto é,</p>
+<p><span class="math display">\[
+\text{Rejeitamos } H_0 \text{ se } |\hat{p} - p_0| &gt; z_{\alpha/2} \sqrt{\frac{p_0(1-p_0)}{n}}
+\]</span></p>
+<p>Queremos determinar os valores <span class="math inline">\(L\)</span> e <span class="math inline">\(U\)</span> que satisfazem:</p>
+<p><span class="math display">\[
+P(\hat{p} \leq L | H_0) = \frac{\alpha}{2} \quad \text{e} \quad P(\hat{p} \geq U | H_0) = \frac{\alpha}{2}
+\]</span></p>
+<p>Sabemos que:</p>
+<p><span class="math display">\[
+P(\hat{p} \leq L | H_0) = \frac{\alpha}{2} \to \frac{L-p_0}{\sqrt{p_0(1-p_0)/n}} = -z_{\alpha/2} \to L = p_0 - z_{\alpha/2} \sqrt{\frac{p_0(1-p_0)}{n}}
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+P(\hat{p} \geq U | H_0) = \frac{\alpha}{2} \to \frac{U-p_0}{\sqrt{p_0(1-p_0)/n}} = z_{\alpha/2} \to U = p_0 + z_{\alpha/2} \sqrt{\frac{p_0(1-p_0)}{n}}
+\]</span></p>
+<p>Portanto, rejeitamos <span class="math inline">\(H_0\)</span> se:</p>
+<p><span class="math display">\[
+\hat{p} \leq L = p_0 - z_{\alpha/2} \sqrt{\frac{p_0(1-p_0)}{n}} \quad \text{ou} \quad \hat{p} \geq U = p_0 + z_{\alpha/2} \sqrt{\frac{p_0(1-p_0)}{n}}
+\]</span></p>
+<p>Exemplo:</p>
+<p>Considere que <span class="math inline">\(X_1, X_2, …, X_n\)</span> seja uma amostra aleatória de tamanho <span class="math inline">\(n=100\)</span> de uma população com distribuição Bernoulli com parâmetro <span class="math inline">\(p\)</span>. Considere o teste das seguintes hipóteses:</p>
+<p><span class="math display">\[
+\begin{align}
+H_0 &amp;: p = 0.6  \quad \text{(hipótese nula)} \\
+H_1 &amp;: p \neq 0.6  \quad \text{(hipótese alternativa)}
+\end{align}
+\]</span></p>
+<p>Considerando um <span class="math inline">\(\alpha\)</span> de 5%, temos a seguinte região crítica:</p>
+<p><span class="math display">\[
+L = p_0 - z_{\alpha/2} \sqrt{\frac{p_0(1-p_0)}{n}} = 0.6 - 1.96 \cdot \sqrt{\frac{0.6 \cdot 0.4}{100}} = 0.5039
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+U = p_0 + z_{\alpha/2} \sqrt{\frac{p_0(1-p_0)}{n}} = 0.6 + 1.96 \cdot \sqrt{\frac{0.6 \cdot 0.4}{100}} = 0.6960
+\]</span></p>
+<p>Portanto, rejeitamos <span class="math inline">\(H_0\)</span> se <span class="math inline">\(\hat{p} \leq 0.5039\)</span> ou <span class="math inline">\(\hat{p} \geq 0.6960\)</span>.</p>
+<p>Fixado o valor de <span class="math inline">\(\alpha=5%\)</span>, simule <span class="math inline">\(B=1000\)</span> amostras de uma população Bernoulli <span class="math inline">\((p=0.6)\)</span> e, para cada amostra, teste as hipóteses acima utilizando o método da região crítica com um nível <span class="math inline">\(\alpha=5%\)</span>. Note que, em todas as réplicas, teremos a mesma região crítica. O objetivo é verificar se em aproximadamente 5% dessas amostras rejeitaremos a hipótese nula, quando sabemos que, na verdade, ela é verdadeira (erro do tipo I). Dessa forma, o nosso objetivo é estimar, empiricamente, o nível <span class="math inline">\(\alpha\)</span>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parâmetros populacionais de X</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>p_real<span class="ot">=</span><span class="fl">0.6</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Tamanho da amostra</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Número de réplicas (simulações)</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>B <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Nível de significância</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>alfa <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulação das médias amostrais</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>props <span class="ot">&lt;-</span> <span class="fu">replicate</span>(B, <span class="fu">mean</span>(<span class="fu">rbinom</span>(n, <span class="at">size=</span><span class="dv">1</span>,<span class="at">p=</span>p_real)))</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Z crítico</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>z_critico <span class="ot">&lt;-</span> <span class="fu">qnorm</span>(alfa<span class="sc">/</span><span class="dv">2</span>,<span class="at">lower.tail=</span>F)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Desvio padrão</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>desvio_padrao <span class="ot">&lt;-</span> <span class="fu">sqrt</span>((p_real<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>p_real))<span class="sc">/</span>n)</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="co"># valores criticos de xbarra</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>L <span class="ot">&lt;-</span> p_real<span class="sc">-</span>z_critico<span class="sc">*</span>desvio_padrao</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>U <span class="ot">&lt;-</span> p_real<span class="sc">+</span>z_critico<span class="sc">*</span>desvio_padrao</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Cria um data frame com os valores das medias e decisão do teste</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">props =</span> props) <span class="sc">%&gt;%</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rejeita_H0 =</span> props <span class="sc">&gt;=</span> U <span class="sc">|</span> props <span class="sc">&lt;=</span> L )</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Porcentagem de testes que rejeitaram a hipótese nula</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>rejeicao <span class="ot">=</span> <span class="fu">mean</span>(df<span class="sc">$</span>rejeita_H0)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gráfico</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> props, <span class="at">fill =</span> rejeita_H0)) <span class="sc">+</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"FALSE"</span> <span class="ot">=</span> <span class="st">"skyblue"</span>, <span class="st">"TRUE"</span> <span class="ot">=</span> <span class="st">"tomato"</span>),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Não rejeita H0"</span>, <span class="st">"Rejeita H0"</span>),</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">name =</span> <span class="st">"Decisão"</span>) <span class="sc">+</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Distribuição das médias amostrais"</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Médias Amostrais"</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Frequência"</span>) <span class="sc">+</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cap4/img4_8.png" class="img-fluid figure-img"></p>
+<figcaption>“img8”</figcaption>
+</figure>
+</div>
+<p>Esse gráfico representa a distribuição empírica dos <span class="math inline">\(B\)</span> valores de <span class="math inline">\(\hat{p}\)</span>. A quantidade empírica de testes que rejeitaram a hipótese nula é próxima de 5%, o nível de significância.</p>
+</section>
+<section id="teste-unilateral-à-direita-1" class="level3" data-number="4.9.2">
+<h3 data-number="4.9.2" class="anchored" data-anchor-id="teste-unilateral-à-direita-1"><span class="header-section-number">4.9.2</span> Teste Unilateral À Direita</h3>
+<p>O teste unilateral à direita verifica se a proporção populacional é maior que um valor específico <span class="math inline">\(p_0\)</span>:</p>
+<p><span class="math display">\[
+\begin{align}
+H_0 &amp;: p \leq p_0  \quad \text{(hipótese nula)} \\
+H_1 &amp;: p &gt; p_0  \quad \text{(hipótese alternativa)}
+\end{align}
+\]</span></p>
+<p>A estatística de teste utilizada é a proporção amostral:</p>
+<p><span class="math display">\[
+\hat{p} = \frac{1}{n} \sum_{i=1}^{n} X_i
+\]</span></p>
+<p>Sabemos que (segundo o TCL):</p>
+<p><span class="math display">\[
+\hat{p} \sim N\left(p, \frac{p(1-p)}{n}\right)
+\]</span></p>
+<p>Sob <span class="math inline">\(H_0\)</span>:</p>
+<p><span class="math display">\[
+\hat{p} \sim N\left(p_0, \frac{p_0(1-p_0)}{n}\right)
+\]</span></p>
+<p>O nível de significância é <span class="math inline">\(\alpha\)</span>. No teste unilateral à direita, rejeitamos <span class="math inline">\(H_0\)</span> se a proporção amostral estiver muito maior que <span class="math inline">\(p_0\)</span>:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cap4/img4_9.png" class="img-fluid figure-img"></p>
+<figcaption>“img9”</figcaption>
+</figure>
+</div>
+<p>Isto é,</p>
+<p><span class="math display">\[
+\text{Rejeitamos } H_0 \text{ se } \hat{p} &gt; L
+\]</span></p>
+<p>Queremos determinar o valor de <span class="math inline">\(L\)</span> que satisfaz:</p>
+<p><span class="math display">\[
+P(\hat{p} \geq L | H_0) = \alpha
+\]</span></p>
+<p>Sabemos que:</p>
+<p><span class="math display">\[
+P(\hat{p} \geq L | H_0) = \alpha \to \frac{L-p_0}{\sqrt{p_0(1-p_0)/n}} = z_{\alpha} \to L = p_0 + z_{\alpha} \sqrt{\frac{p_0(1-p_0)}{n}}
+\]</span></p>
+<p>Portanto, rejeitamos <span class="math inline">\(H_0\)</span> se:</p>
+<p><span class="math display">\[
+\hat{p} \geq L = p_0 + z_{\alpha} \sqrt{\frac{p_0(1-p_0)}{n}}
+\]</span></p>
+<p>Exercício:</p>
+<p>Considere que <span class="math inline">\(X_1, X_2, …, X_n\)</span> seja uma amostra aleatória de tamanho <span class="math inline">\(n=100\)</span> de uma população com distribuição Bernoulli com parâmetro <span class="math inline">\(p\)</span>. Considere o teste das seguintes hipóteses:</p>
+<p><span class="math display">\[
+\begin{align}
+H_0 &amp;: p \leq 0.6  \quad \text{(hipótese nula)} \\
+H_1 &amp;: p &gt; 0.6  \quad \text{(hipótese alternativa)}
+\end{align}
+\]</span></p>
+<p>Considerando um <span class="math inline">\(\alpha\)</span> de 5%, temos a seguinte região crítica:</p>
+<p><span class="math display">\[
+L = p_0 + z_{\alpha} \sqrt{\frac{p_0(1-p_0)}{n}} = 0.6 + 1.645 \cdot \sqrt{\frac{0.6 \cdot 0.4}{100}} = 0.5197
+\]</span></p>
+<p>Portanto, rejeitamos <span class="math inline">\(H_0\)</span> se <span class="math inline">\(\hat{p} \leq 0.5197\)</span>.</p>
+<p>De acordo com α, vamos simular B=1000 amostras de tamanho n=100 de uma população Bernoulli (p=0.6) e, para cada amostra, vamos testar as hipóteses acima utilizando o método da região crítica com um nível α=5%. Note que, em todas as réplicas, teremos a mesma região crítica. O objetivo é verificar se em aproximadamente 5% dessas amostras rejeitamos a hipótese nula, quando sabemos que, na verdade, ela é verdadeira (eerro do tipo I). Dessa forma, o nosso objetivo é estimar, empiricamente, o nível α:</p>
+</section>
+<section id="erro-tipo-ii-e-poder-do-teste-1" class="level3" data-number="4.9.3">
+<h3 data-number="4.9.3" class="anchored" data-anchor-id="erro-tipo-ii-e-poder-do-teste-1"><span class="header-section-number">4.9.3</span> Erro Tipo II e Poder do Teste</h3>
+<p>Vamos investigar o comportamento do erro tipo II e do poder do teste no exemplo do teste bilateral. As hipóteses eram:</p>
+<p><span class="math display">\[
+\begin{align}
+H_0 : p = 0.6 \\
+H_1 : p \neq 0.6
+\end{align}
+\]</span></p>
+<p>Com um tamanho de amostra <span class="math inline">\(n=100\)</span> e considerando um α de <span class="math inline">\(5%\)</span>, obtivemos a seguinte região crítica:</p>
+<p><span class="math display">\[
+C = \hat{p} \leq 0.5039 \quad \text{ou} \quad \hat{p} \geq U = 0.6960
+\]</span></p>
+<p>Dessa forma, o erro tipo II será dado por:</p>
+<p><span class="math display">\[
+\beta = P(\hat{p} \notin C | H_1 \text{verdadeira}) = P(0.5039 &lt; \hat{p} &lt; 0.6960 | p \neq p_a)
+\]</span></p>
+<p>Consequentemente, o poder do teste será dado por:</p>
+<p><span class="math display">\[
+1 - \beta = P(\hat{p} \in C | H_1 \text{verdadeira}) = P(\hat{p} \leq 0.5039 \cup \hat{p} \geq 0.6960 | p \neq p_a)
+\]</span></p>
+<p>Para que <span class="math inline">\(H1\)</span> seja verdadeira, nesse caso, poderemos considerar que a proporção verdadeira p assuma diferentes valores de <span class="math inline">\(0.6\)</span>. Denote por <span class="math inline">\(p_1\)</span> estes valores sob a hipótese alternativa. Segue, o código para a obtenção do erro tipo <span class="math inline">\(II\)</span> e do poder do teste, considerando os valores de n tamanho amostral, <span class="math inline">\(\alpha\)</span> o nível de significância, <span class="math inline">\(p_0\)</span> a proporção sob a hipótese nula e <span class="math inline">\(p_1\)</span> a proporção sob a hipótese alternativa:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>ErroTipoII <span class="ot">=</span> <span class="cf">function</span>(n, alfa, p0, p1){</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calcula o valor crítico para teste bilateral</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  z_critico <span class="ot">=</span> <span class="fu">qnorm</span>(alfa <span class="sc">/</span> <span class="dv">2</span>, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Define os limites da região crítica</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  L <span class="ot">=</span> p0 <span class="sc">-</span> z_critico <span class="sc">*</span> <span class="fu">sqrt</span>((p0<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>p0))) <span class="sc">/</span> <span class="fu">sqrt</span>(n)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  U <span class="ot">=</span> p0 <span class="sc">+</span> z_critico <span class="sc">*</span> <span class="fu">sqrt</span>((p0<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>p0))) <span class="sc">/</span> <span class="fu">sqrt</span>(n)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calcula o erro tipo II: probabilidade de não rejeitar H0 quando mu = mu1</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  Beta <span class="ot">=</span> <span class="fu">pnorm</span>(U, <span class="at">mean =</span> p1, <span class="at">sd =</span> <span class="fu">sqrt</span>((p1<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>p1))) <span class="sc">/</span> <span class="fu">sqrt</span>(n)) <span class="sc">-</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">pnorm</span>(L, <span class="at">mean =</span> p1, <span class="at">sd =</span> <span class="fu">sqrt</span>((p1<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>p1))) <span class="sc">/</span> <span class="fu">sqrt</span>(n))</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(Beta)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>PoderDoTeste <span class="ot">=</span> <span class="cf">function</span>(n, alfa, p0, p1){</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span> <span class="sc">-</span> <span class="fu">ErroTipoII</span>(n, alfa, p0, p1)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Vamos avaliar ambas as funções graficamente, considerando <span class="math inline">\(n=100\)</span>, <span class="math inline">\(p0=0.6\)</span> e <span class="math inline">\(α=5%\)</span>, variando diversos valores possíveis para <span class="math inline">\(p_1\)</span>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parâmetros fixos</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>alfa <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fl">0.6</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Variação de mu1</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>p1_vals <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fl">0.3</span>, <span class="fl">0.9</span>, <span class="at">by =</span> <span class="fl">0.05</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Erro do tipo II</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>betas <span class="ot">&lt;-</span> <span class="fu">ErroTipoII</span>(<span class="at">n=</span>n, <span class="at">alfa=</span>alfa,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>                        <span class="at">p0=</span>p0, <span class="at">p1=</span>p1_vals)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Poder do teste</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>poderes <span class="ot">&lt;-</span> <span class="fu">PoderDoTeste</span>(<span class="at">n=</span>n, <span class="at">alfa=</span>alfa,</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>                        <span class="at">p0=</span>p0, <span class="at">p1=</span>p1_vals) </span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Data frame para plotagem</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>dados <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">p1 =</span> p1_vals,</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>                    <span class="at">betas =</span> betas,</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>                    <span class="at">poderes =</span> poderes)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gráfico com as duas linhas</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dados, <span class="fu">aes</span>(<span class="at">x =</span> p1)) <span class="sc">+</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> betas, <span class="at">color =</span> <span class="st">"Erro Tipo II"</span>), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> poderes, <span class="at">color =</span> <span class="st">"Poder do Teste"</span>), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> p0, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Erro Tipo II"</span> <span class="ot">=</span> <span class="st">"blue"</span>, <span class="st">"Poder do Teste"</span> <span class="ot">=</span> <span class="st">"darkgreen"</span>)) <span class="sc">+</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">title =</span> <span class="fu">expression</span>(<span class="st">"Erro Tipo II e Poder do Teste em função de "</span> <span class="sc">*</span> p[<span class="dv">1</span>]),</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">expression</span>(p[<span class="dv">1</span>]),</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="st">"Probabilidade"</span>,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">color =</span> <span class="st">""</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cap4/img4_10.png" class="img-fluid figure-img"></p>
+<figcaption>“img10”</figcaption>
+</figure>
+</div>
+<p>Este gráfico apresenta a probabilidade do erro tipo II (linha azul) e o poder do teste (linha verde) em função de diferentes valores da média alternativa <span class="math inline">\(p_1\)</span>, ou seja, assume que o teste é para:</p>
+</section>
+</section>
+<section id="média-populacional-caso-amostral-grande" class="level2" data-number="4.10">
+<h2 data-number="4.10" class="anchored" data-anchor-id="média-populacional-caso-amostral-grande"><span class="header-section-number">4.10</span> Média Populacional (caso amostral grande)</h2>
+<p>Agora vamos para o estudo da construção de testes de hipóteses para a média populacional <span class="math inline">\(\mu\)</span>, assumindo que:</p>
+<ul>
+<li>Os dados vêm de qualquer distribuição</li>
+<li>A amostra <span class="math inline">\(X_1, X_2, …, X_n\)</span> é aleatória e de tamanho <span class="math inline">\(n\)</span> grande.</li>
+</ul>
+<section id="teste-bilateral-2" class="level3" data-number="4.10.1">
+<h3 data-number="4.10.1" class="anchored" data-anchor-id="teste-bilateral-2"><span class="header-section-number">4.10.1</span> Teste Bilateral</h3>
+<p>O teste bilateral verifica se a média populacional é igual a um valor específico <span class="math inline">\(\mu_0\)</span> ou diferente, para mais ou para menos.</p>
+<p><span class="math display">\[
+\begin{align}
+H_0 &amp;: \mu = \mu_0  \text{hipótese nula} \\
+H_1 &amp;: \mu \neq \mu_0  \text{hipótese alternativa}
+\end{align}
+\]</span></p>
+<p>A estatística de teste usada é a média amostral</p>
+<p><span class="math display">\[
+\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i
+\]</span></p>
+<p>Sabemos que (segundo o TCL):</p>
+<p><span class="math display">\[
+\bar{X} \sim N(\mu, \sigma^2/n)
+\]</span></p>
+<p>Sob <span class="math inline">\(H_0\)</span>:</p>
+<p><span class="math display">\[
+\bar{X} \sim N(\mu_0, \sigma^2/n)
+\]</span></p>
+<p>O nível de significância é <span class="math inline">\(\alpha\)</span>. No teste bilateral, rejeitamos <span class="math inline">\(H_0\)</span> se a média amostral estiver muito distante de <span class="math inline">\(\mu_0\)</span>:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cap5/img5_11.png" class="img-fluid figure-img"></p>
+<figcaption>“img11”</figcaption>
+</figure>
+</div>
+<p>Isto é,</p>
+<p><span class="math display">\[
+\text{Rejeitamos } H_0 \text{ se } |\bar{X} - \mu_0| &gt; z_{\alpha/2} \frac{\sigma}{\sqrt{n}}
+\]</span></p>
+<p>Queremos determinar os valores <span class="math inline">\(L\)</span> e <span class="math inline">\(U\)</span> que satisfazem:</p>
+<p><span class="math display">\[
+P(\bar{X} \leq L | H_0) = \frac{\alpha}{2} \quad \text{e} \quad P(\bar{X} \geq U | H_0) = \frac{\alpha}{2}
+\]</span></p>
+<p>Como não conhecemos o valor verdadeiro de <span class="math inline">\(\sigma\)</span>, o estimaremos pelo desvio padrão amostral <span class="math inline">\(s\)</span>. Sabemos que:</p>
+<p><span class="math display">\[
+P(\bar{X} \leq L | H_0) = \frac{\alpha}{2} \to \frac{L-\mu_0}{\sigma/\sqrt{n}} = -z_{\alpha/2} \to L = \mu_0 - z_{\alpha/2} \frac{\sigma}{\sqrt{n}}
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+P(\bar{X} \geq U | H_0) = \frac{\alpha}{2} \to \frac{U-\mu_0}{\sigma/\sqrt{n}} = z_{\alpha/2} \to U = \mu_0 + z_{\alpha/2} \frac{\sigma}{\sqrt{n}}
+\]</span></p>
+<p>Portanto, rejeitamos <span class="math inline">\(H_0\)</span> se:</p>
+<p><span class="math display">\[
+\bar{X} \leq L = \mu_0 - z_{\alpha/2} \frac{\sigma}{\sqrt{n}} \quad \text{ou} \quad \bar{X} \geq U = \mu_0 + z_{\alpha/2} \frac{\sigma}{\sqrt{n}}
+\]</span></p>
+<p>Exemplo:</p>
+<p>Considere que <span class="math inline">\(X_1,X_2,\cdot,X_n\)</span> seja uma amostra aleatória de tamanho <span class="math inline">\(n=64\)</span> de de uma população com distribuição Exponencial com parâmetros <span class="math inline">\(\mu = 6\)</span>. Assim, <span class="math inline">\(mu=\frac{1}{6}\)</span>. Considere o teste das seguintes hipóteses:</p>
+<p><span class="math display">\[
+\begin{align}
+H_0 &amp;: \mu = \frac{1}{6}  \text{hipótese nula} \\
+H_1 &amp;: \mu \neq \frac{1}{6}  \text{ hipótese alternativa}
+\end{align}
+\]</span></p>
+<p>Diferentemente do caso anterior, não conseguimos expressar a região crítica sem os dados da amostra, uma vez que ela depende de <span class="math inline">\(s\)</span>, o desvio padrão amostral. Considerando um <span class="math inline">\(\alpha\)</span> de 5%, em cada amostra de tamanho <span class="math inline">\(n=64\)</span> os valores críticos para a construção da regiao de rejeição serão:</p>
+<p><span class="math display">\[
+L = \mu_0 - z_{\alpha/2} \frac{s}{\sqrt{n}} = \frac{1}{6} - 1.96 \cdot \frac{s}{8}
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+U = \mu_0 + z_{\alpha/2} \frac{s}{\sqrt{n}} = \frac{1}{6} + 1.96 \cdot \frac{s}{8}
+\]</span></p>
+<p>Vamos simular <span class="math inline">\(B=1000\)</span> amostras dessa população e, para cada amostra, vamos testar as hipóteses acima utilizando o método da região crítica com um nível <span class="math inline">\(\alpha=5%\)</span>. Note que, em todas as réplicas, teremos diferentes regiões críticas, uma vez que o desvio padrão amostral <span class="math inline">\(s\)</span> varia de amostra para amostra. O objetivo é verificar se em aproximadamente 5% dessas amostras rejeitamos a hipótese nula, quando sabemos que, na verdade, ela é verdadeira (erro do tipo I). Dessa forma, o nosso objetivo é estimar, empiricamente, o nível <span class="math inline">\(\alpha\)</span>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parâmetros populacionais de X</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>lambda_real <span class="ot">&lt;-</span> <span class="dv">6</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>media_real <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">/</span>lambda_real</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Tamanho da amostra</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">64</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Número de réplicas (simulações)</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>B <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Nível de significância</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>alfa <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulação das médias amostrais</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>medias <span class="ot">&lt;-</span> <span class="fu">replicate</span>(B, <span class="fu">mean</span>(<span class="fu">rexp</span>(n, <span class="at">rate=</span>lambda_real)))</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulação dos desvios padrões amostrais</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>desvios_padroes <span class="ot">&lt;-</span> <span class="fu">replicate</span>(B, <span class="fu">sd</span>(<span class="fu">rexp</span>(n, <span class="at">rate=</span>lambda_real)))</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Z crítico</span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>z_critico <span class="ot">&lt;-</span> <span class="fu">qnorm</span>(alfa<span class="sc">/</span><span class="dv">2</span>,<span class="at">lower.tail=</span>F)</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a><span class="co"># valores criticos de xbarra</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>L <span class="ot">&lt;-</span> media_real<span class="sc">-</span>z_critico<span class="sc">*</span>desvios_padroes <span class="sc">/</span><span class="fu">sqrt</span>(n)</span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>U <span class="ot">&lt;-</span> media_real<span class="sc">+</span>z_critico<span class="sc">*</span>desvios_padroes <span class="sc">/</span><span class="fu">sqrt</span>(n)</span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Cria um data frame com os valores das medias e decisão do teste</span></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">medias =</span> medias) <span class="sc">%&gt;%</span></span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rejeita_H0 =</span> medias <span class="sc">&gt;=</span> U <span class="sc">|</span> medias <span class="sc">&lt;=</span> L )</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Porcentagem de testes que rejeitaram a hipótese nula</span></span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>rejeicao <span class="ot">=</span> <span class="fu">mean</span>(df<span class="sc">$</span>rejeita_H0)</span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Gráfico</span></span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> medias, <span class="at">fill =</span> rejeita_H0)) <span class="sc">+</span></span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">color =</span> <span class="st">"black"</span>, <span class="at">bins =</span> <span class="dv">30</span>) <span class="sc">+</span></span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"FALSE"</span> <span class="ot">=</span> <span class="st">"skyblue"</span>, <span class="st">"TRUE"</span> <span class="ot">=</span> <span class="st">"tomato"</span>),</span>
+<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a>                    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Não rejeita H0"</span>, <span class="st">"Rejeita H0"</span>),</span>
+<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a>                    <span class="at">name =</span> <span class="st">"Decisão"</span>) <span class="sc">+</span></span>
+<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Distribuição das médias amostrais"</span>,</span>
+<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Médias Amostrais"</span>,</span>
+<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Frequência"</span>) <span class="sc">+</span></span>
+<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo4_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Esse gráfico representa a distribuição empírica dos <span class="math inline">\(B\)</span> valores de <span class="math inline">\(\bar{X}\)</span>. A quantidade empírica de testes que rejeitaram a hipótese nula é aproximadamente 5%, o nível de significância.</p>
+</section>
+<section id="teste-unilateral-à-direita-2" class="level3" data-number="4.10.2">
+<h3 data-number="4.10.2" class="anchored" data-anchor-id="teste-unilateral-à-direita-2"><span class="header-section-number">4.10.2</span> Teste Unilateral À Direita</h3>
+<p>O teste unilateral à direita verifica se a média populacional é maior que um valor específico <span class="math inline">\(\mu_0\)</span>:</p>
+<p><span class="math display">\[
+\begin{align}
+H_0 &amp;: \mu \leq \mu_0  \text{ (hipótese nula)} \\
+H_1 &amp;: \mu &gt; \mu_0  \text{ (hipótese alternativa)}
+\end{align}
+\]</span></p>
+<p>A estatística de teste utilizada é a média amostral:</p>
+<p><span class="math display">\[
+\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i
+\]</span></p>
+<p>Sabemos que (segundo o TCL):</p>
+<p><span class="math display">\[
+\bar{X} \sim N(\mu, \sigma^2/n)
+\]</span></p>
+<p>Sob <span class="math inline">\(H_0\)</span>:</p>
+<p><span class="math display">\[
+\bar{X} \sim N(\mu_0, \sigma^2/n)
+\]</span></p>
+<p>O nível de significância é <span class="math inline">\(\alpha\)</span>. No teste unilateral à direita, rejeitamos <span class="math inline">\(H_0\)</span> se a média amostral estiver muito maior que <span class="math inline">\(\mu_0\)</span>:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cap4/img4_13.png" class="img-fluid figure-img"></p>
+<figcaption>“img13”</figcaption>
+</figure>
+</div>
+<p>Isto é,</p>
+<p><span class="math display">\[
+\text{Rejeitamos } H_0 \text{ se } \bar{X} \leq L
+\]</span></p>
+<p>Queremos determinar o valor de <span class="math inline">\(L\)</span> que satisfaz:</p>
+<p><span class="math display">\[
+P(\bar{X} \geq L | H_0) = \alpha
+\]</span></p>
+<p>Sabemos que:</p>
+<p><span class="math display">\[
+\frac{L - \mu}{s/\sqrt{n}} = z_{\alpha} \to L = \mu_0 + z_{\alpha} \frac{\sigma}{\sqrt{n}}
+\]</span></p>
+<p>Portanto, rejeitamos <span class="math inline">\(H_0\)</span> se:</p>
+<p><span class="math display">\[
+\bar{X} \geq L = \mu_0 + z_{\alpha} \frac{\sigma}{\sqrt{n}}
+\]</span></p>
+<p>Exercício:</p>
+<p>Considere que <span class="math inline">\(X_1,X_2,\cdot,X_n\)</span> seja uma amostra aleatória de tamanho <span class="math inline">\(n=64\)</span> de de uma população com distribuição Exponencial com parâmetros <span class="math inline">\(\mu = 6\)</span>. Assim, <span class="math inline">\(mu=\frac{1}{6}\)</span>. Considere o teste das seguintes hipóteses:</p>
+<p><span class="math display">\[
+\begin{align}
+H_0 &amp;: \mu \leq \frac{1}{6}  \text{ (hipótese nula)} \\
+H_1 &amp;: \mu &gt; \frac{1}{6}  \text{ (hipótese alternativa)}
+\end{align}
+\]</span></p>
+<p>Não conseguimos expressar a região crítica sem os dados da amostra, uma vez que ela depende de <span class="math inline">\(s\)</span>, o desvio padrão amostral. Considerando um α de 5%, em cada amostra de tamanho <span class="math inline">\(n=64\)</span> os valores críticos para a construção da regiao de rejeição serão:</p>
+<p><span class="math display">\[
+L = \mu_0 + z_{\alpha} \frac{s}{\sqrt{n}} = \frac{1}{6} + 1.645 \cdot \frac{s}{8}
+\]</span></p>
+<p>Vamos simular <span class="math inline">\(B=1000\)</span> amostras dessa população e, para cada amostra, vamos testar as hipóteses acima utilizando o método da região crítica com um nível <span class="math inline">\(\alpha=5%\)</span>. Note que, em todas as réplicas, teremos diferentes regiões críticas, uma vez que o desvio padrão amostral <span class="math inline">\(s\)</span> varia de amostra para amostra. O objetivo é verificar se em aproximadamente 5% dessas amostras rejeitamos a hipótese nula, quando sabemos que, na verdade, ela é verdadeira (erro do tipo I). Dessa forma, o nosso objetivo é estimar, empiricamente, o nível <span class="math inline">\(\alpha\)</span>.</p>
+</section>
+</section>
+<section id="média-populacional-caso-normal-com-variância-populacional-desconhecida" class="level2" data-number="4.11">
+<h2 data-number="4.11" class="anchored" data-anchor-id="média-populacional-caso-normal-com-variância-populacional-desconhecida"><span class="header-section-number">4.11</span> Média Populacional (caso normal com variância populacional desconhecida)</h2>
+<p>Vamos construir testes de hipóteses para a média populacional <span class="math inline">\(\mu\)</span>, assumindo que:</p>
+<ul>
+<li>Os dados vêm de uma população com distribuição normal <span class="math inline">\(N(\mu, \sigma^2)\)</span></li>
+<li>A variância populacional <span class="math inline">\(\sigma^2\)</span> é desconhecida</li>
+<li>A amostra <span class="math inline">\(X_1, X_2, …, X_n\)</span> é aleatória e de tamanho <span class="math inline">\(n\)</span> qualquer.</li>
+</ul>
+<p>### Teste Bilateral</p>
+<p>O teste bilateral verifica se a média populacional é igual a um valor específico <span class="math inline">\(\mu_0\)</span> ou diferente:</p>
+<p><span class="math display">\[
+\begin{align}
+H_0 &amp;: \mu = \mu_0 \quad \text{(hipótese nula)} \\
+H_1 &amp;: \mu \neq \mu_0 \quad  \text{(hipótese alternativa)}
+\end{align}
+\]</span></p>
+<p>Agora a estatística de teste utilizada é:</p>
+<p><span class="math display">\[
+\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i
+\]</span></p>
+<p>Sabemos que, usando o estimador da variância amostral <span class="math inline">\(S^2\)</span>, a estatística padronizada:</p>
+<p><span class="math display">\[
+T = \frac{\bar{X} - \mu}{S/\sqrt{n}}
+\]</span></p>
+<p>segue uma distribuição t de Student com <span class="math inline">\(n-1\)</span> graus de liberdade, sob <span class="math inline">\(H_0\)</span>. Da mesma forma como antes, o nível de significância é <span class="math inline">\(\alpha\)</span>. No teste bilateral, rejeitamos <span class="math inline">\(H_0\)</span> se a média amostral estiver muito distante de <span class="math inline">\(\mu_0\)</span>:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cap4/img4_14.png" class="img-fluid figure-img"></p>
+<figcaption>“img14”</figcaption>
+</figure>
+</div>
+<p>Isto é,</p>
+<p><span class="math display">\[
+\text{Rejeitamos } H_0 \text{ se } \bar{X} \leq \text{ ou } \bar{X} \geq S
+\]</span></p>
+<p>Queremos determinar os valores <span class="math inline">\(L\)</span> e <span class="math inline">\(S\)</span> que satisfazem:</p>
+<p><span class="math display">\[
+P(\bar{X} \leq L | H_0) = \frac{\alpha}{2} \quad \text{e} \quad P(\bar{X} \geq U | H_0) = \frac{\alpha}{2}
+\]</span></p>
+<p>Sabemos que:</p>
+<p><span class="math display">\[
+P(\bar{X} \leq L | H_0) = \frac{\alpha}{2} \to \frac{L-\mu_0}{S/\sqrt{n}} = -t_{\alpha/2,n-1} \to L = \mu_0 - t_{\alpha/2,n-1} \frac{S}{\sqrt{n}}
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+P(\bar{X} \geq U | H_0) = \frac{\alpha}{2} \to \frac{U-\mu_0}{S/\sqrt{n}} = t_{\alpha/2,n-1} \to U = \mu_0 + t_{\alpha/2,n-1} \frac{S}{\sqrt{n}}
+\]</span></p>
+<p>Portanto, rejeitamos <span class="math inline">\(H_0\)</span> se:</p>
+<p><span class="math display">\[
+\bar{X} \leq L = \mu_0 - t_{\alpha/2,n-1} \frac{S}{\sqrt{n}} \quad \text{ou} \quad \bar{X} \geq U = \mu_0 + t_{\alpha/2,n-1} \frac{S}{\sqrt{n}}
+\]</span></p>
+<p>Exemplo:</p>
+<p>Considere que <span class="math inline">\(X_1,X_2,\cdot,X_n\)</span> seja uma amostra aleatória de tamanho <span class="math inline">\(n=25\)</span> de de uma população com distribuição Normal com parâmetros <span class="math inline">\(\mu = 170\)</span> e <span class="math inline">\(\sigma^2 = 100\)</span>. Considere o teste das seguintes hipóteses:</p>
+<p><span class="math display">\[
+\begin{align}
+H_0 &amp;: \mu = 170  \quad \text{(hipótese nula)} \\
+H_1 &amp;: \mu \neq 170  \quad \text{(hipótese alternativa)}
+\end{align}
+\]</span></p>
+<p>Vamos simular <span class="math inline">\(B=1000\)</span> amostras dessa população e, para cada amostra, vamos testar as hipóteses acima utilizando o método da região crítica com um nível <span class="math inline">\(\alpha=5%\)</span>. Note que, em todas as réplicas, teremos diferentes regiões críticas, uma vez que o desvio padrão amostral <span class="math inline">\(s\)</span> varia de amostra para amostra. O objetivo é verificar se em aproximadamente 5% dessas amostras rejeitamos a hipótese nula, quando sabemos que, na verdade, ela é verdadeira (erro do tipo I).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parâmetros populacionais de X</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>media_real <span class="ot">&lt;-</span> <span class="dv">170</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>sigma_real <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Tamanho da amostra</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">25</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Número de réplicas (simulações)</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>B <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Nível de significância</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>alfa <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulação das médias amostrais</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>medias <span class="ot">&lt;-</span> <span class="fu">replicate</span>(B, <span class="fu">mean</span>(<span class="fu">rnorm</span>(n, media_real, sigma_real)))</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulação dos desvios padroes amostrais</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>desvios_padroes <span class="ot">&lt;-</span> <span class="fu">replicate</span>(B, <span class="fu">sd</span>(<span class="fu">rnorm</span>(n, media_real, sigma_real)))</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Z crítico</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>t_critico <span class="ot">&lt;-</span> <span class="fu">qt</span>(alfa<span class="sc">/</span><span class="dv">2</span>,<span class="at">df=</span>n<span class="dv">-1</span>,<span class="at">lower.tail=</span>F)</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a><span class="co"># valores criticos de xbarra</span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>L <span class="ot">&lt;-</span> media_real<span class="sc">-</span>t_critico<span class="sc">*</span>desvios_padroes<span class="sc">/</span><span class="fu">sqrt</span>(n)</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>S <span class="ot">&lt;-</span> media_real<span class="sc">+</span>t_critico<span class="sc">*</span>desvios_padroes<span class="sc">/</span><span class="fu">sqrt</span>(n)</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Cria um data frame com os valores das medias e a decisão do teste</span></span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">medias =</span> medias) <span class="sc">%&gt;%</span></span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rejeita_H0 =</span> medias <span class="sc">&gt;=</span> S <span class="sc">|</span> medias <span class="sc">&lt;=</span> L )</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Porcentagem de testes que rejeitaram a hipótese nula</span></span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>rejeicao <span class="ot">=</span> <span class="fu">mean</span>(df<span class="sc">$</span>rejeita_H0)</span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Gráfico</span></span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> medias, <span class="at">fill =</span> rejeita_H0)) <span class="sc">+</span></span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">color =</span> <span class="st">"black"</span>, <span class="at">bins =</span> <span class="dv">30</span>) <span class="sc">+</span></span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"FALSE"</span> <span class="ot">=</span> <span class="st">"skyblue"</span>, <span class="st">"TRUE"</span> <span class="ot">=</span> <span class="st">"tomato"</span>),</span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>                    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Não rejeita H0"</span>, <span class="st">"Rejeita H0"</span>),</span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>                    <span class="at">name =</span> <span class="st">"Decisão"</span>) <span class="sc">+</span></span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Distribuição das médias amostrais"</span>,</span>
+<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Médias Amostrais"</span>,</span>
+<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Frequência"</span>) <span class="sc">+</span></span>
+<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="capitulo4_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="teste-unilateral-à-direita-3" class="level3" data-number="4.11.1">
+<h3 data-number="4.11.1" class="anchored" data-anchor-id="teste-unilateral-à-direita-3"><span class="header-section-number">4.11.1</span> 4.4.4 Teste Unilateral À Direita</h3>
+<p>O teste unilateral à direita verifica se a média populacional é maior que um valor específico <span class="math inline">\(\mu_0\)</span>:</p>
+<p><span class="math display">\[
+\begin{align}
+H_0 &amp;: \mu \leq \mu_0  \quad \text{(hipótese nula)} \\
+H_1 &amp;: \mu &gt; \mu_0  \quad \text{(hipótese alternativa)}
+\end{align}
+\]</span></p>
+<p>A estatística de teste utilizada é a média amostral:</p>
+<p><span class="math display">\[
+\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i
+\]</span></p>
+<p>Sabemos que, usando o estimador da variância amostral <span class="math inline">\(S^2\)</span>, a estatística padronizada:</p>
+<p><span class="math display">\[
+T = \frac{\bar{X} - \mu}{S/\sqrt{n}}
+\]</span></p>
+<p>segue uma distribuição t de Student com <span class="math inline">\(n-1\)</span> graus de liberdade, sob <span class="math inline">\(H_0\)</span>. Da mesma forma como antes, o nível de significância é <span class="math inline">\(\alpha\)</span>. No teste unilateral à direita, rejeitamos <span class="math inline">\(H_0\)</span> se a média amostral estiver muito maior que <span class="math inline">\(\mu_0\)</span>:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cap4/img4_16.png" class="img-fluid figure-img"></p>
+<figcaption>“img15”</figcaption>
+</figure>
+</div>
+<p>Isto é,</p>
+<p><span class="math display">\[
+\text{Rejeitamos } H_0 \text{ se } \bar{X} \leq L
+\]</span></p>
+<p>Queremos determinar o valor de <span class="math inline">\(L\)</span> que satisfaz:</p>
+<p><span class="math display">\[
+P(\bar{X} \geq L | H_0) = \alpha
+\]</span></p>
+<p>Sabemos que:</p>
+<p><span class="math display">\[
+P(\bar{X} \leq L | H_0) = \alpha \to \frac{L-\mu_0}{S/\sqrt{n}} = t_{\alpha,n-1} \to L = \mu_0 - t_{\alpha,n-1} \frac{S}{\sqrt{n}}
+\]</span></p>
+<p>Portanto, rejeitamos <span class="math inline">\(H_0\)</span> se:</p>
+<p><span class="math display">\[
+\bar{X} \geq L = \mu_0 + t_{\alpha,n-1} \frac{S}{\sqrt{n}}
+\]</span></p>
+<p>Exercício:</p>
+<p>Considere que <span class="math inline">\(X_1,X_2,\cdot,X_n\)</span> seja uma amostra aleatória de tamanho <span class="math inline">\(n=25\)</span> de de uma população com distribuição Normal com parâmetros <span class="math inline">\(\mu = 170\)</span> e <span class="math inline">\(\sigma^2 = 100\)</span>. Considere o teste das seguintes hipóteses:</p>
+<p><span class="math display">\[
+\begin{align}
+H_0 &amp;: \mu \leq 170  \quad \text{(hipótese nula)} \\
+H_1 &amp;: \mu &gt; 170  \quad \text{(hipótese alternativa)}
+\end{align}
+\]</span></p>
+<p>Vamos simular <span class="math inline">\(B=1000\)</span> amostras dessa população e, para cada amostra, vamos testar as hipóteses acima utilizando o método da região crítica com um nível <span class="math inline">\(\alpha=5%\)</span>. Note que, em todas as réplicas, teremos diferentes regiões críticas, uma vez que o desvio padrão amostral <span class="math inline">\(s\)</span> varia de amostra para amostra. O objetivo é verificar se em aproximadamente 5% dessas amostras rejeitamos a hipótese nula, quando sabemos que, na verdade, ela é verdadeira (erro do tipo I).</p>
+</section>
+</section>
+<section id="variância-populacional-caso-normal-1" class="level2" data-number="4.12">
+<h2 data-number="4.12" class="anchored" data-anchor-id="variância-populacional-caso-normal-1"><span class="header-section-number">4.12</span> Variância Populacional (caso normal)</h2>
+<p>Vamos construir testes de hipóteses para a variância populacional <span class="math inline">\(\sigma^2\)</span>, assumindo que:</p>
+<ul>
+<li>Os dados vêm de uma população com distribuição normal <span class="math inline">\(N(\mu, \sigma^2)\)</span></li>
+<li>A média populacional <span class="math inline">\(\mu\)</span> é desconhecida</li>
+<li>A amostra <span class="math inline">\(X_1, X_2, …, X_n\)</span> é aleatória e de tamanho <span class="math inline">\(n\)</span> qualquer.</li>
+</ul>
+<section id="teste-bilateral-3" class="level3" data-number="4.12.1">
+<h3 data-number="4.12.1" class="anchored" data-anchor-id="teste-bilateral-3"><span class="header-section-number">4.12.1</span> Teste Bilateral</h3>
+<p>O teste bilateral verifica se a variância populacional é igual a um valor específico <span class="math inline">\(\sigma_0^2\)</span> ou diferente:</p>
+<p><span class="math display">\[
+\begin{align}
+H_0 &amp;: \sigma^2 = \sigma_0^2  \quad \text{(hipótese nula)} \\
+H_1 &amp;: \sigma^2 \neq \sigma_0^2  \quad \text{(hipótese alternativa)}
+\end{align}
+\]</span></p>
+<p>A estatística de teste usada é a variância amostral:</p>
+<p><span class="math display">\[
+S^2 = \frac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{X})^2
+\]</span></p>
+<p>A estatísitca de teste usada é baseada na variância amostral:</p>
+<p><span class="math display">\[
+S^2 = \frac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{X})^2
+\]</span></p>
+<p>Assim, sob <span class="math inline">\(H_0\)</span>, sabemos que:</p>
+<p><span class="math display">\[
+\chi^2 = \frac{(n-1)S^2}{\sigma_0^2} \sim \chi^2_{n-1}
+\]</span></p>
+<p>segue uma distribuição qui-quadrado com <span class="math inline">\(n-1\)</span> graus de liberdade.</p>
+<p>Fixado o nível de significância <span class="math inline">\(\alpha\)</span>, no teste bilateral, rejeitamos <span class="math inline">\(H_0\)</span> se a estatística de teste <span class="math inline">\(\chi^2\)</span> for muito pequena ou muito grande em relação ao valor esperado sob <span class="math inline">\(H_0\)</span>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cap4/img4_17.png" class="img-fluid figure-img"></p>
+<figcaption>“img16”</figcaption>
+</figure>
+</div>
+<p>Portanto, rejeitamos <span class="math inline">\(H_0\)</span> se:</p>
+<p><span class="math display">\[
+\chi^2 \leq \chi^2_{ \alpha/2, n-1} \quad \text{ou} \quad \chi^2 \geq \chi^2_{ 1-\alpha/2, n-1}
+\]</span></p>
+<p>Exemplo:</p>
+<p>Considere que <span class="math inline">\(X_1,X_2,\cdot,X_n\)</span> seja uma amostra aleatória de tamanho <span class="math inline">\(n=16\)</span> de de uma população com distribuição Normal com parâmetros <span class="math inline">\(\mu\)</span> e <span class="math inline">\(\sigma^2\)</span>. Considere o teste das seguintes hipóteses:</p>
+<p><span class="math display">\[
+\begin{align}
+H_0 &amp;: \sigma^2 = 100  \quad \text{(hipótese nula)} \\
+H_1 &amp;: \sigma^2 \neq 100  \quad \text{(hipótese alternativa)}
+\end{align}
+\]</span></p>
+<p>Considerando um <span class="math inline">\(\alpha\)</span> de 5%, temos que a estatística de teste tem distribuição qui-quadrado com <span class="math inline">\(n-1=15\)</span> graus de liberdade.</p>
+<p>De acordo com <span class="math inline">\(\alpha\)</span>, vamos simular <span class="math inline">\(B=1000\)</span> amostras de tamanho <span class="math inline">\(n=16\)</span> de uma população Normal <span class="math inline">\((\mu=0, \sigma^2=100)\)</span> e, para cada amostra, vamos testar as hipóteses acima utilizando o método da região crítica com um nível <span class="math inline">\(\alpha=5%\)</span>. Note que, em todas as réplicas, teremos a mesma região crítica. O objetivo é verificar se em aproximadamente 5% dessas amostras rejeitamos a hipótese nula, quando sabemos que, na verdade, ela é verdadeira (erro do tipo I). Dessa forma, o nosso objetivo é estimar, empiricamente, o nível <span class="math inline">\(\alpha\)</span>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parâmetros populacionais de X</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>media_real <span class="ot">&lt;-</span> <span class="dv">170</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>sigma_real <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>sigma2_real <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Tamanho da amostra</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">16</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Número de réplicas (simulações)</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>B <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Nível de significância</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>alfa <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulação das médias amostrais</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>vars <span class="ot">&lt;-</span> <span class="fu">replicate</span>(B, <span class="fu">var</span>(<span class="fu">rnorm</span>(n, media_real, sigma_real)))</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Estatística de teste</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>chi <span class="ot">=</span> (n<span class="dv">-1</span>)<span class="sc">*</span>vars<span class="sc">/</span>sigma2_real</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="co"># valores críticos</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>chi_critico1 <span class="ot">&lt;-</span>  <span class="fu">qchisq</span>(alfa<span class="sc">/</span><span class="dv">2</span>,<span class="at">df=</span>n<span class="dv">-1</span>)</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>chi_critico2 <span class="ot">&lt;-</span>  <span class="fu">qchisq</span>(alfa<span class="sc">/</span><span class="dv">2</span>,<span class="at">df=</span>n<span class="dv">-1</span>,<span class="at">lower.tail=</span>F)</span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Cria um data frame com os valores das medias e a decisão do teste</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">chi =</span> chi) <span class="sc">%&gt;%</span></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rejeita_H0 =</span> chi <span class="sc">&lt;=</span> chi_critico1 <span class="sc">|</span> chi <span class="sc">&gt;=</span> chi_critico2 )</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Porcentagem de testes que rejeitaram a hipótese nula</span></span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>rejeicao <span class="ot">=</span> <span class="fu">mean</span>(df<span class="sc">$</span>rejeita_H0)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gráfico</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> chi, <span class="at">fill =</span> rejeita_H0)) <span class="sc">+</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">color =</span> <span class="st">"black"</span>, <span class="at">bins =</span> <span class="dv">30</span>) <span class="sc">+</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"FALSE"</span> <span class="ot">=</span> <span class="st">"skyblue"</span>, <span class="st">"TRUE"</span> <span class="ot">=</span> <span class="st">"tomato"</span>),</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Não rejeita H0"</span>, <span class="st">"Rejeita H0"</span>),</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">name =</span> <span class="st">"Decisão"</span>) <span class="sc">+</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Distribuição da estatística de teste"</span>,</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Médias Amostrais"</span>,</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Frequência"</span>) <span class="sc">+</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cap4/img4_18.png" class="img-fluid figure-img"></p>
+<figcaption>“img17”</figcaption>
+</figure>
+</div>
+</section>
+<section id="teste-unilateral-à-direita-4" class="level3" data-number="4.12.2">
+<h3 data-number="4.12.2" class="anchored" data-anchor-id="teste-unilateral-à-direita-4"><span class="header-section-number">4.12.2</span> Teste Unilateral À Direita</h3>
+<p>O teste unilateral à direita verifica se a variância populacional é maior que um valor específico <span class="math inline">\(\sigma_0^2\)</span>:</p>
+<p><span class="math display">\[
+\begin{align}
+H_0 &amp;: \sigma^2 = \sigma_0^2  \quad \text{(hipótese nula)} \\
+H_1 &amp;: \sigma^2 &gt; \sigma_0^2  \quad \text{(hipótese alternativa)}
+\end{align}
+\]</span></p>
+<p>A estatística de teste usada é baseada na variância amostral:</p>
+<p><span class="math display">\[
+S^2 = \frac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{X})^2
+\]</span></p>
+<p>Assim, sob <span class="math inline">\(H_0\)</span>, sabemos que:</p>
+<p><span class="math display">\[
+\chi^2 = \frac{(n-1)S^2}{\sigma_0^2} \sim \chi^2_{n-1}
+\]</span></p>
+<p>segue uma distribuição qui-quadrado com <span class="math inline">\(n-1\)</span> graus de liberdade.</p>
+<p>Fixado o nível de significância <span class="math inline">\(\alpha\)</span>, no teste unilateral à direita, rejeitamos <span class="math inline">\(H_0\)</span> se a estatística de teste <span class="math inline">\(\chi^2\)</span> for muito grande em relação ao valor esperado sob <span class="math inline">\(H_0\)</span>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cap4/img4_19.png" class="img-fluid figure-img"></p>
+<figcaption>“img19”</figcaption>
+</figure>
+</div>
+<p>Portanto, rejeitamos <span class="math inline">\(H_0\)</span> se:</p>
+<p><span class="math display">\[
+\chi^2 \geq \chi^2_{ 1-\alpha, n-1}
+\]</span></p>
+<p>Exemplo:</p>
+<p>Considere que <span class="math inline">\(X_1,X_2,\cdot,X_n\)</span> seja uma amostra aleatória de tamanho <span class="math inline">\(n=16\)</span> de de uma população com distribuição Normal com parâmetros <span class="math inline">\(\mu\)</span> e <span class="math inline">\(\sigma^2\)</span>. Considere o teste das seguintes hipóteses:</p>
+<p><span class="math display">\[
+\begin{align}
+H_0 &amp;: \sigma^2 = 100  \quad \text{(hipótese nula)} \\
+H_1 &amp;: \sigma^2 &gt; 100  \quad \text{(hipótese alternativa)}
+\end{align}
+\]</span></p>
+<p>Considerando um <span class="math inline">\(\alpha\)</span> de 5%, temos que a estatística de teste tem distribuição qui-quadrado com <span class="math inline">\(n-1=15\)</span> graus de liberdade.</p>
+<p>De acordo com <span class="math inline">\(\alpha\)</span>, vamos simular <span class="math inline">\(B=1000\)</span> amostras de tamanho <span class="math inline">\(n=16\)</span> de uma população Normal <span class="math inline">\((\mu=170, \sigma^2=100)\)</span> e, para cada amostra, vamos testar as hipóteses acima utilizando o método da região crítica com um nível <span class="math inline">\(\alpha=5%\)</span>. Note que, em todas as réplicas, teremos a mesma região crítica. O objetivo é verificar se em aproximadamente 5% dessas amostras rejeitamos a hipótese nula, quando sabemos que, na verdade, ela é verdadeira (erro do tipo I). Dessa forma, o nosso objetivo é estimar, empiricamente, o nível <span class="math inline">\(\alpha\)</span>.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiada");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiada");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./capitulo3.html" class="pagination-link" aria-label="Estimadores Pontuais e sua Propriedades">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Estimadores Pontuais e sua Propriedades</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./capitulo5.html" class="pagination-link" aria-label="Funções do R Para Intervalos de Confiança e Testes de Hipóteses (1 e 2 Populações)">
+        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Funções do R Para Intervalos de Confiança e Testes de Hipóteses (1 e 2 Populações)</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

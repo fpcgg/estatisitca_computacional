@@ -1,685 +1,1822 @@
 ```{r message=FALSE, warning=FALSE}
-library(ggplot2)
+require(ggplot2)   # Abordagem gráfica
+require(qqplotr)   # Gráfico qqplot
+require(DescTools) # Teste da variância
 ```
 
-# Inferência para Uma População
+# Funções do R Para Intervalos de Confiança e Testes de Hipóteses (1 e 2 Populações)
 
-Ao estudarmos a distribuição amostral de um estimador, demos um passo importante para responder a uma pergunta central da inferência estatística: “Quão confiável é o valor obtido a partir de uma única amostra?”
+## Introdução
 
-Agora é hora de usar esse conhecimento para tomar decisões concretas. A partir de uma estimativa pontual (como a média ou a proporção amostral), queremos expressar o grau de incerteza associado a essa estimativa, ou ainda, testar afirmações sobre a população com base nos dados da amostra.
+Até aqui, nosso foco esteve em construir a inferência estatística para uma única população, usando simulações detalhadas no `R` para compreender profundamente como surgem:
 
-Essas duas tarefas constituem os pilares da inferência estatística:
+  - a distribuição amostral da média, proporção e variância;
+  - os intervalos de confiança;
+  - os testes de hipótese para uma população;
+  - o comportamento de erros tipo I e tipo II;
+  - o comportamento do poder do teste;
+  - a lógica geral da inferência.
 
--   Intervalos de confiança, que fornecem uma faixa de valores plausíveis para o parâmetro populacional, com um certo nível de confiança.
--   Testes de hipótese, que avaliam se os dados oferecem ou não evidências suficientes para rejeitar uma suposição sobre a população.
+Esse estudo computacional foi essencial para que vocês dominassem os conceitos, observassem empiricamente o Teorema Central do Limite e enxergassem como a variabilidade amostral fundamenta toda a inferência.
 
-O raciocínio por trás dessas ferramentas se ancora na distribuição amostral: Se sabemos como o estimador se comporta ao longo de muitas amostras, conseguimos avaliar o quanto o valor observado se desvia (ou não) do que seria esperado sob determinada hipótese. O enfoque computacional traz enormes vantagens para o aprendizado dessa etapa. Com simulações, podemos:
+    Além disso, a lógica construída para uma população se estende naturalmente para o caso de duas populações: se simulássemos novamente, veríamos praticamente os mesmos fenômenos — distribuição de estatísticas de diferença, comportamento sob $H_0$, efeitos do tamanho amostral, erros tipo I e II, e o papel central do TCL. Ou seja, a extrapolação das simulações para duas populações é muito similar e, conceitualmente, nada realmente novo surgiria nesse processo.
 
--   Construir empiricamente intervalos de confiança, observando em que proporção eles contêm o verdadeiro parâmetro.
--   Visualizar a lógica dos testes de hipótese, comparando valores observados com a distribuição sob a hipótese nula.
--   Entender o erro tipo I e tipo II de forma intuitiva, simulando diferentes cenários.
--   Explorar o impacto do tamanho da amostra, da variabilidade e do nível de significância.
+A partir deste ponto, iniciamos uma nova etapa: usar as funções prontas do R para realizar inferência estatística. Nesta fase, não vamos reconstruir todas as simulações novamente. Em vez disso, vamos aprender como o `R` implementa, de forma direta e eficiente, os principais procedimentos inferenciais.
 
-Nosso foco hoje será nos casos mais importantes da inferência para uma população:
+Com as simulações que realizamos nas aulas passadas, essa base conceitual permite compreender muito melhor o que cada função do R está fazendo, de onde vêm os números e como interpretar seus resultados.
 
--   Intervalos de confiança e testes de hipóteses para a média populacional (caso normal)
--   Intervalos de confiança e testes de hipótese para a média populacional (caso amostras grandes)
--   Intervalos de confiança e testes para a proporção populacional
--   Intervalos de confiança e testes para a variância populacional (caso normal)
+O foco dessa prática será, portanto:
 
-Em todos os casos, vamos alternar entre teoria e prática, reforçando os conceitos com experimentos computacionais no R. Essa abordagem não só facilita o entendimento, como prepara você para aplicar inferência de forma crítica e fundamentada em situações reais. Para finalizar, serão apresentadas as funções automáticas do R que realizam intervalos de confiança e testes de hipóteses para uma população.
+  - Diagnósticos de normalidade: Antes de aplicar testes paramétricos baseados na normalidade, vamos estudar o Teste de Shapiro Wilk e gráficos para detectar normalidade.
 
-## Intervalos de Confiança
+  - Inferência para uma e duas populações: Sistematizar as funções prontas do R para construir intervalos de confiança e testes sobre média, proporção e variância para uma e duas populações.
 
-Ao estimarmos um parâmetro populacional $\theta$, como a média $\mu$ ou a proporção $p$, a partir de uma amostra aleatória, obtemos apenas uma estimativa pontual $\hat{\theta}$. No entanto, como essa estimativa depende da amostra coletada, ela está sujeita à variabilidade amostral. Para expressar essa incerteza, utilizamos intervalos de confiança, que fornecem um intervalo de valores plausíveis para o parâmetro desconhecido $\theta$, com base nas propriedades de distribuição do estimador $\hat{\theta}$.
+# Diagnósticos de Normalidade
 
-Formalmente, um intervalo de confiança bilateral com nível de confiança $(1-\alpha)$ é construído a partir de dois limites, $L(X)$ e $U(X)$, que são funções da amostra $X$. Esses limites são, portanto, variáveis aleatórias, e o intervalo $[L(X), U(X)]$ deve satisfazer:
+Antes de avançarmos para a aplicação das funções prontas do R em testes e intervalos de confiança, é importante revisitar um ponto essencial na prática inferencial: a verificação da normalidade. Muitos procedimentos paramétricos — como o teste t, teste pra variância e ANOVA — assumem que a(s) população(ões) segue(m) uma distribuição aproximadamente normal.
+
+Nas simulações que realizamos na primeira parte do curso, vocês viram que, graças ao Teorema Central do Limite, a normalidade da estatística (como a média amostral) tende a emergir naturalmente quando o tamanho amostral é moderado ou grande, mesmo quando a população original não é normal.
+
+    É muito importante não confundir isso com a ideia de que “amostras grandes são normais” — o que se torna aproximadamente normal é a distribuição da média amostral, não os dados em si. A população e a amostra podem continuar fortemente assimétricas, mesmo com tamanho grande.
+
+Contudo, para amostras pequenas ou situações com forte assimetria, pode ser útil avaliar empiricamente se a suposição de normalidade é plausível.
+
+Vamos trabalhar com ferramentas como o teste de Shapiro-Wilk, além de gráficos como densidades e QQ-plots. Assim, vocês terão um conjunto completo de instrumentos para analisar a normalidade antes de aplicar os testes paramétricos nas próximas seções.
+
+## Situação Prática Motivadora
+
+Imagine que uma equipe da área de ergonomia está avaliando o tempo de reação de trabalhadores que operam um novo painel de controle industrial. O equipamento ainda está em fase piloto e, por isso, apenas 22 trabalhadores participaram do teste inicial. Os tempos de reação (em milissegundos) são os seguintes:
+
+```{r}
+Tempos <- c(
+  242, 255, 248, 251, 239, 246, 244, 257, 252, 260,
+  241, 249, 245, 243, 254, 247, 250, 259, 263, 272,
+  285, 301
+)
+
+Dados <- data.frame(Tempos = Tempos)
+```
+
+Nesse contexto, estamos diante de uma situação típica na prática profissional: uma amostra pequena $(n < 30)$. Ou seja, é justamente aquele cenário limite em que decidir se a normalidade pode ou não ser assumida se torna relevante para a escolha entre métodos paramétricos ou não paramétricos.
+
+## Gráfico de Densidade
+
+O primeiro passo para avaliar a forma da distribuição é visualizar seus contornos. O gráfico de densidade permite enxergar rapidamente assimetrias, caudas mais pesadas e possíveis desvios sutis da normalidade. Ele é construído suavizando os dados por meio de uma função kernel, resultando em uma curva contínua que aproxima a distribuição dos valores observados. No `R` este gráfico é feito com a função `geom_density` do pacote `ggplot2`:
+
+```{r eval=FALSE}
+ggplot(Dados, aes(x = Tempos)) +
+  geom_density(fill="blue") +
+  xlab("Tempos") + 
+  ylab("Densidade") +
+  theme_bw() +
+  theme(text = element_text(size = 14))
+```
+
+![img5](img\cap5\img5.png)
+
+
+
+    Note como os dados são fortemente assimétricos à direito, indo contra uma situação de normalidade dos dados.
+
+    Pode acontecer de mesmo quando o gráfico de densidade apresenta assimetria aparente, isso não impede que os dados sejam considerados aproximadamente normais. O QQ-plot pode acusar a normalidade dos dados e testes formais, como o Shapiro–Wilk, podem não rejeitar a normalidade. Isso ocorre porque pequenas assimetrias visuais nem sempre são suficientes para indicar desvios estatisticamente significativos da distribuição normal.
+
+## Gráfico Quantil-Quantil (Q-Q PLOT)
+
+O gráfico quantil-quantil (Q-Q plot) é uma ferramenta visual que compara a distribuição dos dados com uma distribuição teórica, geralmente a normal. Ele faz isso confrontando os quantis da amostra com os quantis da distribuição escolhida.
+
+    Se os pontos se alinharem em uma linha reta, os dados são aproximadamente normais.
+    Desvios da linha indicam não normalidade, como assimetrias ou caudas atípicas.
+
+O Q-Q plot é útil para diagnosticar rapidamente padrões de desvio e orientar a escolha dos testes estatísticos. No R, com o ggplot2 e o pacote qqplotr, podemos construir um Q-Q plot completo usando três funções:
+
+    stat_qq_point(): plota os pontos da comparação entre quantis.
+    stat_qq_line(): adiciona a linha teórica de referência.
+    stat_qq_band(): cria bandas de confiança, destacando desvios mais relevantes.
+
+Segue o código que executa este gráfico ao nosso exemplo:
+
+```{r eval=FALSE}	
+ggplot(Dados, aes(sample=Tempos)) +
+    stat_qq_band(fill="lightblue") +
+    stat_qq_line() +
+    stat_qq_point() +
+    xlab("Quantis Teoricos")+
+    ylab("Quantis Amostrais")+
+    theme_bw() +
+    theme(text = element_text(size = 14))
+```
+
+![img5_2](img\cap5\img5_2.png)
+
+Note que, como a cauda à direita da distribuição é mais pesada os pontos finais no gráfico q-q plot se encontram fora da banda de confiança, reforçando a não normalidade dos dados.
+
+## Teste de Shapiro-Wilk
+
+O teste de Shapiro-Wilk é um dos métodos mais utilizados para avaliar a normalidade de uma amostra, especialmente quando o tamanho amostral é pequeno ou moderado. Ele costuma ser mais poderoso que outros testes — como Kolmogorov-Smirnov — porque é mais sensível a desvios sutis da normalidade, sem exigir que os parâmetros da distribuição normal sejam conhecidos.
+
+As hipóteses do teste são
+
+    H0: os dados vêm de uma distribuição normal.
+    H1: os dados não vêm de uma distribuição normal.
+
+O teste compara os valores observados com os valores esperados de uma amostra normal ordenada. A estatística de Shapiro-Wilk é, essencialmente, uma razão entre: a variabilidade explicada pelos pesos dos quantis teóricos, e a variabilidade total da amostra.
+
+Valores próximos de 1 indicam boa aderência à normalidade; valores menores indicam afastamento. Para concluir sobre o teste note que:
+
+    - Se o p-valor for maior que o nível de significância (por exemplo, 0.05), não rejeitamos H₀ → não há evidências suficientes de que a distribuição seja não normal.
+    - Se o p-valor for menor que 0.05, rejeitamos H₀ → há indícios de que os dados não seguem a normalidade.
+
+No R, este teste é feito a partir da função shapiro.test da base do R, que recebe como argumento os dados observados. Vamos aplicar essa função ao nosso exemplo:
+
+```{r}
+shapiro.test(Dados$Tempos)
+```
+
+Note que a saída dessa função apresenta dois resultados:
+
+    - W: Estatísica de teste. Quanto mais próxima de 1, maior a tendência para a normalidade dos dados.
+    - p-valor: P-valor do teste realizado.
+
+Como o p-valor é menor que 0.05, rejeitamos a hipótese nula e há evidências de que os dados não são normais. Nesse caso, não podemos realizar nenhum teste paramétrico aqui para inferir sobre parâmetros populacionais. A alternativa é recorrer à estatística não paramétrica para que seja feita a inferência nesses parâmetros.
+
+## Exercício
+
+Imagine que um laboratório de ciências do esporte está avaliando o tempo de recuperação cardíaca (em segundos) de atletas amadores após um teste de esforço leve. Como o estudo ainda está em fase preliminar, apenas 28 voluntários participaram.
+
+A seguir estão os dados coletados (em segundos):
+
+```{r}
+Tempos <- c(
+  52, 49, 55, 50, 53, 47, 51, 56, 54, 58,
+  48, 52, 50, 49, 57, 55, 53, 60, 62, 65,
+  59, 61, 64, 68, 70, 72, 58, 56
+)
+Dados <- data.frame(Tempos = Tempos)
+```
+
+Verifique se há indícios, a um nível de 5% de significância, que os dados são normalmente distribuídos.
+
+# Caso 1: populações normais com variâncias conhecidas
+
+Este é o caso mais simples do ponto de vista teórico: quando a(s) população(ões) é(são) normal(is) e a(s) variância(s) é(são) conhecida(s), a estatística de teste e os intervalos de confiança utilizam a distribuição Normal padrão (Z). Esse cenário aparece com frequência nos livros-texto porque permite introduzir conceitos fundamentais de forma algebricamente limpa.
+
+Além disso, esse caso é excelente para fins didáticos, especialmente para simulações computacionais. Por ser um contexto totalmente controlado (normalidade perfeita e variância fixa), ele é ideal para observar empiricamente como a distribuição da média, dos estimadores e das estatísticas de teste se comporta — exatamente como fizemos no início da disciplina. É um ambiente “de laboratório”, onde tudo pode ser verificado com precisão.
+
+Na prática aplicada, porém, populações com variância conhecida quase nunca existem. Mesmo com grande quantidade de dados históricos, a variabilidade real da população continua sendo estimada, e não conhecida. Por isso, esse caso é essencialmente teórico e tem utilidade limitada na análise estatística real. Assim, na prática, tratá-lo separadamente não acrescenta ganhos concretos para a análise de dados aplicada. Por esses motivos, NÃO ABORDAREMOS ESTE CASO AQUI.
+
+# Caso 2: proporções
+
+As situações em que trabalhamos com proporções são extremamente comuns na prática estatística: porcentagem de indivíduos vacinados, proporção de peças defeituosas, taxa de aprovação, prevalência de uma doença, entre muitas outras. Em todos esses casos, cada observação pode ser representada como um sucesso (1) ou fracasso (0), isto é, como uma variável Bernoulli.
+
+A partir deste ponto, organizaremos o estudo em duas partes fundamentais:
+
+ - Proporções em uma população
+      Intervalos de confiança e testes de hipótese para o parâmetro p.
+ - Proporções em duas populações
+      Inferência para a diferença $p_1 - p_2$, incluindo intervalos e testes de hipóteses.
+
+Sabemos que o Teorema Central do Limite garante a normalidade aproximada de $\hat{p}$ (ou da diferença $\hat{p_1} - \hat{p_2}$), quando certas condições são atendidas. O $R$ implementa esses procedimentos automaticamente via funções como `prop.test`.
+
+A função `prop.test` é utilizada para realizar o intervalo de confiança e o teste de hipótese para:
+
+  - Uma proporção populacional.
+  - Comparação das proporções populacionais (duas populações independentes).
+
+Os argumentos da função `prop.test` são:
+
+  - `x`: número de sucessos observados na amostra. Pode ser um único valor (uma população) ou um vetor com dois valores (duas populações);
+  - `n`: tamanho da amostra correspondente a x. Pode ser um único valor (uma população) ou um vetor com dois valores (duas populações);
+  - `p`: valor da proporção sob a hipótese nula (um valor para uma população ou a diferença de proporções para duas populações, sendo geralmente 0);
+  - `conf.level`: nível de confiança (consequentemente, é estabelecido o nível de significância).
+  - `alternative`: hipótese alternativa: "greater" para testes unilaterais à direita, "less" para testes unilaterais à esquerda e "two.sided" para testes bilaterais;
+  - `correct` = um valor lógico que indica se a correção de continuidade será utilizada ou não.
+
+As saídas da função `prop.test` são:
+
+ - `statistic`: a estatística de teste X (equivalente a estatística $Z^2$);
+ - `p.value`: valor-p do teste;
+ - `conf.int`: intervalo de confiança para a proporção ou para a diferença de proporções. Se a hipótese alternativa for diferente da bilateral, será feito um intervalo unilateral;
+ - `estimate`: proporção amostral (ou proporções amostrais, se duas populações);
+ - `null.value`: valor sob a hipótese nula;
+ - `alternative`: hipótese alternativa.
+
+Para retornar o intervalo de confiança somente, basta fazer `prop.test(...)$conf.int`.
+
+## Uma população
+
+Quando trabalhamos com proporções em uma única população, nosso objetivo é realizar inferência sobre o parâmetro $p$, que representa a verdadeira proporção de sucessos na população. Construiremos:
+
+ - intervalos de confiança para $p$;
+ - testes de hipótese sobre $p$.
+
+A lógica da inferência é inteiramente baseada na variabilidade natural da proporção amostral $\hat{p}$, que surge porque estamos observando apenas uma amostra da população. Por isso, compreender a distribuição de $\hat{p}$ é fundamental para aplicar corretamente os métodos inferenciais.
+
+Antes, porém, precisamos garantir que certas suposições mínimas são atendidas.
+
+### Suposições Necessárias
+
+Para utilizar a aproximação Normal e aplicar os intervalos e testes clássicos para uma proporção, assumimos que:
+
+ - As observações são independentes.
+ - A variável segue uma distribuição Bernoulli.
+ - A amostra representa corretamente a população.
+ - Tamanho amostral suficiente para que o Teorema Central do Limite atue.
+
+Uma "regra de bolso" muito utilizada é verificar se $n\hat{p} get 10$ e $n(1-\hat{p}) get 10$
+
+### Situação Prática Motivadora
+
+Imagine que uma equipe de saúde ocupacional está conduzindo um estudo preliminar sobre uso correto de equipamentos de proteção individual (EPIs) em um setor de manutenção industrial. O objetivo é estimar a proporção de trabalhadores que utilizam corretamente o capacete de segurança durante toda a jornada de trabalho.
+
+Como o estudo ainda está em fase piloto, apenas 50 trabalhadores foram observados ao longo de um turno. Para cada trabalhador, o observador registrou:
+
+ - 1 → uso adequado do capacete durante 100% das atividades;
+ - 0 → uso inadequado (retirou, afrouxou ou utilizou de forma incorreta).
+
+Os dados coletados foram os seguintes:
+
+```{r}
+UsoCapacete <- c(
+  1,1,1,1,0,1,1,1,1,0,
+  1,1,0,1,1,1,0,1,1,0,
+  1,0,1,0,1,1,1,1,1,1,
+  0,1,1,1,1,0,1,1,1,0,
+  0,1,1,1,1,0,1,1,1,0
+)
+Dados = data.frame(UsoCapacete = UsoCapacete)
+n = length(Dados$UsoCapacete)
+Sucessos = sum(Dados$UsoCapacete)
+p_hat = mean(Dados$UsoCapacete)
+```
+
+Considere o objetivo de construir intervalos de confiança e fazer testes de hipótese para o parâmetro populacional $p$, a verdadeira proporção de trabalhadores que utilizam corretamente o capacete de segurança.
+
+### Intervalos de Confiança 
+
+Para uma única proporção populacional $p$, queremos construir um intervalo de confiança (IC) que quantifique a incerteza da estimativa amostral $\hat{p}$.
+
+O IC clássico para a proporção populacional é dado por:
+
+$$ 
+IC = \hat{p} \pm z_{\alpha/2} \sqrt{\frac{\hat{p}(1-\hat{p})}{n}} 
+$$
+
+ - $\hat{p}$: proporção observada na amostra
+ - $z_{\alpha/2}$: valor crítico da distribuição Normal padrão.
+ - $n$: tamanho da amostra.
+
+A função `prop.test` não usa o IC clássico, e sim o intervalo de score de Wilson, que apresenta melhor desempenho, especialmente em amostras pequenas ou proporções extremas.
+
+A fórmula utilizada é:
 
 $$
-\mathbb{P}(L(X) \leq \theta \leq U(X)) = 1 - \alpha
+\begin{align*}
+p^{~} = \frac{\hat{p} + \frac{z^2}{2n}}{1 + \frac{z^2}{n}} \\
+Erro = \frac{z}{1 + \frac{z^2}{n}} \sqrt{\frac{\hat{p}(1-\hat{p})}{n} + \frac{z^2}{4n^2}} \\
+\end{align*}
+$$
+
+O intervalo de confiança é dado por:
+
+$$
+(p^{~} - Erro, p^{~} + Erro)
+$$
+
+ - É mais estável quando a amostra é pequena.
+ - Evita limites distorcidos quando a proporção está muito próxima de 0 ou 1.
+ - Apresenta melhor cobertura que o intervalo clássico.
+
+Quando correct = TRUE, o R aplica a correção de continuidade de Yates, que consiste em subtrair 1/2 do valor absoluto da diferença entre o número de sucessos observados e o esperado no cálculo do intervalo de escore:
+
+Esse ajuste torna o intervalo mais conservador. A correção é útil quando:
+
+ - o tamanho amostral é pequeno;
+ - a proporção observada está próxima de 0 ou 1;
+ - deseja-se um intervalo mais conservador (maior garantia de cobertura).
+
+ Vamos aplicar a função para o cálculo do intervalo de confiança na nossa situação prática. Como temos um $\hat{p}$ não extremo e um tamanho de amostra razoável, não vamos aplicar a correção. Os comandos são:
+
+```{r}
+# Intervalo de confiança bilateral
+prop.test(x=Sucessos,
+          n=n,
+          conf.level = 0.95,
+          correct = F)$conf.int
+
+# Intervalo de confiança unilateral à esquerda
+prop.test(x=Sucessos,
+          n=n,
+          conf.level = 0.95,
+          correct = F,
+          alternative = "less")$conf.int
+
+# Intervalo de confiança unilateral à direita
+prop.test(x=Sucessos,
+          n=n,
+          conf.level = 0.95,
+          correct = F,
+          alternative = "greater")$conf.int
+```
+
+As saídas apresentam o intervalo e o nível de confiança.
+
+### Testes de Hipótese
+
+Para uma única proporção populacional $p$, podemos testar hipóteses do tipo:
+
+$$
+\begin{align}
+H_0: p = p_0 \\
+H_1: p \neq p_0 \quad \text{(bilateral)}
+\end{align}
+$$
+
+onde $p_0$ é a proporção de referência ou meta da população.
+
+Quando $n$ é suficientemente grande, podemos usar a aproximação normal para a estatística de teste da proporção:
+
+$$
+Z = \frac{\hat{p} - p_0}{\sqrt{\frac{p_0(1-p_0)}{n}}}
+$$
+
+ - $\hat{p}$: proporção amostral observada.
+ - $p_0$: proporção sob a hipótese nula.
+ - $n$: tamanho da amostra.
+
+O valor de Z é então comparado com a distribuição normal padrão para obter o p-valor.
+
+A função `prop.test` realiza o teste de hipótese para proporções usando o teste de escore, que é equivalente à Z2, que tem uma distribuição χ21. Quando correct = TRUE, o termo −0.5 é acrescido na estatística de teste.
+
+ - Por padrão, `prop.test` aplica a correção de continuidade de Yates (`correct = TRUE`), tornando o teste mais conservador.
+ - Em situações com $\hat{p}$ não extremo e tamanho amostral razoável, podemos desativar a correção: `correct = FALSE`.
+
+Vamos testar se a proporção de uso correto de capacete ($\hat{p}$) difere de uma meta $p_0=0.70$. Pelos mesmos motivos de antes, não usaremos correação aqui também. Seguem os comandos:
+
+```{r}
+# Teste bilateral 
+prop.test(x=Sucessos,
+          n=n,
+          p = 0.70,
+          alternative = "two.sided",
+          correct = F)
+
+# Teste unilateral à esquerda (p < p0)
+prop.test(x=Sucessos,
+          n=n,
+          p = 0.70,
+          alternative = "less",
+          correct = F)
+
+# Teste unilateral à direita (p > p0)
+prop.test(x=Sucessos,
+          n=n,
+          p = 0.70,
+          alternative = "greater",
+          correct = F)
+```
+
+As saídas apresentam:
+
+ - A estatística de teste
+ - O valor-p
+ - Intervalo de Confiança
+
+### Exercício
+
+Uma empresa está avaliando a taxa de sucesso no login de usuários em uma nova versão de seu aplicativo. Foram observados os seguintes dados de 60 usuários:
+
+```{r}
+Usuarios <- c(
+    1,0,1,0,1,1,0,1,0,1,
+    1,1,0,1,0,1,1,0,1,0,
+    1,1,1,0,1,0,1,1,0,1,
+    1,0,1,0,1,1,0,1,1,0,
+    1,1,0,1,0,1,1,0,1,1,
+    1,1,0,1,0,1,1,0,1,1
+  )
+Dados = data.frame(Usuarios = Usuarios)
+```
+
+ 1. Construa um intervalo de confiança bilateral de 95% para a proporção de sucesso no login.
+ 2. A empresa definiu uma meta mínima aceitável de sucesso nos logins de $p_0=0.60$. Formule e teste a hipótese:
+
+$$
+\begin{align}
+H_0: p = 0.60 \\
+H_1: p > 0.60
+\end{align}
+$$
+
+Com base no p-valor, decida se há evidências suficientes para rejeitar H_0 ao nível de 5%.
+
+## Duas Populações Independentes
+
+Quando trabalhamos com proporções em duas populações, nosso objetivo é realizar inferência sobre os parâmetros $p_1$ e $p_2$, que representam as verdadeiras proporções de sucessos nas populações 1 e 2, respectivamente. Construiremos:
+
+ - intervalos de confiança para a diferença $p_1 - p_2$;
+ - testes de hipótese sobre $p_1 - p_2$, incluindo verificações de igualdade de proporções.
+
+A lógica da inferência é inteiramente baseada na variabilidade natural das proporções amostrais $\hat{p}_1$ e $\hat{p}_2$, que surge porque estamos observando apenas amostras das populações. Por isso, compreender a distribuição conjunta dessas proporções é fundamental para aplicar corretamente os métodos inferenciais.
+
+Antes, porém, precisamos garantir que certas suposições mínimas são atendidas.
+
+### Suposições Necessárias
+
+Para utilizar a aproximação Normal e aplicar os intervalos e testes clássicos para a diferença de proporções, assumimos que:
+
+ - As observações em cada amostra são independentes.
+ - As variáveis seguem distribuições Bernoulli.
+ - As amostras representam corretamente as populações.
+ - Tamanhos amostrais suficientes para que o Teorema Central do Limite atue.
+
+ Uma “regra de bolso” muito utilizada é verificar se $n_1\hat{p}_1 get 10$, $n_1(1-\hat{p}_1) get 10$, $n_2\hat{p}_2 get 10$ e $n_2(1-\hat{p}_2) get 10$.
+
+### Situação Prática Motivadora
+
+Imagine que uma equipe de saúde ocupacional está conduzindo um estudo sobre uso correto de equipamentos de proteção individual (EPIs) em dois setores de manutenção industrial: Setor A e Setor B. O objetivo é comparar a proporção de trabalhadores que utilizam corretamente o capacete de segurança em cada setor.
+
+Foram observados 40 trabalhadores do Setor A e 50 trabalhadores do Setor B, registrando para cada trabalhador:
+
+ - 1 → uso adequado do capacete durante 100% das atividades;
+ - 0 → uso inadequado (retirou, afrouxou ou utilizou de forma incorreta).
+
+Os dados coletados foram os seguintes:
+
+```{r}
+# Setor A
+UsoCapacete_A <- c(
+  1,1,1,1,0,1,1,1,1,0,
+  1,1,0,1,1,1,1,0,1,0,
+  1,1,1,0,1,0,1,1,1,1,
+  0,0,1,1,1,1,1,1,1,0
+)
+
+# Setor B
+UsoCapacete_B <- c(
+  1,1,0,0,1,1,1,0,1,1,
+  1,1,1,0,1,1,1,1,1,1,
+  1,0,0,1,1,1,0,1,1,1,
+  0,1,1,1,0,0,1,0,1,1,
+  1,1,0,1,0,1,1,1,0,1
+)
+
+Dados1 = data.frame(UsoCapacete_A=UsoCapacete_A)
+Dados2 = data.frame(UsoCapacete_B=UsoCapacete_B)
+n_A = length(Dados1$UsoCapacete_A)
+Sucessos_A = sum(Dados1$UsoCapacete_A)
+p_hat_A = mean(Dados1$UsoCapacete_A)
+n_B = length(Dados2$UsoCapacete_B)
+Sucessos_B = sum(Dados2$UsoCapacete_B)
+p_hat_B = mean(Dados2$UsoCapacete_B)
+```
+
+### Intervalos de Confiança
+
+Para comparar duas proporções populacionais p1 e p2, queremos construir um intervalo de confiança (IC) para a diferença $p_1 - p_2$, que quantifique a incerteza da estimativa amostral $\hat{p}_1 - \hat{p}_2$.
+
+O IC clássico para a diferença de proporções é dado por:
+
+$$
+IC = (\hat{p}_1 - \hat{p}_2) \pm z_{\alpha/2} \sqrt{\frac{\hat{p}_1(1-\hat{p}_1)}{n_1} + \frac{\hat{p}_2(1-\hat{p}_2)}{n_2}}
+$$
+
+ - $\hat{p}_1$, $\hat{p}_2$: proporções observadas nas amostras 1 e 2.
+ - $z_{\alpha/2}$: valor crítico da distribuição Normal padrão.
+ - $n_1$, $n_2$: tamanhos das amostras 1 e 2.
+
+A função `prop.test` usa o IC clássico e quando `correct = TRUE`, o R aplica a correção de continuidade de Yates, que ajusta o cálculo para tornar o teste (e o intervalo obtido por inversão) mais conservador. Isso é útil quando:
+
+ - os tamanhos amostrais são pequenos;
+ - as proporções observadas estão próximas de 0 ou 1;
+ - deseja-se um intervalo mais conservador (maior garantia de cobertura).
+
+No nosso exemplo prático com os setores A e B, como temos tamanhos amostrais razoáveis e proporções não extremas, não vamos aplicar a correção. Podemos calcular o intervalo de confiança para a diferença de proporções com:
+
+```{r}
+# Intervalo de confiança bilateral para a diferença de proporções (Setor A - Setor B)
+prop.test(
+  x = c(Sucessos_A, Sucessos_B),
+  n = c(n_A, n_B),
+  conf.level = 0.95,
+  correct = FALSE
+)$conf.int
+
+# Intervalo de confiança unilateral à esquerda (p_A - p_B < 0)
+prop.test(
+  x = c(Sucessos_A, Sucessos_B),
+  n = c(n_A, n_B),
+  conf.level = 0.95,
+  correct = FALSE,
+  alternative = "less"
+)$conf.int
+
+# Intervalo de confiança unilateral à direita (p_A - p_B > 0)
+prop.test(
+  x = c(Sucessos_A, Sucessos_B),
+  n = c(n_A, n_B),
+  conf.level = 0.95,
+  correct = FALSE,
+  alternative = "greater"
+)$conf.int
+```
+
+### Testes de Hipótese
+
+Para duas proporções populacionais $p_1$ e $p_2$, podemos testar hipóteses do tipo:
+
+$$
+\begin{align}
+H_0: p_1 = p_2 \\
+H_1: p_1 \neq p_2 \quad \text{(bilateral)}
+\end{align}
+$$
+
+ou seja, o teste verifica se as proporções de sucesso nas duas populações são iguais ou diferentes.
+
+Quando os tamanhos amostrais n1 e n2 são suficientemente grandes, podemos usar a aproximação normal para a estatística de teste da diferença de proporções:
+
+$$
+Z = \frac{(\hat{p}_1 - \hat{p}_2) - 0}{\sqrt{\hat{p}(1-\hat{p})\left(\frac{1}{n_1} + \frac{1}{n_2}\right)}}
+$$
+
+ - $\hat{p}_1$, $\hat{p}_2$: proporções amostrais observadas.
+ - $\hat{p}$: proporção combinada das duas amostras.
+ - $n_1$, $n_2$: tamanhos das amostras.
+
+O valor de Z é então comparado com a distribuição normal padrão para obter o p-valor.
+
+A função `prop.test` realiza o teste de score, que é equivalente à estatística de teste $z^2$, que tem uma distribuição $\chi^2_1$, sob H_0. Quando `correct = TRUE`, o termo −0.5 é acrescido na estatística de teste.
+
+ - Por padrão, `prop.test` aplica a correção de continuidade de Yates (`correct = TRUE`), tornando o teste mais conservador.
+ - Em situações com proporções não extremas e tamanhos amostrais razoáveis, podemos desativar a correção: `correct = FALSE`.
+
+ No nosso exemplo prático, com os setores A e B, podemos testar se há diferença significativa no uso correto do capacete usando:
+
+```{r}
+# Teste bilateral para duas proporções (Setor A vs Setor B)
+prop.test(
+  x = c(Sucessos_A, Sucessos_B),
+  n = c(n_A, n_B),
+  alternative = "two.sided",
+  correct = FALSE
+)
+
+# Teste unilateral à esquerda (p_A - p_B < 0)
+prop.test(
+  x = c(Sucessos_A, Sucessos_B),
+  n = c(n_A, n_B),
+  alternative = "less",
+  correct = FALSE
+)
+
+# Teste unilateral à direita (p_A - p_B > 0)
+prop.test(
+  x = c(Sucessos_A, Sucessos_B),
+  n = c(n_A, n_B),
+  alternative = "greater",
+  correct = FALSE
+)
+```
+
+### Exercício
+
+Duas fábricas, Fábrica A e Fábrica B, produzem o mesmo componente. Uma amostra de componentes em cada fábrica foi coletada e os resultados estão a seguir (1 =  peça defeituosa, 0 = peça não defeituosa):
+
+```{r}
+# Dados (amostras independentes)
+FabricaA <- c(
+  1,0,1,0,1,0,0,1,0,1,
+  0,1,0,0,1,1,0,1,0,0,
+  1,0,1,0,0,1,0,1,0,1,
+  1,0,1,0,0,1,0,1,0,1
+)
+
+FabricaB <- c(
+  0,1,0,0,1,0,0,0,1,0,
+  1,0,0,1,0,0,0,1,0,0,
+  0,1,0,0,0,1,0,0,1,0
+)
+
+Dados1 = data.frame(FabricaA = FabricaA)
+Dados2 = data.frame(FabricaB = FabricaB)
+```
+
+ 1. Construa um intervalo de confiança de 95% bilateral para a diferença das proporções de itens defeituosos entre as fábricas. Interprete o intervalo.
+ 2. A empresa acredita que a proporção de itens defeituosos da fabrica A é maior que a proporção de itens defeituosos da fábrica B. Com base no p-valor, decida se há evidências suficientes para rejeitar $H_0$ ao nível de 5%.
+
+# Caso 3: Variâncias em Populações Normais
+
+Na prática estatística, muitas vezes precisamos avaliar a variabilidade de uma população ou comparar a variabilidade entre duas populações. Estamos interessados no parâmetro $\sigma^2$, a variância populacional, que mede o grau de dispersão dos dados em torno da média.\
+
+A análise das variâncias é especialmente relevante quando:
+
+ - Queremos testar se duas populações têm a mesma variabilidade antes de aplicar testes paramétricos de média.
+ - Desejamos construir intervalos de confiança para a variância de uma população.
+
+Podemos considerar dois cenários principais:
+
+ - Uma população
+   Testes de hipótese ou intervalos de confiança para $\sigma^2$.
+
+ - Duas populações independentes
+   Testes de hipótese ou intervalos de confiança para a razão $\frac{\sigma_1^2}{\sigma_2^2}$.
+
+Em ambos os casos, supomos que os dados sigam uma distribuição normal. Este é um requisito essencial, pois a estatística de teste usada (qui-quadrado para uma população, F para duas populações) depende da normalidade.
+
+O R implementa testes de variância de forma prática por meio da função `VarTest()` do pacote **DescTools**. Esta função permite:
+
+* Realizar testes de hipótese para a variância de uma população.
+* Comparar variâncias entre duas populações.
+* Obter intervalos de confiança para uma única variância e para a razão de duas variâncias.
+
+Os principais argumentos da função `VarTest()` são:
+
+* `x`: vetor com os dados da amostra da primeira população.
+* `y`: vetor com os dados da amostra da segunda população (opcional, para comparação entre duas populações).
+* `alternative`: define a hipótese alternativa.
+    * `"greater"`: para hipótese alternativa unilateral à direita.
+    * `"less"`: para hipótese unilateral à esquerda.
+    * `"two.sided"`: para testar desigualdade bilateral.
+* `ratio`: valor numérico que representa a razão das variâncias sob a hipótese nula (padrão é 1).
+* `sigma.squared`: valor numérico que representa a variância populacional sob a hipótese nula (utilizado para testes de uma população).
+* `conf.level`: nível de confiança para o intervalo de confiança.
+
+As saídas retornadas pela função `VarTest()` incluem:
+
+* `statistic`: a estatística $\chi^2$ (uma população) ou $F$ (duas populações) do teste.
+* `p.value`: valor-p do teste.
+* `conf.int`: intervalo de confiança. Se a hipótese alternativa for unilateral, o intervalo será unilateral.
+* `estimate`: estimativa da variância populacional (uma população) ou razão das variâncias amostrais (duas populações).
+* `null.value`: valor sob a hipótese nula.
+* `alternative`: a hipótese alternativa utilizada.
+
+> **Nota:** Para retornar somente o intervalo de confiança, basta acessar o objeto da lista: `VarTest(...)$conf.int`.
+
+## Uma População
+
+Quando trabalhamos com a variância de uma única população, nosso objetivo é realizar inferência sobre o parâmetro $\sigma^2$, que representa a verdadeira variabilidade dos dados na população. Construiremos:
+
+ - intervalos de confiança para $\sigma^2$;
+ - testes de hipótese sobre $\sigma^2$.
+
+A lógica da inferência é inteiramente baseada na variabilidade natural do estimador amostral $S^2$, que surge porque estamos observando apenas uma amostra da população. Por isso, compreender a distribuição de $S^2$ é fundamental para aplicar corretamente os métodos inferenciais.
+
+Antes, porém, precisamos garantir que certas suposições mínimas são atendidas.
+
+### Suposições Necessárias
+
+Para aplicar intervalos de confiança e testes clássicos para a variância populacional, assumimos que:
+
+ - As observações são independentes.
+ - A variável segue uma distribuição Normal.
+ - A amostra representa corretamente a população.
+
+### Situação Prática Motivadora
+
+Imagine que uma fábrica deseja avaliar a consistência na produção de peças metálicas. O objetivo é estimar a variância do diâmetro das peças, pois isso afeta diretamente a qualidade final e o encaixe em montagens subsequentes.
+
+Para um estudo piloto, foram coletadas 15 peças produzidas durante um turno. Cada peça foi medida em milímetros quanto ao diâmetro externo. Os dados observados foram:
+
+```{r}
+Diametros <- c(
+  10.12,  9.94, 10.08,  9.97, 10.05,
+   9.92, 10.11, 10.03, 10.07,  9.96,
+  10.15, 10.02,  9.98, 10.09,  9.93
+)
+Dados <- data.frame(Diametros = Diametros)
+```
+
+O objetivo agora é construir intervalos de confiança e realizar testes de hipótese para o parâmetro populacional $\sigma^2$, a verdadeira variância do diâmetro das peças metálicas.
+
+Entretanto, antes precisamos verificar se há indícios de que os dados são normalmente distribuídos. Vamos aos diagnósticos:
+
+```{r eval=FALSE}
+ggplot(Dados, aes(x = Diametros)) +
+  geom_density(fill="blue") +
+  xlab("Diâmetros") + 
+  ylab("Densidade") +
+  theme_bw() +
+  theme(text = element_text(size = 14))
+```
+
+![img5_3](img\cap5\img5_3.png)
+
+```{r eval=FALSE}
+ggplot(Dados, aes(sample=Diametros)) +
+    stat_qq_band(fill="lightblue") +
+    stat_qq_line() +
+    stat_qq_point() +
+    xlab("Quantis Teoricos")+
+    ylab("Quantis Amostrais")+
+    theme_bw() +
+    theme(text = element_text(size = 14))
+```
+
+![img5_4](img\cap5\img5_4.png)
+
+```{r}
+shapiro.test(Dados$Diametros)
+```
+
+O gráfico de densidade não aponta sérios desvios da simetria. O gráfico qq-plot aponta para a normalidade dos dados, que também é corroborada pelo teste de normalidade de Shapiro Wilk, a um nível de 5%. Então temos indícios de que os dados são normalmente distribuídos.
+
+### Intervalos de Confiança
+
+Para a variância de uma população normal $\sigma^2$, queremos construir um intervalo de confiança (IC) que quantifique a incerteza da estimativa amostral $S^2$.
+
+O IC clássico para a variância populacional, baseado na distribuição qui-quadrado, é dado por:
+
+$$
+IC = \left( \frac{(n-1)S^2}{\chi^2_{\alpha/2, n-1}}, \frac{(n-1)S^2}{\chi^2_{1-\alpha/2, n-1}} \right)
+$$
+
+ - $S^2$: variância amostral.
+ - $\chi^2_{\alpha/2, n-1}$ e $\chi^2_{1-\alpha/2, n-1}$: valores críticos da distribuição qui-quadrado com n-1 graus de liberdade.
+ - $n$: tamanho da amostra.
+
+Vamos aplicar a função `VarTest()` para calcular o intervalo de confiança para a variância do diâmetro das peças metálicas. Os comandos são:
+
+```{r}
+# Intervalo de confiança bilateral (default)
+VarTest(x=Dados$Diametros, 
+        conf.level = 0.95)$conf.int
+
+# Intervalo de confiança unilateral à esquerda (sigma^2 < sigma0^2)
+VarTest(x=Dados$Diametros, conf.level = 0.95, alternative = "less")$conf.int
+
+# Intervalo de confiança unilateral à direita (sigma^2 > sigma0^2)
+VarTest(x=Dados$Diametros, conf.level = 0.95, alternative = "greater")$conf.int
+```
+
+As saídas apresentam o intervalo de confiança e o nível estabelecído.
+
+### Testes de Hipótese
+
+Para a variância de uma população normal $\sigma^2$, podemos testar hipóteses do tipo:
+
+$$
+\begin{align}
+H_0: \sigma^2 = \sigma_0^2 \\
+H_1: \sigma^2 \neq \sigma_0^2 \quad \text{(bilateral)}
+\end{align}
+$$
+
+onde $\sigma_0^2$ é a variância de referência da população.
+
+A estatística de teste clássica para a variância de uma população normal é baseada na distribuição qui-quadrado:
+
+$$
+\chi^2 = \frac{(n-1)S^2}{\sigma_0^2}
+$$
+
+ - $S^2$: variância amostral observada.
+ - $\sigma_0^2$: variância sob a hipótese nula.
+ - $n$: tamanho da amostra.
+
+O valor de $\chi^2$ é então comparado com a distribuição qui-quadrado com n-1 graus de liberdade para obter o p-valor.
+
+A função `VarTest()` realiza o teste de hipótese para a variância populacional automaticamente, permitindo:
+
+ - Teste bilateral (`alternative = "two.sided"`).
+ - Teste unilateral à esquerda (`alternative = "less"`).
+ - Teste unilateral à direita (`alternative = "greater"`).
+
+Exemplo prático na nossa situação:
+
+Suponha que queremos testar se a variância do diâmetro das peças metálicas difere de uma meta $\sigma_0^2 = 0.006 mm^2$. Os comandos são:
+
+```{r}
+# Teste bilateral (H0: sigma^2 dif 0.006)
+VarTest(x=Dados$Diametros, 
+        sigma.squared = 0.006, 
+        alternative = "two.sided")
+
+# Teste unilateral à esquerda (H0: sigma^2 < 0.006)
+VarTest(x=Dados$Diametros, 
+        sigma.squared = 0.006, 
+        alternative = "less")
+
+# Teste unilateral à direita (H0: sigma^2 > 0.006)
+VarTest(x=Dados$Diametros, 
+        sigma.squared = 0.006, 
+        alternative = "greater")
+```
+
+### Exercício
+
+Imagine que uma empresa de alimentos deseja avaliar a consistência do processo de envase de café moído. Cada pacote deveria conter exatamente 500 gramas, mas o maquinário apresentou sinais de instabilidade, sugerindo maior dispersão nos pesos embalados.
+
+Para investigar essa inconsistência, foram coletados 20 pacotes consecutivos e pesados com alta precisão.
+
+Os dados observados (em gramas) foram:
+
+```{r}
+Pesos <- c(
+  498.6, 501.2, 499.4, 500.8, 497.9,
+  501.5, 499.1, 502.0, 498.8, 500.3,
+  501.1, 499.0, 500.7, 498.5, 501.8,
+  499.6, 500.9, 498.3, 501.4, 499.2
+)
+
+Dados <- data.frame(Pesos = Pesos)
+```
+
+ 1. Construa um intervalo de confiança bilateral de 95% para a variância do peso dos pacotes de café.
+ 2. Teste a hipótese de a variância populacional ser diferente de 2, a um nível de 5%.
+
+## Duas Populações Independentes
+
+Quando trabalhamos com variâncias em duas populações, nosso objetivo é realizar inferência sobre os parâmetros $\sigma_1^2$ e $\sigma_2^2$, que representam as verdadeiras variâncias nas populações 1 e 2, respectivamente. Construiremos:
+
+ - intervalos de confiança para a razão $\frac{\sigma_1^2}{\sigma_2^2}$;
+ - testes de hipótese sobre a razão $\frac{\sigma_1^2}{\sigma_2^2}$, incluindo verificações de igualdade de variâncias.
+
+A lógica da inferência é inteiramente baseada na variabilidade natural dos estimadores amostrais $S_1^2$ e $S_2^2$, que surge porque estamos observando apenas amostras das populações. Por isso, compreender a distribuição conjunta dessas variâncias amostrais é fundamental para aplicar corretamente os métodos inferenciais.
+
+Antes, porém, precisamos garantir que certas suposições mínimas são atendidas.
+
+### Suposições Necessárias
+Para aplicar intervalos de confiança e testes clássicos para a razão de variâncias populacionais, assumimos que:
+
+ - As observações em cada amostra são independentes.
+ - As variáveis seguem distribuições Normais.
+ - As amostras representam corretamente as populações.
+
+### Situação Prática Motivadora
+Imagine que uma empresa deseja comparar a consistência na produção de peças metálicas em duas fábricas diferentes: Fábrica A e Fábrica B. O objetivo é comparar a variabilidade no diâmetro das peças produzidas em cada fábrica, pois isso afeta diretamente a qualidade final e o encaixe em montagens subsequentes.
+
+Foram coletadas 15 peças da Máquina A e 18 peças da Máquina B, medindo o diâmetro em milímetros:
+
+```{r}
+# Máquina A
+Diametros_A <- c(
+  10.12,  9.94, 10.08, 10.01,  9.92,
+  10.15,  9.98, 10.05,  9.90, 10.06,
+  10.11,  9.96, 10.09, 10.03, 10.14
+)
+
+# Máquina B
+Diametros_B <- c(
+  9.88, 10.07,  9.95, 10.12,  9.90,
+ 10.10, 10.04, 10.15,  9.93, 10.08,
+ 10.11,  9.92, 10.05, 10.09,  9.97,
+ 10.13, 10.02,  9.94
+)
+
+Dados1 = data.frame(Diametros_A=Diametros_A)
+Dados2 = data.frame(Diametros_B=Diametros_B)
+```
+
+O objetivo agora é construir intervalos de confiança e realizar testes de hipótese para a razão das variâncias populacionais $\frac{\sigma_1^2}{\sigma_2^2}$, comparando a variabilidade do diâmetro das peças metálicas produzidas em cada fábrica.
+
+Entretanto, antes, precisamos verificar se há indícios de que os dados de ambas as amostras são normalmente distribuídos. Vamos aos diagnósticos:
+
+Para a primeira amostra:
+
+```{r eval=FALSE}
+ggplot(Dados1, aes(x = Diametros_A)) +
+  geom_density(fill="blue") +
+  xlab("Diâmetros") + 
+  ylab("Densidade") +
+  theme_bw() +
+  theme(text = element_text(size = 14))
+```
+
+![img5_5](img\cap5\img5_5.png)
+
+```{r eval=FALSE}
+ggplot(Dados1, aes(sample=Diametros_A)) +
+    stat_qq_band(fill="lightblue") +
+    stat_qq_line() +
+    stat_qq_point() +
+    xlab("Quantis Teoricos")+
+    ylab("Quantis Amostrais")+
+    theme_bw() +
+    theme(text = element_text(size = 14))
+```
+
+![img5_6](img\cap5\img5_6.png)
+
+```{r}
+shapiro.test(Dados1$Diametros_A)
+```
+
+Para a segunda amostra:
+
+```{r eval=FALSE}
+ggplot(Dados2, aes(x = Diametros_B)) +
+  geom_density(fill="blue") +
+  xlab("Diâmetros") + 
+  ylab("Densidade") +
+  theme_bw() +
+  theme(text = element_text(size = 14))
+```
+
+![img5_7](img\cap5\img5_7.png)
+
+```{r eval=FALSE}
+ggplot(Dados2, aes(sample=Diametros_B)) +
+    stat_qq_band(fill="lightblue") +
+    stat_qq_line() +
+    stat_qq_point() +
+    xlab("Quantis Teoricos")+
+    ylab("Quantis Amostrais")+
+    theme_bw() +
+    theme(text = element_text(size = 14))
+```
+
+![img5_8](img\cap5\img5_8.png)	
+
+```{r}
+shapiro.test(Dados2$Diametros_B)
+```
+
+Em ambas as amostras, os gráficos de densidade não apontam sérios desvios da simetria. Os gráficos qq-plot apontam para a normalidade dos dados, que também é corroborada pelos testes de normalidade de Shapiro Wilk, a um nível de 5%. Então temos indícios de que os dados das duas populações são normalmente distribuídos.
+
+### Intervalos de Confiança
+
+Para comparar duas variâncias populacionais $\sigma_1^2$ e $\sigma_2^2$, queremos construir um intervalo de confiança (IC) para a razão $\frac{\sigma_1^2}{\sigma_2^2}$, que quantifique a incerteza da estimativa amostral $\frac{S_1^2}{S_2^2}$.
+
+O IC clássico para a razão de variâncias é baseado na distribuição F:
+
+$$
+IC = \left( \frac{S_1^2 / S_2^2}{F_{1-\alpha/2, n_1-1, n_2-1}}, \frac{S_1^2 / S_2^2}{F_{\alpha/2, n_1-1, n_2-1}} \right)
+$$
+
+ - $S_1^2$, $S_2^2$: variâncias amostrais.
+ - $F_{1-\alpha/2, n_1-1, n_2-1}$ e $F_{\alpha/2, n_1-1, n_2-1}$: valores críticos da distribuição F com n1-1 e n2-1 graus de liberdade.
+ - $n_1$, $n_2$: tamanhos das amostras 1 e 2.
+
+A função `VarTest()` calcula automaticamente este intervalo e também permite IC unilateral à esquerda ou à direita, útil quando o interesse é avaliar se a variância de uma população é maior ou menor que a outra.
+
+No nosso exemplo prático com as Máquinas A e B, como as distribuições são aproximadamente normais, podemos calcular o IC para a razão de variâncias com:
+
+```{r}
+# Intervalo de confiança bilateral para a razão de variâncias (Máquina A / Máquina B)
+VarTest(x=Dados1$Diametros_A,
+        y=Dados2$Diametros_B,
+        conf.level = 0.95)$conf.int
+
+# Intervalo de confiança unilateral à esquerda (sigma_A^2 / sigma_B^2 < 1)
+VarTest(x=Dados1$Diametros_A,
+        y=Dados2$Diametros_B, 
+        conf.level = 0.95, 
+        alternative = "less")$conf.int
+
+# Intervalo de confiança unilateral à direita (sigma_A^2 / sigma_B^2 > 1)
+VarTest(x=Dados1$Diametros_A,
+        y=Dados2$Diametros_B, 
+        conf.level = 0.95, 
+        alternative = "greater")$conf.int
+```
+
+### Testes de Hipótese
+
+Para comparar as variâncias de duas populações normais independentes $σ^2_1$ e $σ^2_2$, podemos testar hipóteses do tipo:
+
+$$
+\begin{align}
+H_0: \sigma_1^2 = \sigma_2^2 \\
+H_1: \sigma_1^2 \neq \sigma_2^2 \quad \text{(bilateral)}
+\end{align}
+$$
+
+A estatística de teste clássica para a razão de variâncias é baseada na distribuição F:
+
+$$
+F = \frac{S_1^2 / S_2^2}{\sigma_1^2 / \sigma_2^2}
+$$
+
+ - $S_1^2$, $S_2^2$: variâncias amostrais observadas.
+ - $\sigma_1^2 / \sigma_2^2$: razão das variâncias sob a hipótese nula.
+ - $n_1$, $n_2$: tamanhos das amostras.
+
+O valor de F é comparado com a distribuição F com n1-1 e n2-1 graus de liberdade para obter o p-valor.
+
+A função `VarTest()` realiza esse teste automaticamente, permitindo:
+
+ - Teste bilateral (`alternative = "two.sided"`).
+ - Teste unilateral à esquerda (`alternative = "less"`).
+ - Teste unilateral à direita (`alternative = "greater"`).
+
+Exemplo prático na nossa situação (Máquinas A e B):
+
+```{r}
+# Teste bilateral (H0: sigma_A^2 = sigma_B^2)
+VarTest(x=Dados1$Diametros_A,
+        y=Dados2$Diametros_B)
+
+# Teste unilateral à esquerda (H0: sigma_A^2 < sigma_B^2)
+VarTest(x=Dados1$Diametros_A,
+        y=Dados2$Diametros_B,
+        alternative="less")
+
+# Teste unilateral à direita (H0: sigma_A^2 > sigma_B^2)
+VarTest(x=Dados1$Diametros_A,
+        y=Dados2$Diametros_B,
+        alternative="greater")
+```
+
+### Exercício
+
+Uma empresa produz baterias de íons de lítio em duas linhas de montagem distintas:
+
+ - Linha X (processo mais antigo)
+ - Linha Y (processo recentemente atualizado)
+
+Foram coletadas:
+
+ - 40 baterias da Linha X
+ - 50 baterias da Linha Y
+
+Os dados são:
+
+```{r}
+# Linha X (maior variabilidade)
+Cap_X <- c(
+  2998, 3012, 3005, 2987, 3021, 3009, 3018, 2994, 2979, 3030,
+  3011, 3002, 2988, 3024, 2993, 3020, 2985, 3007, 3015, 2990,
+  3001, 3022, 3010, 2996, 2989, 3008, 3027, 2978, 3003, 3019,
+  2986, 3025, 2992, 3006, 3014, 2984, 3032, 3004, 2991, 3023
+)
+
+# Linha Y (menor variabilidade)
+Cap_Y <- c(
+  3005, 3010, 3001, 3007, 2998, 3012, 3003, 3004, 3008, 2999,
+  3006, 3011, 2997, 3002, 3009, 3013, 3000, 3005, 3006, 2998,
+  3010, 3001, 2999, 3004, 3007, 2997, 3002, 3011, 3003, 3012,
+  3004, 2998, 3006, 3005, 3010, 3007, 2999, 3008, 3002, 3013,
+  3001, 3000, 3009, 3004, 2997, 3006, 3012, 3003, 3005, 2998
+)
+
+DadosX <- data.frame(Capacidade = Cap_X)
+DadosY <- data.frame(Capacidade = Cap_Y)
+```
+
+ 1. Construa um intervalo de confiança bilateral de 95% para a razão das variâncias das capacidades das baterias entre as duas linhas de montagem.
+ 2. Teste a hipótese de que a nova linha (Y) apresenta menor variabilidade na capacidade das baterias. Considere $\alpha=5%$.
+
+# Caso 4: Populações normais com Variâncias Desconhecidas
+
+Na prática estatística, muitas vezes precisamos comparar médias de populações normais quando as variâncias são desconhecidas. Nesse contexto, o parâmetro de interesse é μ, a média populacional, enquanto a variabilidade é estimada a partir dos dados amostrais.
+
+A análise de médias com variâncias desconhecidas é especialmente relevante quando:
+
+ 1. Uma população
+    - Podemos construir intervalos de confiança para a média usando a distribuição $t$ de Student.
+    - Podemos realizar testes de hipótese para a média quando a variância é desconhecida.
+ 2. Duas populações dependentes
+    - Quando as observações de uma população estão naturalmente pareadas com as da outra (ex.: antes e depois de um tratamento no mesmo indivíduo), usamos o teste $t$ pareado.
+    - Neste caso, calculamos a diferença para cada par e aplicamos o teste $t$ de uma amostra sobre essas diferenças.
+    - Podemos construir intervalos de confiança e testes de hipótese para a diferença das médias das duas populações.
+ 3. Duas populações independentes
+    - Podemos comparar médias de duas populações independentes.
+    - Existem duas abordagens dependendo se assumimos variâncias iguais ou diferentes.
+    - Em todos os casos, podemos construir intervalos de confiança e testes de hipótese para a diferença das médias.
+
+Em todos os casos, supomos que os dados sigam uma distribuição normal, pois a estatística de teste $t$ depende dessa suposição.
+
+Os argumentos da função `t.test()` do R são:
+
+ - `x`: vetor com os dados da amostra da primeira população.
+ - `y`: vetor com os dados da amostra da segunda população (opcional, para comparação entre duas populações).
+ - `alternative`: define a hipótese alternativa.
+    - `"greater"`: para hipótese alternativa unilateral à direita.
+    - `"less"`: para hipótese unilateral à esquerda.
+    - `"two.sided"`: para testar desigualdade bilateral.
+ - `mu`: valor numérico que representa a média populacional sob a hipótese nula (utilizado para testes de uma população).
+ - `paired`: valor lógico que indica se as amostras são pareadas (TRUE) ou independentes (FALSE).
+ - `var.equal`: valor lógico que indica se as variâncias das duas populações são iguais (TRUE) ou diferentes (FALSE). O padrão é FALSE.
+ - `conf.level`: nível de confiança para o intervalo de confiança.
+
+As saídas retornadas pela função `t.test()` incluem:
+
+ - `statistic`: a estatística $t$ do teste.
+ - `p.value`: valor-p do teste.
+ - `conf.int`: intervalo de confiança. Se a hipótese alternativa for unilateral, o intervalo será unilateral.
+ - `estimate`: estimativa da média populacional (uma população) ou diferença das médias amostrais (duas populações).
+ - `null.value`: valor sob a hipótese nula.
+ - `alternative`: a hipótese alternativa utilizada.
+ - `method`: o método do teste aplicado.
+ - `data.name`: nome dos dados utilizados.
+
+Para retornar o intervalo de confiança somente, basta usar `t.test(...)$conf.int`.
+
+## Uma População
+
+Quando trabalhamos com a média de uma única população normal e variância desconhecida, nosso objetivo é realizar inferência sobre o parâmetro $\mu$, que representa a média verdadeira da população. Podemos construir:
+
+ - intervalos de confiança para $\mu$;
+ - testes de hipótese sobre $\mu$.
+
+A lógica da inferência é baseada na variabilidade observada na amostra, que surge porque estamos observando apenas um subconjunto da população. Por isso, compreender a distribuição da estatística amostral associada à média (distribuição $t$ de Student) é fundamental para aplicar corretamente os métodos inferenciais.
+
+Antes de prosseguir, é importante garantir que certas suposições mínimas são atendidas.
+
+### Suposições Necessárias
+
+Para aplicar intervalos de confiança e testes t para a média, assumimos que:
+
+ 1. As observações são independentes.
+ 2. A população é normalmente distribuída.
+ 3. A amostra representa corretamente a população.
+
+### Situação Prática Motivadora
+
+Um laboratório de análises clínicas deseja avaliar a concentração de glicose no sangue de pacientes em jejum. Os valores medidos têm variação natural entre os indivíduos.
+
+Para um estudo piloto, foram coletadas 12 medições de diferentes pacientes. Os dados observados (em mg/dL) foram:
+
+```{r}
+Glicose <- c(
+  92.5, 105.2, 98.7, 110.3, 101.6, 97.4,
+  104.1, 99.8, 108.7, 95.3, 102.9, 100.5
+)
+Dados <- data.frame(Glicose = Glicose)
+```
+
+O objetivo agora é construir intervalos de confiança e realizar testes de hipótese para o parâmetro populacional $\mu$, a verdadeira média da concentração de glicose em jejum.
+
+Entretanto, antes precisamos verificar se há indícios de que os dados são normalmente distribuídos. Vamos aos diagnósticos:
+
+```{r eval=FALSE}
+ggplot(Dados, aes(x = Glicose)) +
+  geom_density(fill="blue") +
+  xlab("Diâmetros") + 
+  ylab("Densidade") +
+  theme_bw() +
+  theme(text = element_text(size = 14))
+```
+
+![img5_9](img\cap5\img5_9.png)
+
+```{r eval=FALSE}
+ggplot(Dados, aes(sample=Glicose)) +
+    stat_qq_band(fill="lightblue") +
+    stat_qq_line() +
+    stat_qq_point() +
+    xlab("Quantis Teoricos")+
+    ylab("Quantis Amostrais")+
+    theme_bw() +
+    theme(text = element_text(size = 14))
+```
+
+![img5_10](img\cap5\img5_10.png)
+
+```{r}
+shapiro.test(Dados$Glicose)
+```
+
+O gráfico de densidade não aponta sérios desvios da simetria. O gráfico qq-plot aponta para a normalidade dos dados, que também é corroborada pelo teste de normalidade de Shapiro Wilk, a um nível de 5%. Então temos indícios de que os dados são normalmente distribuídos.
+
+### Intervalos de Confiança
+
+Quando a variância populacional é desconhecida, queremos construir um intervalo de confiança (IC) para a média populacional $\mu$, que quantifique a incerteza da estimativa amostral $\bar{x}$.
+
+O IC clássico para a média, baseado na distribuição t de Student, é dado por:
+
+$$
+IC = \left( \bar{x} - t_{\alpha/2, n-1} \frac{S}{\sqrt{n}}, \bar{x} + t_{\alpha/2, n-1} \frac{S}{\sqrt{n}} \right)
+$$
+
+ - $\bar{x}$: média amostral.
+ - $S$: desvio padrão amostral.
+ - $t_{\alpha/2, n-1}$: valor crítico da distribuição t com n-1 graus de liberdade.
+ - $n$: tamanho da amostra.
+
+Este intervalo é derivado da estatística:
+
+$$
+t = \frac{\bar{X} - \mu}{S / \sqrt{n}}
+$$
+
+Portanto, fornece uma estimativa precisa da média populacional mesmo quando a variância não é conhecida.
+
+No R, a função `t.test()` calcula automaticamente intervalos de confiança bilaterais e unilaterais. Seguem exemplos usando os dados de exemplo:
+
+```{r}
+# Intervalo de confiança bilateral (default)
+t.test(Dados$Glicose, 
+       conf.level = 0.95)$conf.int
+
+# Intervalo de confiança unilateral à esquerda (mu < mu0)
+t.test(Dados$Glicose, 
+       alternative = "less")$conf.int
+
+# Intervalo de confiança unilateral à direita (mu > mu0)
+t.test(Dados$Glicose, 
+       alternative = "greater")$conf.int
+```
+
+As saídas apresentam o intervalo de confiança e o nível estabelecido.
+
+### Testes de Hipótese
+
+Quando a variância populacional $\sigma^2$ é desconhecida, podemos testar hipóteses sobre a média populacional $\mu$:
+
+$$
+\begin{align}
+H_0: \mu = \mu_0 \\
+H_1: \mu \neq \mu_0 \quad \text{(bilateral)}
+\end{align}
+$$
+
+onde $\mu_0$ é a média de referência da população.
+A estatística de teste clássica para a média, baseada na distribuição t de Student, é dada por:
+
+$$
+t = \frac{\bar{X} - \mu_0}{S / \sqrt{n}}
+$$
+
+ - $\bar{X}$: média amostral observada.
+ - $\mu_0$: média sob a hipótese nula.
+ - $S$: desvio padrão amostral.
+ - $n$: tamanho da amostra.
+
+O valor de t é comparado com a distribuição t com n-1 graus de liberdade para obter o p-valor.
+
+A função t.test() realiza esse teste automaticamente, permitindo:
+
+ - Teste bilateral (`alternative = "two.sided"`).
+ - Teste unilateral à esquerda (`alternative = "less"`).
+ - Teste unilateral à direita (`alternative = "greater"`).
+
+Suponha que queremos testar se a média da glicose em jejum é igual a um valor de $\mu = 98$ mg/dL contra todas as hipóteses alternativas possíveis:
+
+```{r}
+# Teste bilateral (H0: mu = 98)
+t.test(Dados$Glicose, 
+       mu = 98, 
+       alternative = "two.sided")
+
+# Teste unilateral à esquerda (H0: mu < 98)
+t.test(Dados$Glicose, 
+       mu = 98, 
+       alternative = "less")
+
+# Teste unilateral à direita (H0: mu > 98)
+t.test(Dados$Glicose, 
+       mu = 98, 
+       alternative = "greater")
+```
+
+### Exercício
+
+Uma pesquisadora em nutrição esportiva deseja avaliar o nível de creatina sérica de atletas amadores que iniciaram recentemente um programa de suplementação. Sabe-se que há variação natural entre indivíduos, e a pesquisadora quer verificar se os níveis médios observados estão próximos dos valores esperados em indivíduos saudáveis.
+
+Para isso, ela coleta 10 medições independentes de creatina sérica (em mg/dL) após quatro semanas de suplementação.
+
+Os dados observados foram:
+
+```{r}
+Creatina <- c(
+  0.75, 1.12, 0.94, 1.08, 0.74,
+  0.97, 1.04, 1.18, 0.91, 1.10
+)
+Dados <- data.frame(Creatina = Creatina)
+```
+
+ 1. Construa um intervalo de confiança bilateral de 95% para a média dos níveis de creatina sérica.
+ 2. Teste a hipótese de que a média populacional dos níveis de creatina sérica é diferente de 1 mg/dL, a um nível de 5%.
+
+## Duas Populações Dependentes (Amostras Pareadas)
+
+Quando trabalhamos com duas populações dependentes (isto é, duas medições pareadas nos mesmos indivíduos, como antes/depois de um tratamento), nosso objetivo é realizar inferência sobre o parâmetro $μ_d$, que representa a média verdadeira das diferenças entre as duas medições. Podemos construir:
+
+ - intervalos de confiança para $μ_d$;
+ - testes de hipótese sobre $μ_d$.
+
+A inferência é baseada na variabilidade das diferenças dentro de cada par, e a estatística relevante é a média das diferenças $\bar{D}$, cuja distribuição sob normalidade das diferenças segue uma t de Student com $n−1$ graus de liberdade. Assim, é como se construíssemos um teste t para uma única amostra (a amostra das diferenças).
+
+### Suposições Necessárias
+
+Para aplicar intervalos de confiança e testes t para a média das diferenças, assumimos que:
+
+ - As medições são pareadas corretamente (mesmo indivíduo antes/depois, ou dois métodos aplicados na mesma unidade).
+ - As diferenças são independentes entre os pares.
+ - A amostra de pares representa adequadamente a população.
+ - As diferenças $D_i = X_{i1} - X_{i2}$ são aproximadamente normais.
+
+Importante: não é necessário que as duas variáveis originais sejam normais, apenas as diferenças.
+
+### Situação Prática Motivadora
+
+Um fisioterapeuta esportivo deseja avaliar se um programa de fortalecimento muscular de 6 semanas melhora o tempo de reação de atletas amadores. O tempo de reação foi medido em milissegundos (ms) usando o mesmo equipamento, antes e depois do programa de treinamento. Como cada atleta é avaliado duas vezes, trata-se de um caso de amostras pareadas.
+
+Abaixo estão os dados coletados de 12 atletas:
+
+```{r}
+Tempo_antes <- c(255, 240, 262, 274, 248, 260,
+251, 243, 270, 258, 266, 249)
+
+Tempo_depois <- c(238, 231, 250, 260, 240, 252,
+243, 237, 259, 249, 255, 241)
+
+Dados <- data.frame(antes = Tempo_antes, depois = Tempo_depois)
+Dados$Diferenca = Dados$antes - Dados$depois
+```
+
+Considere o objetivo de investigar, a partir de intervalos de confiança e teste de hipótese, o comportamento da diferença das médias populacionais de desempenho desses atletas.
+
+Entretanto, antes precisamos verificar se há indícios de que as diferenças são normalmente distribuídas. Vamos aos diagnósticos:
+
+```{r eval=FALSE}
+ggplot(Dados, aes(x = Diferenca)) +
+  geom_density(fill="blue") +
+  xlab("Diâmetros") + 
+  ylab("Densidade") +
+  theme_bw() +
+  theme(text = element_text(size = 14))
+```
+
+![img5_11](img\cap5\img5_11.png)
+
+```{r eval=FALSE}
+ggplot(Dados, aes(sample=Diferenca)) +
+    stat_qq_band(fill="lightblue") +
+    stat_qq_line() +
+    stat_qq_point() +
+    xlab("Quantis Teoricos")+
+    ylab("Quantis Amostrais")+
+    theme_bw() +
+    theme(text = element_text(size = 14))
+```
+
+![img5_12](img\cap5\img5_12.png)
+
+```{r}
+shapiro.test(Dados$Diferenca)
+```
+
+O gráfico de densidade não aponta um desvio muito sério de simetria. O gráfico qq-plot aponta para a normalidade dos dados (exceto por um desvio que não é grave), que também é corroborada pelo teste de normalidade de Shapiro Wilk, a um nível de 5%. Então temos indícios de que as diferenças são normalmente distribuídas.
+
+### Intervalos de Confiança
+
+Quando trabalhamos com duas populações dependentes, isto é, duas medições pareadas sobre os mesmos indivíduos, queremos construir um intervalo de confiança (IC) para a média das diferenças $\mu_d$. Essa quantidade representa a diferença média verdadeira entre as duas condições.
+
+Para cada par, definimos:
+
+$$
+D_i = X_{i1} - X_{i2}
+$$
+
+e usamos a média das diferenças $\bar{D}$, o desvio padrão das diferenças $S_D$ e o número de pares $n$ para construir o IC:
+
+$$
+IC = \left( \bar{D} - t_{\alpha/2, n-1} \frac{S_D}{\sqrt{n}}, \bar{D} + t_{\alpha/2, n-1} \frac{S_D}{\sqrt{n}} \right)
+$$
+
+ - $\bar{D}$: média das diferenças.
+ - $S_D$: desvio padrão das diferenças.
+ - $t_{\alpha/2, n-1}$: valor crítico da distribuição t com n-1 graus de liberdade.
+ - $n$: número de pares.
+
+e fornece uma estimativa inferencial válida mesmo quando a variância populacional das diferenças é desconhecida.
+
+No R, a função `t.test()` calcula automaticamente intervalos de confiança bilaterais e unilaterais no contexto pareado.
+
+```{r}
+#Intervalo de confiança bilateral 
+t.test(Dados$antes, 
+       Dados$depois, 
+       paired = TRUE, 
+       conf.level = 0.95)$conf.int
+
+#Intervalo unilateral à esquerda
+t.test(Dados$antes, 
+       Dados$depois, 
+       paired = TRUE, 
+       alternative = "less",
+       conf.level = 0.95)$conf.int
+
+#Intervalo unilateral à direita
+t.test(Dados$antes, 
+       Dados$depois, 
+       paired = TRUE, 
+       alternative = "greater",
+       conf.level = 0.95)$conf.int
+```	
+
+As saídas apresentam o intervalo de confiança adequado ao tipo de hipótese escolhido.
+
+### Testes de Hipótese
+
+Quando temos duas populações dependentes, isto é, duas medições pareadas sobre os mesmos indivíduos, podemos testar hipóteses sobre a média das diferenças:
+
+$$
+\begin{align}
+H_0: \mu_d = \mu_0 \\
+H_1: \mu_d \neq \mu_0 \quad \text{(bilateral)}
+\end{align}
 $$
 
 onde:
 
--   $\theta$ é o parâmetro populacional desconhecido
--   $L(X)$ e $U(X)$ são, respectivamente, o limite inferior e superior do intervalo de confiança
--   $\alpha$ é o nível de significância, isto é, a probabilidade de que o intervalo não contenha o parâmetro verdadeiro
+ - $\mu_d$: média das diferenças populacionais.
+ - $D_i = X_{i1} - X_{i2}$ é a diferença para cada par
 
-Dessa forma, interpretamos o nível de confiança $1 - \alpha$ como a proporção de vezes (no longo prazo) em que o intervalo $[L(X), U(X)]$, construído da mesma maneira a partir de amostras aleatórias independentes, conteria verdadeiro valor de $\theta$.
-
-Nesta seção, abordaremos a construção de intervalos de confiança bilaterais tanto por métodos analíticos quanto por simulações, desenvolvendo uma compreensão intuitiva e rigorosa de sua interpretação e uso. Os casos unilaterais serão explorados posteriormente, na Lista 2.
-
-## Média Populacional (caso normal com variância conhecida)
-
-Vamos começar estudando a construção do intervalo de confiança para a média populacional $\mu$, assumindo que:
-
--   Os dados vêm de uma população com distribuição normal $N(\mu,\sigma^2)$
--   A variância populacional $\sigma^2$ é conhecida
--   A amostra $X_1, X_2, …, X_n$ é aleatória e de tamanho $n$.
-
-Sabemos que, sob essas condições, a média amostral $\bat{X}$ segue uma distribuição normal:
+A estatística de teste é a estatística t de Student aplicada às diferenças:
 
 $$
-\bar{X} \sim N(\mu, \sigma^2/n)
+t = \frac{\bar{D} - \mu_0}{S_D / \sqrt{n}}
 $$
 
-Usando a padronização da média amostral, temos:
+ - $\bar{D}$: média das diferenças amostrais.
+ - $\mu_0$: média das diferenças sob a hipótese nula.
+ - $S_D$: desvio padrão das diferenças amostrais.
+ - $n$: número de pares.
 
-$$
-Z = \frac{\bar{X} - \mu}{\sigma/\sqrt{n}} \sim N(0,1)
-$$
+O valor da estatística t é comparado com a distribuição t com n-1 graus de liberdade para obter o p-valor.
 
-Para construir um intervalo de confiança bilateral com nível de confiança $1 − \alpha$ (por exemplo, 95%), utilizamos o quantil $z_{\alpha/2}$ da distribuição normal padrão. A figura a seguir retrata essa quantidade:
+A função `t.test()` realiza esse teste automaticamente no contexto pareado, permitindo:
 
-!["img1"](img/cap5/img5.png)
+ - Teste bilateral (`alternative = "two.sided"`).
+ - Teste unilateral à esquerda (`alternative = "less"`).
+ - Teste unilateral à direita (`alternative = "greater"`).
 
-No $R$, esse valor crítico é obtido da seguinte forma (para uma confiança de 95%, por exemplo):
+Suponha agora que queremos testar se o valor médio antes é igual ao valor médio depois, contra todas as alternativas possíveis. Considerando os vetores antes e depois:
 
 ```{r}
-# Nível de confiança
-conf = 0.95
-# Nível de significância
-alfa = 1-conf
-# Valor crítico
-z_critico = qnorm(alfa/2,lower.tail=F)
+#Teste bilateral (H0: mu_d dif 0)
+t.test(Dados$antes,
+       Dados$depois,
+       paired = TRUE,
+       alternative = "two.sided")
+
+#Teste unilateral à esquerda (H1: mu_d < 0)
+t.test(Dados$antes,
+       Dados$depois,
+       paired = TRUE,
+       alternative = "less")
+
+#Teste unilateral à direita (H1: mu_d > 0)
+t.test(Dados$antes,
+       Dados$depois,
+       paired = TRUE,
+       alternative = "greater")
 ```
 
-Isso nos leva ao seguinte intervalo com confiança $1−\alpha$ para a média populacional $\mu$:
+### Exercício
 
-$$
-IC_{1-\alpha}(\mu) = \left[ \bar{X} - z_{\alpha/2} \frac{\sigma}{\sqrt{n}}, \; \bar{X} + z_{\alpha/2} \frac{\sigma}{\sqrt{n}} \right]
-$$
-
-A interpretação correta é: se repetíssemos o processo de amostragem muitas vezes, cerca de $100 \cdot (1−\alpha)%$ dos intervalos construídos conteriam o verdadeiro valor de $\mu$. Na próxima etapa, vamos explorar computacionalmente como esse tipo de intervalo se comporta na prática, usando simulações para verificar sua frequência de acerto e o impacto de diferentes parâmetros.
-
-### Exemplo
-
-Considere que $X_1, X_2, …, X_n$ seja uma amostra aleatória de tamanho $n = 25$ de uma população com distribuição Normal com parâmetros $\mu = 170$ e $\sigma^2 = 100$. Vamos simular $B = 100$ amostras dessa população e, para cada amostra, vamos construir o intervalo de confiança com 95% de confiança, assumindo que a variância é conhecida.
+Imagine que a Secretaria de Saúde de um estado está implementando um novo curso de capacitação para aplicação de vacinas. A ideia é verificar se esse treinamento realmente melhora o tempo médio de atendimento dos profissionais em uma sala de vacinação. Foram selecionados 15 profissionais, e o tempo (em minutos) para aplicar uma dose em um paciente foi medido antes e depois do treinamento. Os dados coletados são:
 
 ```{r}
-# Parâmetros populacionais de X
-media_real = 170
-sigma_real = 10
-
-# Tamanho da amostra
-n = 25
-
-# Quantidade de réplicas
-B = 100
-
-# Nível de confiança
-Conf = 0.95
-
-# Nível de signifiância
-Alfa = 1-Conf
-
-# Cria o vetor de B médias amostrais da população teórica
-set.seed(2025)
-medias = replicate(B, mean(rnorm(n, media_real, sigma_real)))
-
-# Z crítico e erro padrão
-z_critico = qnorm(Alfa/2,lower.tail=F)
-erro_padrao = sigma_real / sqrt(n)
-
-# Intervalos de confiança
-inferior = medias - z_critico * erro_padrao
-superior = medias + z_critico * erro_padrao
-
-# Verifica se o intervalo contém o valor verdadeiro
-Contem = inferior <= media_real & superior >= media_real
-
-# Cobertura dos intervalos
-Cobertura = sum(Contem)/length(Contem)
-
-# Dados para o gráfico
-dados = data.frame(
-  Replica = 1:B,
-  Inferior = inferior,
-  Superior = superior,
-  Contem = Contem
+dados_treinamento <- data.frame(
+  Profissional = 1:15,
+  Tempo_Antes = c(12.1, 11.3, 13.5, 14.2, 12.8, 11.9, 13.0, 14.5, 12.2, 13.7,
+                  11.5, 12.9, 13.1, 14.0, 12.4),
+  Tempo_Depois = c(10.4, 10.7, 11.9, 12.8, 11.2, 11.0, 12.5, 12.7, 11.1, 12.6,
+                   10.9, 11.7, 12.2, 12.3, 11.5)
 )
-
-ggplot(dados, aes(x = Replica)) +
-  geom_segment(aes(xend = Replica, y = Inferior, yend = Superior, color = Contem), size = 1) +
-  geom_hline(yintercept = media_real, linetype = "dashed", color = "black") +
-  scale_color_manual(values = c("TRUE" = "blue", "FALSE" = "red")) +
-  labs(
-title = expression("IC para " * mu * " (caso normal e " * sigma^2 * " conhecida)"),
-    x = "Replicações",
-    y = "Intervalo de Confiança"
-  ) +
-  theme_minimal()+
-  theme(legend.position = "none")
 ```
 
-Assim, conseguimos uma cobertura de 96% dos intervalos (próxima do valor verdadeiro de 95%). Essa cobertura vai se aproximando cada vez mais do valor de 95% à medida que aumentamos o valor de $B$ (Experimente alterar $B$ para 10000).
+A um nível de 5%, teste se o treinamento reduziu significativamente o tempo médio de aplicação de vacinas.
 
-### Exercício: impacto do tamanho da amostra
+## Duas Populações Independentes
 
-Retorne ao exemplo anterior e troque o tamanho da amostra de $n=25$ para $n=100$. Compare os dois gráficos. O que você nota de diferente?
-
-## Média Populacional (caso normal com variância desconhecida)
-
-Vamos agora estudar a construção do intervalo de confiança para a média populacional μ, assumindo que:
-
--   Os dados vêm de uma população com distribuição normal $N(\mu,\sigma^2)$
--   A variância populacional σ² é desconhecida
--   A amostra $X_1, X_2, …, X_n$ é aleatória e de tamanho n, com n pequeno $(n<30)$.
-
-Nesse caso, como não conhecemos $\sigma$, utilizamos o desvio padrão amostral $S$, definido por:
+Quando trabalhamos com duas populações independentes (isto é, observações do Grupo 1 não têm relação com observações do Grupo 2), nosso objetivo é realizar inferência sobre o parâmetro
 
 $$
-S = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{X})^2}
+\mu_1 - \mu_2
 $$
 
-A média amostral $\bar{X}$ ainda é um estimador de $\mu$, mas a distribuição agora que é utilizada é a $T$ de Student com $n−1$ graus de liberdade:
+que representa a diferença verdadeira entre as médias populacionais dos dois grupos.
 
-$$
-T = \frac{\bar{X} - \mu}{S/\sqrt{n}} \sim t(n-1)
-$$
+Quando as duas populações são normais e as variâncias populacionais são desconhecidas, utilizamos o teste t para duas amostras independentes (com variâncias iguais ou desiguais). O R faz essa escolha automaticamente via `var.equal = TRUE` ou `FALSE` na função `t.test()`.
 
-Essa variabilidade adicional alarga a cauda da distribuição, e isso é capturado pela distribuição T de Student, que possui as seguintes características:
+Podemos construir:
 
--   Média zero, como a normal;
--   Caudas mais pesadas, ou seja, maior probabilidade de valores extremos;
--   Depende de um parâmetro: os graus de liberdade $n−1$
+ - intervalos de confiança para $\mu_1 - \mu_2$;
+ - testes de hipótese sobre $\mu_1 - \mu_2$ usando o teste t de duas amostras independentes.
 
-À medida que o tamanho da amostra aumenta $(n \to \infty)$, a distribuição $T$ se aproxima da distribuição normal. Por isso, com amostras grandes, o uso da normal ou da $T$ costuma levar a resultados semelhantes. Para construir um intervalo de confiança bilateral com nível de confiança $1−α$ (por exemplo, 95%), utilizamos o quantil $t_{n-1, α/2}$ da distribuição $T$ de Student com $n−1$ graus de liberdade. Veja na figura a seguir:
+### Suposições Necessárias
 
-!["img2"](img/cap5/img5_2.png)
+Para aplicar o intervalo de confiança e o teste t para duas populações independentes, assumimos:
 
-No $R$, esse valor crítico é obtido da seguinte forma (para uma confiança de 95%, por exemplo):
+ - Independência entre observações dentro de cada grupo e entre os grupos.
+ - Amostras aleatórias representativas das duas populações.
+ - As populações de cada grupo são aproximadamente normais, especialmente se n é pequeno.
+ - As variâncias podem ser consideradas: 
+    - Iguais $\to$ teste t com variâncias iguais (pooled);
+    - Desiguais $\to$ teste t de Welch (padrão do R).
 
-```{r eval = FALSE}
-# Tamanho da amostra
-n = length(dados)
-# Nível de confiança
-conf = 0.95
-# Nível de significância
-alfa = 1-conf
-# Valor crítico
-t_critico = qt(alfa/2,df=n-1,lower.tail=F)
-```
+### Situação Prática Motivadora
 
-Isso nos leva ao seguinte intervalo confiança para $\mu$ com nível de confiança $1 − \alpha$ é dado por:
+Um pesquisador deseja avaliar se um novo suplemento nutricional melhora o desempenho de atletas em um teste de força máxima.
+Dois grupos independentes foram avaliados:
 
-$$
-IC_{1-\alpha}(\mu) = \left[ \bar{X} - t_{n-1, \alpha/2} \frac{S}{\sqrt{n}}, \; \bar{X} + t_{n-1, \alpha/2} \frac{S}{\sqrt{n}} \right]
-$$
+ - Grupo 1 – Controle: não recebeu suplemento
+ - Grupo 2 – Tratamento: recebeu suplemento por 8 semanas
 
-A interpretação correta permanece: se repetíssemos o processo de amostragem muitas vezes, cerca de $100 \cdot (1−\alpha)%$ dos intervalos construídos conteriam o verdadeiro valor de $\mu$. Na próxima etapa, vamos explorar computacionalmente como esse tipo de intervalo se comporta na prática, usando simulações para verificar sua frequência de acerto e o impacto de diferentes parâmetros.
+A variável medida foi a força máxima (kg) obtida no teste.
 
-### Exemplo
-
-Considere que $X_1, X_2, \cdots, X_n$ seja uma amostra aleatória de tamanho n=25 de uma população com distribuição Normal com parâmetros μ=170 e σ2=100. Vamos simular B=100 amostras dessa população e, para cada amostra, vamos construir o intervalo de confiança com 95% de confiança, assumindo que a variância é desconhecida.
+Abaixo estão os dados coletados (22 atletas no total):
 
 ```{r}
-# Parâmetros populacionais de X
-media_real = 170
-sigma_real = 10
+Controle <- c(124, 118, 130, 122, 127, 119, 125, 121, 128, 123, 129, 130)
+Tratamento <- c(127, 124, 128, 133, 138, 129, 130, 132, 129, 134)
 
-# Tamanho da amostra
-n = 25
-
-# Quantidade de réplicas
-B = 100
-
-# Nível de confiança
-Conf = 0.95
-
-# Nível de signifiância
-Alfa = 1-Conf
-
-# Cria o vetor de B médias amostrais da população teórica
-set.seed(2025)
-medias = replicate(B, mean(rnorm(n, media_real, sigma_real)))
-
-# Cria o vetor de B desvios padrões amostrais da população teórica
-set.seed(2025)
-desvios_padroes = replicate(B, sd(rnorm(n, media_real, sigma_real)))
-
-# T crítico e erros padrões
-t_critico = qt(Alfa/2,df=n-1,lower.tail=F)
-erros_padroes = desvios_padroes / sqrt(n)
-
-# Intervalos de confiança
-inferior = medias - t_critico * erros_padroes
-superior = medias + t_critico * erros_padroes
-
-# Verifica se o intervalo Contem o valor verdadeiro
-Contem = inferior <= media_real & superior >= media_real
-
-# Cobertura dos intervalos
-Cobertura = sum(Contem)/length(Contem)
-
-# Dados para o gráfico
-dados = data.frame(
-  Replica = 1:B,
-  Inferior = inferior,
-  Superior = superior,
-  Contem = Contem
-)
-
-ggplot(dados, aes(x = Replica)) +
-  geom_segment(aes(xend = Replica, y = Inferior, yend = Superior, color = Contem), size = 1) +
-  geom_hline(yintercept = media_real, linetype = "dashed", color = "black") +
-  scale_color_manual(values = c("TRUE" = "blue", "FALSE" = "red")) +
-  labs(
-title = expression("IC para " * mu * " (caso normal e " * sigma^2 * " desconhecida)"),
-    x = "Replicações",
-    y = "Intervalo de Confiança"
-  ) +
-  theme_minimal()+
-  theme(legend.position = "none")
+Dados1 <- data.frame(Controle = Controle) 
+Dados2 <- data.frame(Tratamento = Tratamento) 
 ```
 
-Assim, conseguimos, novamente, uma cobertura de 96% dos intervalos (próxima do valor verdadeiro de 95%). Essa cobertura vai se aproximando cada vez mais do valor de 95% à medida que aumentamos o valor de $B$.
+O objetivo agora é construir intervalos de confiança e realizar testes de hipótese para a diferença entre as duas médias populacionais.
 
-### Exercício: impacto do tamanho do nível de confiança
+Entretanto, antes precisamos verificar se há indícios de que os dados das duas amostras são provenientes de populações normais e, caso positivo, verificar a igualdade das variâncias. Vamos aos diagnósticos de normalidade. Na primeira amostra:
 
-Retorne ao exemplo anterior e troque o nível de confiança de 95% para 80%. Compare os dois gráficos. O que você nota de diferente?
-
-## Média Populacional (caso amostras grandes)
-
-Vamos estudar a construção do intervalo de confiança para a média populacional $\mu$, assumindo que:
-
--   Os dados vêm de uma população com distribuição qualquer, com média $\mu$ e variância $\sigma^2$;
--   A variância populacional $\sigma^2$ é desconhecida;
--   A amostra $X_1, X_2, …, X_n$ é aleatória e de tamanho $n$.
-
-Como a variância populacional é desconhecida, usamos a variância amostral $s^2$ para estimar $\sigma^2$. Além disso, como n é grande, podemos aplicar o Teorema Central do Limite para afirmar que a média amostral $\bar{X}$ é aproximadamente normal:
-
-$$
-\bar{X} \sim N(\mu, \sigma^2/n)
-$$
-
-Substituindo $\sigma$ por $s$, a estatística
-
-$$
-Z \sim \frac{\bar{X} - \mu}{s/\sqrt{n}}
-$$
-
-pode ser aproximada por uma distribuição normal padrão $N(0,1)$, quando $n$ é grande. Assim, o intervalo de confiança para $\mu$, com nível de confiança $1 − \alpha$, é dado por:
-
-$$
-IC_{1 - \alpha}(\mu) = \left[ \bar{X} - z_{\alpha/2} \frac{s}{\sqrt{n}}, \; \bar{X} + z_{\alpha/2} \frac{s}{\sqrt{n}} \right]
-$$
-
-Note que usamos o quantil $z_{\alpha/2}$ da normal padrão, e não o $t$, porque a aproximação normal é válida para amostras grandes, mesmo com variância desconhecida. A interpretação permanece: se repetíssemos o processo de amostragem muitas vezes, aproximadamente $100 \cdot (1 − \alpha)$% dos intervalos construídos conteriam o verdadeiro valor de $\mu$.
-
-Na próxima etapa, vamos investigar computacionalmente como esse intervalo se comporta na prática, verificando sua frequência de acerto para diferentes distribuições populacionais e tamanhos amostrais.
-
-### Exercício
-
-Considere que $X_1, X_2, ..., X_n$ seja uma amostra aleatória de uma população com distribuição Exponencial com parâmetro $\lambda$. Considerando $n=48$ e $\lambda=6$, faça, em sequência:
-
-1- Gere $B=100$ amostras de tamanho $n=48$ dessa população e, para cada amostra, obtenha o intervalo com 90% de confiança para a média populacional $\mu$.
-
-2- Faça o gráfico da cobertura dos intervalos gerados e calcule a porcentagem de cobertura.
-
-3- Altere o valor do nível de confiança para 80% e veja o que muda no gráfico.
-
-4- Altere o valor o tamanho da amostra para $n=100$ e veja o que muda no gráfico.
-
-## Proporção Populacional
-
-Vamos estudar a construção do intervalo de confiança para a proporção populacional $p$, assumindo que:
-
--   Os dados vêm de uma variável aleatória binária (por exemplo, sucesso/falha) com proporção de sucessos $p$;
--   A amostra $X_1, X_2, …, X_n$ é aleatória e de tamanho $n$;
--   A proporção populacional $p$ é desconhecida, e será estimada pela proporção amostral $\hat{p}$.
-
-Como $n$ é grande, podemos aplicar o Teorema Central do Limite para afirmar que a proporção amostral $\hat{p}$ é aproximadamente normal:
-
-$$
-\hat{p} \sim N\left(p, \frac{p(1-p)}{n}\right)
-$$
-
-Como $p$ é desconhecido, substituímos pela estimativa $\hat{p}$, obtendo a estatística:
-
-$$
-Z = \frac{\hat{p} - p}{\sqrt{\hat{p}(1-\hat{p})/n}} \sim N(0,1)
-$$
-
-que pode ser aproximada por uma distribuição normal padrão $N(0,1)$. Essa aproximação acontece, principalmente, se:
-
-$$
-n\hat{p} \geq 5 \quad \text{e} \quad n(1-\hat{p}) \geq 5
-$$
-
-Assim, o intervalo de confiança para $p$, com nível de confiança $1 − \alpha$, é dado por:
-
-$$
-IC_{1 - \alpha}(p) = \left[ \hat{p} - z_{\alpha/2} \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}, \; \hat{p} + z_{\alpha/2} \sqrt{\frac{\hat{p}(1-\hat{p})}{n}} \right]
-$$
-
-Esse intervalo é conhecido como intervalo de Wald. Ele é simples de calcular, mas pode ter desempenho ruim quando a proporção está muito próxima de 0 ou 1, ou quando o tamanho amostral é pequeno. Por isso, a importância das condições acima. A interpretação permanece: se repetíssemos o processo de amostragem muitas vezes, aproximadamente $100 \cdot (1− \alpha)$% dos intervalos construídos conteriam o verdadeiro valor de $p$.
-
-Na próxima etapa, vamos investigar computacionalmente como esse intervalo se comporta na prática, verificando sua frequência de acerto para diferentes valores de $p$ e tamanhos amostrais.
-
-### Exercício
-
-Considere que $X_1, X_2, …, X_n$ seja uma amostra aleatória de uma população com distribuição Bernouli com parâmetro $p$. Considerando $n=64$ e $p=0.6$, faça, em sequência:
-
-1- Gere $B=100$ amostras de tamanho $n=64$ dessa população e, para cada amostra, obtenha o intervalo com 95% de confiança para a proporção populacional $p$.
-
-2- Faça o gráfico da cobertura dos intervalos gerados e calcule a porcentagem de cobertura.
-
-3- Altere o valor de $p$ para $p=0.9$ e observe o que muda.
-
-## Variância Populacional (caso normal)
-
-Vamos estudar a construção do intervalo de confiança para a variância populacional $\sigma^2$, assumindo que:
-
--   Os dados vêm de uma população com distribuição normal $N(\mu,\sigma^2)$;
--   A amostra $X_1, X_2, …, X_n$ é aleatória e de tamanho $n$.
-
-Como a população é assumida normal, temos uma distribuição exata para a estatística baseada na variância amostral $S^2$:
-
-$$
-\frac{(n-1)S^2}{\sigma^2} \sim \chi^2(n-1)
-$$
-
-Ou seja, a razão entre a soma dos quadrados centrados da amostra e a variância populacional segue uma distribuição qui-quadrado com $n−1$ graus de liberdade.
-
-Para construir um intervalo de confiança bilateral com nível de confiança $1−\alpha$ (por exemplo, 95%), utilizamos os quantis $χ^2_{n−1, α/2}$ e $χ^2_{n−1,1−α/2}$ da distribuição chi-quadrado com $n−1$ graus de liberdade. Veja na figura a seguir:
-
-!["img3"](img/cap5/img5_3.png)
-
-No `R`, esses valores críticos são obtidos da seguinte forma (para uma confiança de 95%, por exemplo):
-
-```{r eval = FALSE}
-# Tamanho da amostra
-n = length(dados)
-# Nível de confiança
-conf = 0.95
-# Nível de significância
-alfa = 1-conf
-# Valores críticos
-x_critico1 = qchisq(alfa/2,df=n-1)
-x_critico2 = qchisq(alfa/2,df=n-1,lower.tail=F)
+```{r eval=FALSE}
+ggplot(Dados1, aes(x = Controle)) +
+  geom_density(fill="blue") +
+  xlab("Diâmetros") + 
+  ylab("Densidade") +
+  theme_bw() +
+  theme(text = element_text(size = 14))
 ```
 
-Com isso, podemos construir um intervalo de confiança para $\sigma^2$, com nível de confiança $1−\alpha$, utilizando os quantis da distribuição qui-quadrado:
+![img5_13](img\cap5\img5_13.png)
 
-$$
-IC_{1 - \alpha}(\sigma^2) = \left[ \frac{(n-1)S^2}{\chi^2_{n-1, 1-\alpha/2}}, \; \frac{(n-1)S^2}{\chi^2_{n-1, \alpha/2}} \right]
-$$
+```{r eval=FALSE}
+ggplot(Dados1, aes(sample=Controle)) +
+    stat_qq_band(fill="lightblue") +
+    stat_qq_line() +
+    stat_qq_point() +
+    xlab("Quantis Teoricos")+
+    ylab("Quantis Amostrais")+
+    theme_bw() +
+    theme(text = element_text(size = 14))
+```
 
-Note que **a ordem dos quantis é invertida**, pois a distribuição qui-quadrado é assimétrica. A **interpretação permanece**: se repetíssemos o processo de amostragem muitas vezes, aproximadamente $100⋅(1−\alpha)$% dos intervalos construídos conteriam o verdadeiro valor de $\alpha$.
-
-Na próxima etapa, vamos investigar computacionalmente como esse intervalo se comporta na prática, verificando sua frequência de acerto para diferentes valores de $\sigma^2$ e tamanhos amostrais.
-
-### Exercício
-
-Considere que $X_1, X_2, ..., X_n$ seja uma amostra aleatória de uma população com distribuição Normal com parâmetros $\mu = 170$ e $\sigma^2 = 100$. Considerando $n=22$, faça, em sequência:
-
-1- Gere $B=100$ amostras de tamanho $n=22$ dessa população e, para cada amostra, obtenha o intervalo com 95% de confiança para a variância populacional $\sigma^2$.
-2- Faça o gráfico da cobertura dos intervalos gerados e calcule a porcentagem de cobertura.
-3- Altere o valor de $\sigma^2$ para 25 e observe o que muda.
-
-## Testes de Hipótese
-
-Diante da incerteza sobre o verdadeiro valor de um parâmetro populacional $\beta$, como a média, proporção ou variância, o teste de hipóteses nos fornece uma estrutura formal para avaliar uma suposição sobre esse parâmetro com base em dados amostrais.
-
-Começamos formulando duas hipóteses estatísticas mutuamente exclusivas:
-
--   Hipótese nula ($H_0$): Representa a suposição inicial que queremos testar;
--   Hipótese alternativa ($H_a$): Representa a suposição que queremos investigar, sugerindo uma diferença ou efeito. Pode ser unilateral (por exemplo, $H_a: \beta > \beta_0$) ou bilateral (por exemplo, $H_a: \beta \neq \beta_0$).
-
-Com uma amostra aleatória $X=(X_1, X_2, …, X_n)$, calculamos uma estatística de teste $T(X)$, escolhida de forma que valores extremos de $T(X)$ forneçam evidência contra $H0$. Com base em $T(X)$, definimos uma região crítica $C$, tal que:
-
-$$
-\text{Rejeitamos} H_0 \text{ se } T(X) \in C
-$$
-
-Essa decisão envolve incertezas, que podem ser quantificadas por dois tipos de erro:
-
- -   Erro tipo I ($\alpha$): Rejeitar $H_0$ quando ela é verdadeira. A probabilidade desse erro é o nível de significância do teste.
-
-$$
-\alpha = P(T(X) \in C | H_0 \text{ é verdadeira})
-$$
-
- -   Erro tipo II ($\beta$): Não rejeitar $H_0$ quando $H_1$ é verdadeira. A probabilidade desse erro depende do verdadeiro valor do parâmetro sob $H_a$.
-
-$$
-\beta = P(T(X) \notin C | H_1 \text{ é verdadeira})
-$$
-
- - Poder do teste ($1 - \beta$): A probabilidade de corretamente rejeitar $H_0$ quando $H_1$ é verdadeira. Um teste poderoso tem um baixo valor de $\beta$.
-
-$$
-1 - \beta = P(T(X) \in C | H_1 \text{ é verdadeira})
-$$
-
-Uma forma amplamente utilizada para tomar a decisão sobre rejeitar ou não $H0$ é por meio do p-valor, que representa a probabilidade de observarmos um valor tão extremo quanto o valor observado da estatística de teste, sob a suposição de que $H0$ é verdadeira. Assim:
-
- - Calculamos o p-valor com base na estatística de teste observada;
- - Comparamos o p-valor com o nível de significância $\alpha$;
- - Rejeitamos $H0$ se o p-valor for menor ou igual a $\alpha$; 
-
- Com o apoio de ferramentas computacionais, é possível simular o comportamento da estatística de teste sob diferentes cenários, o que permite investigar de forma prática as probabilidades dos erros tipo I e tipo II, avaliar o poder do teste e explorar o efeito de diferentes hipóteses alternativas.
-
-## Média Populacional (caso normal com variância conhecida)
-
-Vamos começar estudando a construção de testes de hipóteses para a média populacional $\mu$, assumindo que:
-
- - Os dados vêm de uma população com distribuição normal $N(\mu,\sigma^2)$;
- - A variância populacional $\sigma^2$ é conhecida;
- - A amostra $X_1, X_2, …, X_n$ é aleatória e de tamanho $n$.
-
-### Teste Bilateral
-
-O teste bilateral verifica se a média populacional é igual a um valor específico $\mu_0$ ou diferente, para mais ou para menos.
-
-$$
-\begin{align*}
-H_0 &: \mu = \mu_0  \text{hipótese nula} \\
-H_1 &: \mu \neq \mu_0  \text{hipótese alternativa}
-$$
-
-A estatística de teste usada é a média amostral
-
-$$
-\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i
-$$
-
-Sabemos que:
-
-$$
-\bar{X} \sim N(\mu, \sigma^2/n)
-$$
-
-Sob $H_0$:
-
-$$
-\bar{X} \sim N(\mu_0, \sigma^2/n)
-$$
-
-O nível de significância é $\alpha$. No teste bilateral, rejeitamos $H_0$ se a média amostral estiver muito distante de $\mu_0$:
-
-!["img4"](img/cap5/img5_4.png)
-
-Isto é,
-
-$$
-\text{Rejeitamos} H_0 \text{ se } |\bar{X} - \mu_0| > z_{\alpha/2} \frac{\sigma}{\sqrt{n}}
-$$
-
-Queremos determinar os valores $L$ e $U$ que satisfazem:
-
-$$
-P(\bar{X} \leq L | H_0) = \frac{\alpha}{2} \quad \text{e} \quad P(\bar{X} \geq U | H_0) = \frac{\alpha}{2}
-$$
-
-Sabemos que:
-
-$$
-P(\bar{X} \leq L | H_0) = \frac{\alpha}{2} \to \frac{L-\mu_0}{\sigma/\sqrt{n}} = -z_{\alpha/2} \to L = \mu_0 - z_{\alpha/2} \frac{\sigma}{\sqrt{n}}
-$$
-
-e
-
-$$
-P(\bar{X} \geq U | H_0) = \frac{\alpha}{2} \to \frac{U-\mu_0}{\sigma/\sqrt{n}} = z_{\alpha/2} \to U = \mu_0 + z_{\alpha/2} \frac{\sigma}{\sqrt{n}}
-$$
-
-Portanto, rejeitamos $H_0$ se:
-
-$$
-\bar{X} \leq L = \mu_0 - z_{\alpha/2} \frac{\sigma}{\sqrt{n}} \quad \text{ou} \quad \bar{X} \geq U = \mu_0 + z_{\alpha/2} \frac{\sigma}{\sqrt{n}}
-$$
-
-Exemplo:
-
-Considere que $X_1, X_2, …, X_n$ seja uma amostra aleatória de tamanho $n=16$ de uma população com distribuição Normal com parâmetros $\mu$ e $\sigma^2$, com $\sigma^2=100$. Considere o teste das seguintes hipóteses:
-
-$$
-\begin{align*}
-H_0 &: \mu = 170  \text{hipótese nula} \\
-H_1 &: \mu \neq 170  \text{hipótese alternativa}
-\end{align*}
-$$
-
-Considerando um $\alpha$ de 5%, temos a seguinte região crítica:
-
-$$
-L = \mu_0 - z_{\alpha/2} \frac{\sigma}{\sqrt{n}} = 170 - 1.96 \cdot \frac{10}{4} = 165.1
-$$
-
-e
-
-$$
-U = \mu_0 + z_{\alpha/2} \frac{\sigma}{\sqrt{n}} = 170 + 1.96 \cdot \frac{10}{4} = 174.9
-$$
-
-Portanto, rejeitamos $H_0$ se $\bar{X} \leq 165.1$ ou $\bar{X} \geq 174.9$.
-
-De acordo com $\alpha$, vamos simular $B=1000$ amostras de tamanho $n=16$ de uma população com $\mu = 170$ e $\sigma^2 = 100$ e, para cada amostra, vamos testar as hipóteses acima utilizando o método da região crítica com um nível $\alpha = 5%$, assumindo $\sigma^2$ conhecido. Note que, em todas as réplicas, teremos a mesma região crítica. O objetivo é verificar se em aproximadamente 5% dessas amostras rejeitamos a hipótese nula, quando sabemos que, na verdade, ela é verdadeira (eerro do tipo I). Dessa forma, o nosso objetivo é estimar, empiricamente, o nível $\alpha$:
+![img5_14](img\cap5\img5_14.png)
 
 ```{r}
-# Parâmetros populacionais de X
-media_real <- 170
-sigma_real <- 10
-
-# Tamanho da amostra
-n <- 16
-
-# Número de réplicas (simulações)
-B <- 1000
-
-# Nível de significância
-alfa <- 0.05
-
-# Simulação das médias amostrais
-set.seed(2025)
-medias <- replicate(B, mean(rnorm(n, media_real, sigma_real)))
-
-# Z crítico
-z_critico <- qnorm(alfa/2,lower.tail=F)
-
-# valores criticos de xbarra
-L <- media_real-z_critico*sigma_real/sqrt(n)
-U <- media_real+z_critico*sigma_real/sqrt(n)
-
-# Cria um data frame com os valores das medias e decisão do teste
-df <- data.frame(medias = medias) %>%
-  mutate(rejeita_H0 = medias >= U | medias <= L )
-
-# Porcentagem de testes que rejeitaram a hipótese nula
-rejeicao = mean(df$rejeita_H0)
-
-# Gráfico
-ggplot(df, aes(x = medias, fill = rejeita_H0)) +
-  geom_histogram(color = "black") +
-  scale_fill_manual(values = c("FALSE" = "skyblue", "TRUE" = "tomato"),
-                    labels = c("Não rejeita H0", "Rejeita H0"),
-                    name = "Decisão") +
-  labs(title = "Distribuição das médias amostrais",
-       x = "Médias Amostrais",
-       y = "Frequência") +
-  theme_minimal()
+shapiro.test(Dados1$Controle)
 ```
 
-Esse gráfico representa a distribuição empírica dos B valores de $\bar{X}$. A quantidade empírica de testes que rejeitaram a hipótese nula é aproximadamente 5%, o nível de significância.
+Na segunda amostra:
 
-### Teste Unilateral À Direita
+```{r eval=FALSE}
+ggplot(Dados2, aes(x = Tratamento)) +
+  geom_density(fill="blue") +
+  xlab("Diâmetros") + 
+  ylab("Densidade") +
+  theme_bw() +
+  theme(text = element_text(size = 14))
+```	
 
-O teste unilateral à direita verifica se a média populacional é maior que um valor específico $\mu_0$:
+![img5_15](img\cap5\img5_15.png)
+
+```{r eval=FALSE}
+ggplot(Dados2, aes(sample=Tratamento)) +
+    stat_qq_band(fill="lightblue") +
+    stat_qq_line() +
+    stat_qq_point() +
+    xlab("Quantis Teoricos")+
+    ylab("Quantis Amostrais")+
+    theme_bw() +
+    theme(text = element_text(size = 14))
+```
+
+![img5_16](img\cap5\img5_16.png)
+
+```{r}
+shapiro.test(Dados2$Tratamento)
+```
+
+Em ambas as amostras, os gráficos de densidade não apontam sérios desvios da simetria. Os gráficos qq-plot apontam para a normalidade dos dados, que também é corroborada pelos testes de normalidade de Shapiro Wilk, a um nível de 5%. Então temos indícios de que os dados das duas populações são normalmente distribuídos.
+
+Agora verificamos se as variâncias são iguais ou diferentes:
+
+```{r}
+VarTest(x=Dados1$Controle,
+        y=Dados2$Tratamento)
+```
+
+Logo, ao nível de 5% de significância, temos evidências de que as variâncias são iguais. Assim, essa informção deverá ser levada para a função `t.test()`.
+
+### Intervalos de Confiança
+
+Quando trabalhamos com duas populações independentes, queremos construir um intervalo de confiança (IC) para a diferença das médias populacionais $\mu_1 - \mu_2$, que quantifique a incerteza da estimativa amostral $\bar{x}_1 - \bar{x}_2$. A inferência depende do comportamento das variâncias amostrais. Existem duas versões clássicas do intervalo:
+
+#### Variâncias Iguais
+
+Assumimos que as duas populações têm variâncias iguais:
 
 $$
+\sigma^2_1 = \sigma^2_2
+$$
+
+Sejam:
+
+ - $\bar{x}_1$, $\bar{x}_2$: médias amostrais.
+ - $S_p^2$: variância combinada (pooled).
+ - $n_1$, $n_2$: tamanhos das amostras 1 e 2.
+
+A variância combinada (pooled) é:
+
+$$
+S_p^2 = \frac{(n_1 - 1) S_1^2 + (n_2 - 1) S_2^2}{n_1 + n_2 - 2}
+$$
+
+O intervalo de confiança é:
+
+$$
+IC = \left( (\bar{x}_1 - \bar{x}_2) - t_{\alpha/2, n_1 + n_2 - 2} \cdot S_p \sqrt{\frac{1}{n_1} + \frac{1}{n_2}}, (\bar{x}_1 - \bar{x}_2) + t_{\alpha/2, n_1 + n_2 - 2} \cdot S_p \sqrt{\frac{1}{n_1} + \frac{1}{n_2}} \right)
+$$
+
+#### Variâncias Diferentes
+
+Quando as variâncias populacionais são distintas:
+
+$$
+\sigma^2_1 \neq \sigma^2_2
+$$
+
+não é adequado combinar variâncias. Nesse caso, o erro padrão é
+
+$$
+SE = \sqrt{\frac{S_1^2}{n_1} + \frac{S_2^2}{n_2}}
+$$
+
+E os graus de liberdade aproximados são dados por
+
+$$
+df = \frac{\left( \frac{S_1^2}{n_1} + \frac{S_2^2}{n_2} \right)^2}{\frac{\left( \frac{S_1^2}{n_1} \right)^2}{n_1 - 1} + \frac{\left( \frac{S_2^2}{n_2} \right)^2}{n_2 - 1}}
+$$
+
+O intervalo de confiança é:
+
+$$
+IC = \left( (\bar{x}_1 - \bar{x}_2) - t_{\alpha/2, df} \cdot SE, (\bar{x}_1 - \bar{x}_2) + t_{\alpha/2, df} \cdot SE \right)
+$$
+
+Essa versão é mais conservadora e é o padrão do R, pois não assume igualdade de variâncias.
+
+A função `t.test()` calcula automaticamente intervalos bilaterais e unilaterais e permite escolher entre as duas versões usando var.equal. Como no nosso exemplo, assumimos as variâncias iguais, seguem os códigos:
+
+```{r}
+# Intervalo de confiança bilateral (variâncias iguais)
+t.test(Dados1$Controle,
+       Dados2$Tratamento,
+       var.equal = TRUE,
+       conf.level = 0.95)$conf.int
+
+# Intervalo unilateral à esquerda (mu1 - mu2 < 0)
+t.test(Dados1$Controle,
+       Dados2$Tratamento,
+       alternative = "less",
+       var.equal = TRUE,
+       conf.level = 0.95)$conf.int
+
+# Intervalo unilateral à direita (mu1 - mu2 > 0)
+t.test(Dados1$Controle,
+       Dados2$Tratamento,
+       alternative = "greater",
+       var.equal = TRUE,
+       conf.level = 0.95)$conf.int
+```
+
+### Testes de Hipótese
+
+Quando trabalhamos com duas populações independentes, podemos testar hipóteses sobre a diferença entre as médias populacionais:
+
+$$
+::: {.center-align data-latex=""}
 \begin{align*}
-H_0 &: \mu \leq \mu_0  \text{ (hipótese nula)} \\
-H_1 &: \mu > \mu_0  \text{ (hipótese alternativa)}
+H_0: \mu_1 - \mu_2 = \delta_0 \\
+H_1: \mu_1 - \mu_2 \neq \delta_0 \quad \text{(bilateral)}
 \end{align*}
+:::
 $$
 
-A estatística de teste utilizada é a média amostral:
+onde:
+
+ - $\mu_1$, $\mu_2$: médias populacionais dos grupos 1 e 2.
+ - $\delta_0$: diferença sob a hipótese nula.
+
+A estatística de teste depende da suposição sobre as variâncias populacionais.
+
+#### Variâncias Iguais
+
+Quando assumimos:
 
 $$
-\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i
+\sigma^2_1 = \sigma^2_2
 $$
 
-Sabemos que:
+utilizamos a variância combinada:
 
 $$
-\bar{X} \sim N(\mu, \sigma^2/n)
+S_p^2 = \frac{(n_1 - 1) S_1^2 + (n_2 - 1) S_2^2}{n_1 + n_2 - 2}
 $$
 
-Sob $H_0$:
+A estatística de teste t é:
 
 $$
-\bar{X} \sim N(\mu_0, \sigma^2/n)
+t = \frac{(\bar{X}_1 - \bar{X}_2) - \delta_0}{S_p \sqrt{\frac{1}{n_1} + \frac{1}{n_2}}} \sim t_{n_1 + n_2 - 2}
 $$
 
-O nível de significância é $\alpha$. No teste unilateral à direita, rejeitamos $H_0$ se a média amostral estiver muito maior que $\mu_0$:
+ - $\bar{X}_1$, $\bar{X}_2$: médias amostrais observadas.
+ - $\delta_0$: diferença sob a hipótese nula.
+ - $S_p$: desvio padrão combinado.
+ - $n_1$, $n_2$: tamanhos das amostras.
 
-!["img5"](img/cap5/img5_5.png)
+#### Variâncias Diferentes
 
-Isto é,
-
-$$
-\text{Rejeitamos } H_0 \text{ se } \bar{X} > U
-$$
-
-Queremos determinar o valor $U$ tal que:
+Quando permitimos:
 
 $$
-P(\bar{X} \geq U | H_0) = \alpha
+\sigma^2_1 \neq \sigma^2_2
 $$
 
-Sabemos que:
+A estatística de teste t é:
 
 $$
-P(\bar{X} \geq U | H_0) = \alpha \to \frac{U-\mu_0}{\sigma/\sqrt{n}} = z_{\alpha} \to U = \mu_0 + z_{\alpha} \frac{\sigma}{\sqrt{n}}
+t = \frac{(\bar{X}_1 - \bar{X}_2) - \delta_0}{\sqrt{\frac{S_1^2}{n_1} + \frac{S_2^2}{n_2}}} \sim t_{df}
 $$
 
-Portanto, rejeitamos $H_0$ se:
+Os graus de liberdade são aproximados por:
 
 $$
-\bar{X} \geq U = \mu_0 + z_{\alpha} \frac{\sigma}{\sqrt{n}}
+df = \frac{\left( \frac{S_1^2}{n_1} + \frac{S_2^2}{n_2} \right)^2}{\frac{\left( \frac{S_1^2}{n_1} \right)^2}{n_1 - 1} + \frac{\left( \frac{S_2^2}{n_2} \right)^2}{n_2 - 1}}
 $$
 
-Exercício:
+A seguir, segue o nosso exemplo testando várias hipóteses alternativas, considerando que as variâncias são iguais:
 
-Considere que $X_1, X_2, …, X_n$ seja uma amostra aleatória de tamanho n=16 de uma população com distribuição Normal com parâmetros $\mu$ e $\sigma^2$, com $\simga^2=100$. Considere o teste das seguintes hipóteses:
+```{r}
+# Teste bilateral (H0: mu1 - mu2 = 0)
+t.test(Dados1$Controle,
+       Dados2$Tratamento,
+       var.equal = TRUE,
+       alternative = "two.sided")
 
-$$
-\begin{align*}
-H_0 &: \mu \leq 170  \text{ (hipótese nula)} \\
-H_1 &: \mu > 170  \text{ (hipótese alternativa)}
-\end{align*}
-$$
+# Teste unilateral a esquerda (H0: mu1 - mu2 < 0)
+t.test(Dados1$Controle,
+       Dados2$Tratamento,
+       var.equal = TRUE,
+       alternative = "less")
 
-Considerando um $\alpha$ de 5%, temos a seguinte região crítica:
+# Teste unilateral a direita (H0: mu1 - mu2 > 0)
+t.test(Dados1$Controle,
+       Dados2$Tratamento,
+       var.equal = TRUE,
+       alternative = "greater")
+```
 
-$$
-U = \mu_0 + z_{\alpha} \frac{\sigma}{\sqrt{n}} = 170 + 1.645 \cdot \frac{10}{4} = 174.1
-$$
+### Exercício
 
-Portanto, rejeitamos $H_0$ se $\bar{X} \geq 174.1$.
+A Secretaria de Saúde quer comparar a cobertura da vacina DTP entre municípios de Minas Gerais (MG) e municípios de outros estados (Fora de MG) para saber se as ações locais em MG resultaram em cobertura média maior. Foram selecionados 20 municípios de MG e 25 municípios fora de MG aleatoriamente. Os dados coletados foram:
 
-Fixado o valor de $\alpha=5%$, simule $B=1000$ amostras de uma população normal $(\mu=170, \alpha2=100)$ e, para cada amostra, teste as hipóteses acima utilizando o método da regiao crítica com um nível $\alpha=5%$, assumindo $\sigma^2$ conhecido. Note que, em todas as réplicas, teremos a mesma região crítica. O objetivo é verificar se em aproximadamente 5% dessas amostras rejeitaremos a hipótese nula, quando sabemos que, na verdade, ela é verdadeira (erro do tipo I). Dessa forma, o nosso objetivo é estimar, empiricamente, o nível $\alpha$.
+```{r}
+MG <- c(86.1, 84.5, 88.2, 85.0, 87.3, 83.9, 89.0, 86.7, 84.2, 88.8, 85.5, 87.8, 86.0, 84.9, 88.1, 85.7, 87.0, 86.9, 83.6, 89.3)
 
-### ERRO TIPO II E PODER DO TESTE
+Fora_de_MG <- c(81.4, 79.8, 80.5, 82.0, 78.9, 80.1, 77.6, 81.0, 79.3, 80.8, 78.4, 82.2, 79.9, 80.6, 78.7, 81.5, 79.1, 80.0, 77.8, 82.4, 75.7, 74.5, 75, 85.7,77.5)
+
+Dados1 = data.frame(MG = MG)
+Dados2 = data.frame(Fora_de_MG = Fora_de_MG)
+```
+
+ 1. Construa um intervalo de confiança de 95% para a diferença das médias de cobertura.
+ 2. Teste, ao nível de 5%, se a média de cobertura em MG é maior do que Fora de MG.
+
+# Caso 5: Amostras Grandes
+
+Quando trabalhamos com amostras pequenas, a aplicação do teste t exige atenção especial à normalidade e, no caso de duas populações independentes, à igualdade de variâncias.
+Agora, entrando no cenário de amostras grandes, algumas dessas exigências tornam-se menos rígidas, especialmente por causa do Teorema Central do Limite. Ainda assim, existem verificações importantes que devem ser feitas antes de aplicar o teste t.
+
+Em todos os cenários analisados — uma população, duas populações dependentes e duas independentes (com ou sem variâncias iguais) — a função recomendada no R continua sendo `t.test`. Isso ocorre porque, com amostras grandes, a distribuição t se aproxima da distribuição normal padrão, de modo que o teste t e o teste z tornam-se praticamente equivalentes. Por isso, não há necessidade de usar um teste z separado: o próprio `t.test` já é totalmente adequado e robusto para esses casos.
+
+A seguir, detalhamos os cuidados necessários nos contextos clássicos.
+
+## Uma População
+
+O que verificar antes do teste:
+
+ - Normalidade não é mais exigida para a média amostral
+ - Inspecionar possíveis outliers, pois eles influenciam a média e a variância.
+ - Verificar assimetria extrema ou caudas muito longas.
+ - Garantir independência das observações; essa condição não pode ser violada.
+
+## Duas Populações Dependentes
+
+O que verificar antes do teste:
+
+ - O teste é aplicado às diferenças, então verifique a presença de outliers nessas diferenças.
+ - Normalidade não é obrigatória para as diferenças quando $n$ é grande.
+ - Confirmar o pareamento correto (medidas antes/depois ou pares naturais).
+ - Verificar independência entre os pares, mesmo que haja dependência dentro de cada par.
+
+## Duas Populações Independentes
+
+O que verificar antes do teste:
+
+ - Independência entre as amostras — condição essencial.
+ - Presença de outliers em cada grupo, pois podem influenciar a média.
+ - Tamanhos amostrais grandes (n≳30 por grupo), garantindo a normalidade aproximada da média pelo Teorema Central do Limite.
+ - Normalidade não é exigida quando as amostras são grandes.
+ - Sobre testar igualdade das variâncias:
+   - O teste F (var.test) exige normalidade estrita e não é recomendado em duas amostras grandes.
+   - Testes robustos, como Levene ou Brown–Forsythe, até podem ser usados, mas tornam-se hipersensíveis com amostras grandes, detectando diferenças irrelevantes.
+   - Por isso, não se recomenda testar igualdade de variâncias para grandes amostras.
+ - Use diretamente o teste t de Welch, que não exige igualdade de variâncias e é robusto mesmo quando elas diferem.
+ - Se as variâncias forem realmente iguais, a perda de eficiência em Welch é mínima.
+ - Além disso, com graus de liberdade grandes, a aproximação para a normal é uma consequência.
